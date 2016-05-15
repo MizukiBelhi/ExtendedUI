@@ -13,7 +13,7 @@ ExtendedUI requires [cwAPI](https://github.com/fiote/treeofsavior-addons) from [
 
 If you do not want to install cwAPI, ExtendedUI has a package with cwAPI included. (It is always better to download cwAPI yourself)
 
-Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/release/bin/) and download the package that suits you best.
+Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases) and download the package that suits you best.
 
 Extract the package into your '\Steam\SteamApps\common\TreeOfSavior\' folder.
 
