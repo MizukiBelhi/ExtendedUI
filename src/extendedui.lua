@@ -755,6 +755,7 @@ function topcall(frame, ctrl, argStr)
 				if v.isMovable and v.show then
 					local tocc = ui.GetFrame("extuiframectrls"..tostring(k));
 					if tocc ~= nil then
+						tocc:ShowWindow(0);
 						if extui.frames[k].hasChild then
 							for ch,v in pairs(extui.frames[k]["child"]) do
 								 ui.GetFrame("extuiframectrls"..k..ch):ShowWindow(0);
