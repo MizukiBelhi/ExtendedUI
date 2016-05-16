@@ -1770,6 +1770,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	addon:RegisterMsg("JOB_EXP_UPDATE", "EXTENDEDUI_ON_JOB_EXP");
 	addon:RegisterMsg("JOB_EXP_ADD", "EXTENDEDUI_ON_JOB_EXP");
 	addon:RegisterMsg("CHANGE_COUNTRY", "EXTENDEDUI_ON_CHAR_EXP");
+	addon:RegisterMsg("ESCAPE_PRESSED", "EXTENDEDUI_ON_CLOSE_UI");
 
 
 	extui.isSetting = false;
