@@ -8,7 +8,7 @@ ExtendedUI, as the name suggest, extends Tree of Savior's UI to what it should b
 ## Issues
 
 In the current release there are following issues:
-- Higher than 1920x1080 resolutions break the sysmenu (Fixed in next release)
+- Higher/Lower than 1920x1080 resolutions break the sysmenu (Still investigating)
 - Pressing the `Show Frame Area` button multiple times throws an error and breaks the menu (Fixed in next release)
 - Child frames currently don't get saved on the first run, for now please restart the client at least once before using. (Still investigating)
 
@@ -17,7 +17,7 @@ Please send me a private message in-game (Server: Klaipeda) or join our [Discord
 ## Installation
 
 ###~~ DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK ~~
-###~~ THIS ADDON HAS ONLY BEEN TESTED WITH 1920x1080 RESOLUTION ANYTHING HIGHER MIGHT, AND CURRENTLY DOES BREAK IT ~~
+###~~ THIS ADDON HAS ONLY BEEN TESTED WITH 1920x1080 RESOLUTION ANYTHING HIGHER OR LOWER MIGHT, AND CURRENTLY DOES BREAK IT ~~
 
 ExtendedUI requires [cwAPI](https://github.com/fiote/treeofsavior-addons) from [fiote](https://github.com/fiote/) to work!
 
