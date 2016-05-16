@@ -11,6 +11,7 @@ In the current release there are following issues:
 - Higher/Lower than 1920x1080 resolutions break the sysmenu (Still investigating)
 - Pressing the `Show Frame Area` button multiple times throws an error and breaks the menu (Fixed in next release)
 - Child frames currently don't get saved on the first run, for now please restart the client at least once before using. (Still investigating)
+- Restoring Defaults breaks under certain conditions
 
 Please send me a private message in-game (Server: Klaipeda) or join our [Discord](https://discord.gg/0yyOKTr8o3OdJTxa) and message me `privately` on there. Alternatively, please open up a [issue](https://github.com/MizukiBelhi/ExtendedUI/issues).
 
