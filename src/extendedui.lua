@@ -607,9 +607,8 @@ function EXTENDEDUI_ON_SAVE()
 end
 
 function EXTENDEDUI_ON_DRAGGING(frame)
-	if extui.closingSettings then
-		return 0;
-	end
+	if extui.closingSettings then return 0;	end
+	if not(extui.IsDragging) then return 1; end
 	
 	local x = frame:GetX();
 	local y = frame:GetY();
@@ -658,9 +657,8 @@ function EXTENDEDUI_VOID()
 end
 
 function EXTENDEDUI_ON_DRAGGING_CHILD(frame)
-	if extui.closingSettings then
-		return 0;
-	end
+	if extui.closingSettings then return 0;	end
+	if not(extui.IsDragging) then return 1; end
 	
 	local x = frame:GetX();
 	local y = frame:GetY();
@@ -1189,6 +1187,21 @@ function EXTUI_ON_SLIDE()
 						local tcc = ui.GetFrame("extuiframectrls"..tostring(k));
 						if tcc ~= nil then
 							tcc:MoveFrame(x, y);
+							if extui.frames[k].hasChild then
+								for ch,v in pairs(extui.frames[k]["child"]) do
+									local chfrm = ui.GetFrame("extuiframectrls"..k..ch);
+
+									local ssc = toc:GetChild(ch);
+									local xc = ssc:GetX();
+									local yc = ssc:GetY();
+
+									chfrm:SetOffset(x+xc, y+yc);
+
+									if k == "buff" or k == "targetbuff" then
+										extui.MoveBuffCaption(k, ch);
+									end
+								end
+							end
 						end
 						extui.framepos[tostring(k)]["x"] = x;
 						extui.framepos[tostring(k)]["y"] = y;
