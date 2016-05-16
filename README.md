@@ -15,6 +15,7 @@ In the current release there are following issues:
 ## Installation
 
 ###~~ DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK ~~
+###~~ THIS ADDON HAS ONLY BEEN TESTED WITH 1920x1080 RESOLUTION ANYTHING HIGHER MIGHT, AND CURRENTLY DOES BREAK IT ~~
 
 ExtendedUI requires [cwAPI](https://github.com/fiote/treeofsavior-addons) from [fiote](https://github.com/fiote/) to work!
 
