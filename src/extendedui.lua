@@ -103,7 +103,6 @@ extui.frames = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Menu",
-			["noResize"] = true,
 		},
 		["channel"] = {
 			["isMovable"] = true,
@@ -753,12 +752,10 @@ function topcall(frame, ctrl, argStr)
 		else
 			for k,v in pairs(extui.frames) do
 				if v.isMovable and v.show then
-					local tocc = ui.GetFrame("extuiframectrls"..tostring(k));
-					if tocc ~= nil then
-						if extui.frames[k].hasChild then
-							for ch,v in pairs(extui.frames[k]["child"]) do
-								 ui.GetFrame("extuiframectrls"..k..ch):ShowWindow(0);
-							end
+					ui.GetFrame("extuiframectrls"..tostring(k)):ShowWindow(0);
+					if extui.frames[k].hasChild then
+						for ch,v in pairs(extui.frames[k]["child"]) do
+							 ui.GetFrame("extuiframectrls"..k..ch):ShowWindow(0);
 						end
 					end
 					v.show = false;
@@ -807,13 +804,10 @@ function topcall(frame, ctrl, argStr)
 			
 			extui.frames[argStr].show = true;
 		else
-			local tocc = ui.GetFrame("extuiframectrls"..argStr);
-			if tocc ~= nil then
-				tocc:ShowWindow(0);
-				if extui.frames[argStr].hasChild then
-					for ch,v in pairs(extui.frames[argStr]["child"]) do
-						ui.GetFrame("extuiframectrls"..argStr..ch):ShowWindow(0);
-					end
+			ui.GetFrame("extuiframectrls"..argStr):ShowWindow(0);
+			if extui.frames[argStr].hasChild then
+				for ch,v in pairs(extui.frames[argStr]["child"]) do
+					ui.GetFrame("extuiframectrls"..argStr..ch):ShowWindow(0);
 				end
 			end
 			
