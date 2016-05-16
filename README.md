@@ -5,6 +5,13 @@
 
 ExtendedUI, as the name suggest, extends Tree of Savior's UI to what it should be!
 
+## Issues
+
+In the current release there are following issues:
+- Higher than 1920x1080 resolutions break the sysmenu (Fixed in next release)
+- Pressing the `Show Frame Area` button multiple times throws an error and breaks the menu (Fixed in next release)
+- Child frames currently don't get saved on the first run, for now please restart the client at least once before using. (Still investigating)
+
 ## Installation
 
 ###~~ DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK ~~
