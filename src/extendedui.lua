@@ -1181,7 +1181,6 @@ function EXTUI_ON_SLIDE()
 					end
 					
 					if doMove then
-						cwAPI.util.log("::: "..tostring(toc:GetX())..","..tostring(toc:GetY()))
 						toc:MoveFrame(x, y);
 						local tcc = ui.GetFrame("extuiframectrls"..tostring(k));
 						if tcc ~= nil then
