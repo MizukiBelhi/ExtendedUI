@@ -22,8 +22,6 @@ Please send me a private message in-game (Server: Klaipeda) or join our [Discord
 
 ExtendedUI requires [cwAPI](https://github.com/fiote/treeofsavior-addons) from [fiote](https://github.com/fiote/) to work!
 
-If you do not want to install cwAPI, ExtendedUI has a package with cwAPI included. (It is always better to download cwAPI yourself)
-
 Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases) and download the package that suits you best.
 
 Extract the package into your '\Steam\SteamApps\common\TreeOfSavior\' folder.
