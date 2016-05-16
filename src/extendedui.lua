@@ -275,10 +275,10 @@ function extui.LoadSettings()
 										sliderY:SetMaxSlideLevel(toc:GetHeight()-h);
 										sliderY:SetMinSlideLevel(0);
 									else
-										sliderX:SetMaxSlideLevel(option.GetClientWidth());
-										sliderX:SetMinSlideLevel(-option.GetClientWidth());
-										sliderY:SetMaxSlideLevel(option.GetClientHeight());
-										sliderY:SetMinSlideLevel(-option.GetClientHeight());
+										sliderX:SetMaxSlideLevel(ui.GetClientInitialWidth());
+										sliderX:SetMinSlideLevel(-ui.GetClientInitialWidth());
+										sliderY:SetMaxSlideLevel(ui.GetClientInitialHeight());
+										sliderY:SetMinSlideLevel(-ui.GetClientInitialHeight());
 									end
 								end);
 							end,
@@ -1181,6 +1181,7 @@ function EXTUI_ON_SLIDE()
 					end
 					
 					if doMove then
+						cwAPI.util.log("::: "..tostring(toc:GetX())..","..tostring(toc:GetY()))
 						toc:MoveFrame(x, y);
 						local tcc = ui.GetFrame("extuiframectrls"..tostring(k));
 						if tcc ~= nil then
@@ -1223,10 +1224,10 @@ function EXTUI_ON_SLIDE()
 								end
 							else
 								if toc:GetWidth() ~= sliderX:GetMaxLevel() or toc:GetHeight() ~= sliderY:GetMaxLevel() then
-									sliderX:SetMaxSlideLevel(option.GetClientWidth());
-									sliderX:SetMinSlideLevel(-option.GetClientWidth());
-									sliderY:SetMaxSlideLevel(option.GetClientHeight());
-									sliderY:SetMinSlideLevel(-option.GetClientHeight());
+									sliderX:SetMaxSlideLevel(ui.GetClientInitialWidth());
+									sliderX:SetMinSlideLevel(-ui.GetClientInitialWidth());
+									sliderY:SetMaxSlideLevel(ui.GetClientInitialHeight());
+									sliderY:SetMinSlideLevel(-ui.GetClientInitialHeight());
 								end
 							end
 							
@@ -1468,7 +1469,7 @@ function extui.InitSideFrame()
 				
 				ctrls = cbox:CreateOrGetControl("slidebar", "extuislidex"..tostring(k), inx+12, iny, 300, 30);
 				ctrls = tolua.cast(ctrls, "ui::CSlideBar");
-				ctrls:SetMaxSlideLevel(option.GetClientWidth());
+				ctrls:SetMaxSlideLevel(ui.GetClientInitialWidth());
 				ctrls:SetMinSlideLevel(0);
 				ctrls:SetLevel(x);
 				
@@ -1485,7 +1486,7 @@ function extui.InitSideFrame()
 				
 				ctrls = cbox:CreateOrGetControl("slidebar", "extuislidey"..tostring(k), inx+12, iny, 300, 30);
 				ctrls = tolua.cast(ctrls, "ui::CSlideBar");
-				ctrls:SetMaxSlideLevel(option.GetClientHeight());
+				ctrls:SetMaxSlideLevel(ui.GetClientInitialHeight());
 				ctrls:SetMinSlideLevel(0);
 				ctrls:SetLevel(y);
 				
@@ -1508,7 +1509,7 @@ function extui.InitSideFrame()
 					
 					ctrls = cbox:CreateOrGetControl("slidebar", "extuislidew"..tostring(k), inx+12, iny, 300, 30);
 					ctrls = tolua.cast(ctrls, "ui::CSlideBar");
-					ctrls:SetMaxSlideLevel(option.GetClientWidth());
+					ctrls:SetMaxSlideLevel(ui.GetClientInitialWidth());
 					ctrls:SetMinSlideLevel(0);
 					ctrls:SetLevel(w);
 					
@@ -1524,7 +1525,7 @@ function extui.InitSideFrame()
 					
 					ctrls = cbox:CreateOrGetControl("slidebar", "extuislideh"..tostring(k), inx+12, iny, 300, 30);
 					ctrls = tolua.cast(ctrls, "ui::CSlideBar");
-					ctrls:SetMaxSlideLevel(option.GetClientHeight());
+					ctrls:SetMaxSlideLevel(ui.GetClientInitialHeight());
 					ctrls:SetMinSlideLevel(0);
 					ctrls:SetLevel(h);
 					
