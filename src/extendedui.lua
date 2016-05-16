@@ -574,19 +574,25 @@ end
 function EXTENDEDUI_ON_RESTORE_R()
 	extui.isReload = true;
 
+
 	extui.ForEachFrame(function(k,v,toc)
-							extui.framepos[tostring(k)] = extui.defaultFrames[tostring(k)];
+							extui.framepos[tostring(k)].x = extui.defaultFrames[tostring(k)].x;
+							extui.framepos[tostring(k)].y = extui.defaultFrames[tostring(k)].y;
 							toc:MoveFrame(extui.framepos[tostring(k)].x, extui.framepos[tostring(k)].y);
 							if not(v.noResize) then
+								extui.framepos[tostring(k)].w = extui.defaultFrames[tostring(k)].w;
+								extui.framepos[tostring(k)].h = extui.defaultFrames[tostring(k)].h;
 								toc:Resize(extui.framepos[tostring(k)].w, extui.framepos[tostring(k)].h);
 							end
 						end,
 						nil, nil, nil,
 						function(k, v, ck, cv, toc, tcc)
-							extui.framepos[tostring(k)]["child"][tostring(ck)] = extui.defaultFrames[tostring(k)]["child"][tostring(ck)];
+							extui.framepos[tostring(k)]["child"][tostring(ck)].x = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].x;
+							extui.framepos[tostring(k)]["child"][tostring(ck)].y = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].y;
 							tcc:SetOffset(extui.framepos[tostring(k)]["child"][tostring(ck)].x, extui.framepos[tostring(k)]["child"][tostring(ck)].y);
 						end,
 						nil);
+
 	extui.SavePositions();
 	extui.UpdateSliders();
 	extui.isReload = false;
@@ -684,8 +690,6 @@ function EXTENDEDUI_ON_DRAGGING_CHILD(frame)
 				cFrame:SetOffset(x-xs,y-ys);
 				extui.framepos[tostring(isFrame)]["child"][isChild]["x"] = x-xs;
 				extui.framepos[tostring(isFrame)]["child"][isChild]["y"] = y-ys;
-
-				extui.defaultFrames[tostring(isFrame)] = extui.framepos[tostring(isFrame)];
 
 				extui.UpdateSliders();
 
@@ -1278,7 +1282,13 @@ end
 
 --TODO: Needs to use ForEachFrame
 function extui.InitSideFrame()
-	if extui.isSetting then return; end
+	if extui.isSetting then
+		if ui.GetFrame("EXTENDEDUI_SIDE_FRAME") ~= nil then
+			return;
+		else
+			extui.isSetting = false;
+		end
+	end
 
 	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_SIDE_FRAME");
 	frm:Resize(800 , 600);
@@ -1673,7 +1683,7 @@ function extui.InitSideFrame()
 
 end
 
-function EXTENDEDUI_ON_CLOSE_UI()
+function EXTENDEDUI_ON_CLOSE_UI(frame)
 	extui.close();
 end
 
