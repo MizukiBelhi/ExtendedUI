@@ -27,9 +27,9 @@ Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases) and downloa
 
 Extract the package into your '\Steam\SteamApps\common\TreeOfSavior\' folder.
 
-After extracting make sure 'extendedui.ipf' in your data folder has a '?' in front of it.
+After extracting make sure 'extendedui.ipf' in your data folder has a '⚗' in front of it.
 
-If it does not don't forget to add it so it looks like '?extendedui.ipf' otherwise it will not work!
+If it does not don't forget to add it so it looks like '⚗extendedui.ipf' otherwise it will not work!
 
 ## Usage
 ### DON'T FORGET TO PRESS 'SAVE' AFTER YOU'RE DONE OR YOUR SETTINGS WILL BE DISCARDED
