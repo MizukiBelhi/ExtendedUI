@@ -10,7 +10,7 @@ ExtendedUI, as the name suggest, extends Tree of Savior's UI to what it should b
 In the current release there are following issues:
 - On rare occasions child frames don't get saved on the first run, for now please restart the client at least once before using. (Still investigating)
 
-Please send me a private message in-game (Server: Klaipeda) or join our [Discord](https://discord.gg/0yyOKTr8o3OdJTxa) and message me `privately` on there. Alternatively, please open up a [issue](https://github.com/MizukiBelhi/ExtendedUI/issues).
+Please send me a private message in-game (Server: Klaipeda, Family Name: Belhi) or join our [Discord](https://discord.gg/0yyOKTr8o3OdJTxa) and message me `privately` on there. Alternatively, please open up a [issue](https://github.com/MizukiBelhi/ExtendedUI/issues).
 
 ## Installation
 
