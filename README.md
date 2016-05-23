@@ -3,7 +3,12 @@
 
 ## What Sorcery Is This?
 
-ExtendedUI, as the name suggest, extends Tree of Savior's UI to what it should be!
+ExtendedUI allows you to move most UI elements on your screen to wherever you want them.  
+It also comes with a few nice options to customize your UI even further, including:
+- Showing exact experience numbers when hovering over your experience bars
+- Disabling recipe item popups
+- Some elements save their hidden status, like FPS
+- And many more planned in the future
 
 ## Issues
 
