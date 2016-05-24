@@ -1,6 +1,4 @@
 
-
-
 ## What Sorcery Is This?
 
 ExtendedUI allows you to move most UI elements on your screen to wherever you want them.  
