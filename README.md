@@ -19,9 +19,7 @@ Please send me a private message in-game (Server: Klaipeda, Family Name: Belhi) 
 
 ###~~ DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK ~~
 
-ExtendedUI requires [cwAPI](https://github.com/fiote/treeofsavior-addons) from [fiote](https://github.com/fiote/) to work!
-
-Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases) and download the package that suits you best.
+Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases) and download the latest version.
 
 Extract the package into your '\Steam\SteamApps\common\TreeOfSavior\' folder.
 

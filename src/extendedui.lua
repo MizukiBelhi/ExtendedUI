@@ -1,8 +1,5 @@
 local addonName = "EXTENDEDUI";
 
-_G["ADDON_LOADER"] = {};
-dofile('../addons/cwapi/cwapi.lua');
-
 extui = {};
 extui.firstStart = false;
 extui.frames = {
@@ -69,6 +66,7 @@ extui.frames = {
 			["hasChild"] = false,
 			["name"] = "Mini Map",
 			["noResize"] = true,
+			["saveHidden"] = true,
 		},
 		["chat"] = {
 			["isMovable"] = true,
@@ -93,47 +91,42 @@ extui.frames = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "EXP Bars",
+			["saveHidden"] = true,
 		},
 		["headsupdisplay"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Character Status",
+			["saveHidden"] = true,
 		},
 		["sysmenu"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Menu",
 			["noResize"] = true,
+			["saveHidden"] = true,
 		},
 		["channel"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Channel",
 			["noResize"] = true,
+			["saveHidden"] = true,
 		},
 		["partyinfo"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Party",
 			["noResize"] = true,
+			["saveHidden"] = true,
 		},
-		
-		--[[
-		["questinfo"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Quest Log",
-			["noResize"] = true,
-		},
-		--]]
-
 		["questinfoset_2"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Quest Log",
 			["noResize"] = true,
+			["saveHidden"] = true,
 		},
-
 		["weaponswap"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
@@ -152,6 +145,41 @@ extui.frames = {
 			["hasChild"] = false,
 			["name"] = "Durability",
 			["noResize"] = true,
+			["saveHidden"] = true,
+		},
+		["openingameshopbtn"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "TP Shop Button",
+			["saveHidden"] = true,
+		},
+		["quickslotnexpbar"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "Keyboard/Mouse Quickslot",
+			["noResize"] = true,
+			["isQuickSlot"] = true,
+		},
+		["restquickslot"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "Rest Quickslot",
+			["noResize"] = true,
+			["isQuickSlot"] = true,
+		},
+		["joystickquickslot"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "Joystick Quickslot",
+			["noResize"] = true,
+			["isQuickSlot"] = true,
+		},
+		["joystickrestquickslot"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "Joystick Rest Quickslot",
+			["noResize"] = true,
+			["isQuickSlot"] = true,
 		},
 	};
 
@@ -199,7 +227,7 @@ end
 
 function extui.AddSetting(name, tbl)
 	extui.lSettingsUI[name] = tbl;
-	extui.lSettingsUI[name].order = cwAPI.util.tablelength(extui.lSettingsUI);
+	extui.lSettingsUI[name].order = extui.tablelength(extui.lSettingsUI);
 
 end
 
@@ -225,9 +253,9 @@ function extui.LoadSettings()
 		["lockquest"]	=	true,
 		["nopet"]		=	true,
 		["extquest"]	=	true,
-		["confine"]		=	true,
 		["discraft"]	=	false,
 		["iconsize"]	=	32,
+		["extbuff"]		=	true,
 	});
 
 	extui.lSettingsUI = {};
@@ -245,44 +273,6 @@ function extui.LoadSettings()
 			["typedata"] = {
 				["a"] = "newline",
 			}
-		}
-	);
-
-
-	extui.AddSetting("confine", {
-			["name"] = "Confine Child To Parent Frames",
-			["tool"] = "Experimental Feature",
-			["typedata"] = {
-				["t"] = "ui::CCheckBox",
-				["a"] = "checkbox",
-			},
-			["val"] = extui.ldSettingsUI["confine"],
-			["callback"] = function(frame, ctrl)
-								extui.SetSetting("confine",ctrl:IsChecked() == 1); 
-								local uibox = GET_CHILD(extui.sideFrame, "extuibox", "ui::CGroupBox");
-							
-								extui.ForEachFrame(nil,nil,nil,nil,function(k, v, ck, cv, toc, tcc)
-									local sliderX = GET_CHILD(uibox,"extuislidex"..tostring(k)..tostring(ck),"ui::CSlideBar");
-									local sliderY = GET_CHILD(uibox,"extuislidey"..tostring(k)..tostring(ck),"ui::CSlideBar");
-
-									if ctrl:IsChecked()==1 then
-										toc = ui.GetFrame(k);
-										tcc = toc:GetChild(tostring(ck));
-										local w = tcc:GetWidth();
-										local h = tcc:GetHeight();
-										sliderX:SetMaxSlideLevel(toc:GetWidth()-w);
-										sliderX:SetMinSlideLevel(0);
-										sliderY:SetMaxSlideLevel(toc:GetHeight()-h);
-										sliderY:SetMinSlideLevel(0);
-									else
-										sliderX:SetMaxSlideLevel(ui.GetClientInitialWidth());
-										sliderX:SetMinSlideLevel(-ui.GetClientInitialWidth());
-										sliderY:SetMaxSlideLevel(ui.GetClientInitialHeight());
-										sliderY:SetMinSlideLevel(-ui.GetClientInitialHeight());
-									end
-								end);
-							end,
-			["oncall"] = ui.LBUTTONUP,
 		}
 	);
 
@@ -312,15 +302,21 @@ function extui.LoadSettings()
 		}
 	);
 
-	--[[
-	extui.AddSetting("newline", {
+	extui.AddSetting("lockquest", {
+			["name"] = "Lock Quest Log Position",
+			["tool"] = "Locks the Quest Log so it no longer moves in both directions when new quests are added or removed.",
 			["typedata"] = {
-				["a"] = "newline",
-			}
+				["t"] = "ui::CCheckBox",
+				["a"] = "checkbox",
+			},
+			["val"] = extui.ldSettingsUI["lockquest"],
+			["callback"] = function(frame, ctrl) extui.SetSetting("lockquest",ctrl:IsChecked() == 1); end,
+			["oncall"] = ui.LBUTTONUP,
 		}
 	);
 
-	extui.AddSetting("line", {
+
+	extui.AddSetting("line4", {
 			["typedata"] = {
 				["a"] = "labelline",
 			},
@@ -336,7 +332,7 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddSetting("newline", {
+	extui.AddSetting("newline3", {
 			["typedata"] = {
 				["a"] = "newline",
 			}
@@ -351,11 +347,62 @@ function extui.LoadSettings()
 				["a"] = "slidebar",
 			},
 			["val"] = extui.ldSettingsUI["iconsize"],
-			["callback"] = function(frame, ctrl) end,
+			["callback"] = function(frame, ctrl)
+							extui.SetSetting("iconsize",ctrl:GetLevel());
+							extui.MoveBuffCaption("buff", "buffcountslot");
+							extui.MoveBuffCaption("buff", "buffslot");
+							extui.MoveBuffCaption("buff", "debuffslot");
+							extui.MoveBuffCaption("targetbuff", "buffcountslot");
+							extui.MoveBuffCaption("targetbuff", "buffslot");
+							extui.MoveBuffCaption("targetbuff", "debuffslot");
+
+							local frm = ui.GetFrame("buff");
+							local ch = frm:GetChild("buffcountslot");
+							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+							ch = frm:GetChild("buffslot");
+							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+							ch = frm:GetChild("debuffslot");
+							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+
+							frm = ui.GetFrame("targetbuff");
+							ch = frm:GetChild("buffcountslot");
+							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+							ch = frm:GetChild("buffslot");
+							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+							ch = frm:GetChild("debuffslot");
+							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+
+							for k,v in pairs(extui.frames) do
+								if v.isMovable and v.show and (k=="buff" or k=="targetbuff") then
+									if extui.frames[k].hasChild then
+										for ch,v in pairs(extui.frames[k]["child"]) do
+											if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+												ui.GetFrame("extuiframectrls"..k..ch):Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+											end
+										end
+									end
+								end
+							end
+
+						end,
 			["oncall"] = ui.LBUTTONUP,
 			["max"] = 100,
 		}
-	);--]]
+	);
+
+	extui.AddSetting("extbuff", {
+			["name"] = "Extend Buff Display",
+			["tool"] = "Extends the buff display to show a maximum of 30 buffs.",
+			["typedata"] = {
+				["t"] = "ui::CCheckBox",
+				["a"] = "checkbox",
+			},
+			["val"] = extui.ldSettingsUI["extbuff"],
+			["callback"] = function(frame, ctrl) extui.SetSetting("extbuff",ctrl:IsChecked() == 1); end,
+			["oncall"] = ui.LBUTTONUP,
+			["disabled"] = true,
+		}
+	);
 
 
 	extui.AddSetting("line", {
@@ -379,20 +426,6 @@ function extui.LoadSettings()
 			["typedata"] = {
 				["a"] = "newline",
 			}
-		}
-	);
-	
-	extui.AddSetting("lockquest", {
-			["name"] = "Lock Quest Log Position",
-			["tool"] = "Locks the Quest Log so it no longer moves in both directions when new quests are added or removed.",
-			["typedata"] = {
-				["t"] = "ui::CCheckBox",
-				["a"] = "checkbox",
-			},
-			["val"] = extui.ldSettingsUI["lockquest"],
-			["callback"] = function(frame, ctrl) extui.SetSetting("lockquest",ctrl:IsChecked() == 1); end,
-			["oncall"] = ui.LBUTTONUP,
-			["disabled"] = true,
 		}
 	);
 	
@@ -433,7 +466,7 @@ function EXTENDEDUI_ON_SETTINGS_PRESS(frame, ctrl, argStr)
 	if _settings[argStr].callback ~= nil then
 		local t,p = pcall(_settings[argStr].callback, frame, ctrl);
 		if not(t) then
-			cwAPI.util.log(tostring(p));
+			extui.print(tostring(p));
 		end
 	end
 	
@@ -466,18 +499,44 @@ end
 
 
 -- util
-function round(num, idp)
-  if idp and idp>0 then
-    local mult = 10^idp;
-    return math.floor(num * mult + 0.5) / mult;
-  end
-  return math.floor(num + 0.5);
+local function round(num, idp)
+	if idp and idp>0 then
+		local mult = 10^idp;
+		return math.floor(num * mult + 0.5) / mult;
+	end
+	return math.floor(num + 0.5);
 end
 
 function extui.GetPercent(anum,maxn,amaxn)
 	local nn = tonumber(maxn/amaxn);
 	return tonumber(nn*anum);
 end
+
+function extui.print(t)
+	CHAT_SYSTEM(tostring(t));
+end
+
+--directly stolen from fiotes cwAPI, much love <3
+function extui.tablelength(T)
+  	local count = 0
+  	for _ in pairs(T) do count = count + 1 end
+  	return count
+end
+
+function extui.FromString(s)
+	if s == "false" then
+		return false;
+	elseif s == "true" then
+		return true;
+	end
+
+	if tonumber(s) ~= nil then
+		return tonumber(s);
+	end
+
+	return s;
+end
+
 
 function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 	local toc = nil;
@@ -488,14 +547,14 @@ function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 				if func then
 					local t,p = pcall(func, k,v,toc);
 					if not(t) then
-						cwAPI.util.log("ForEachFrame Err func(): "..tostring(p));
+						extui.print("ForEachFrame Err func(): "..tostring(p));
 					end
 				end
 			else
 				if nfunc then
 					local t,p = pcall(nfunc, k,v,toc);
 					if not(t) then
-						cwAPI.util.log("ForEachFrame Err nfunc(): "..tostring(p));
+						extui.print("ForEachFrame Err nfunc(): "..tostring(p));
 					end
 				end
 			end
@@ -503,7 +562,7 @@ function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 			if nefunc then
 				local t,p = pcall(nefunc, k,v,toc);
 				if not(t) then
-					cwAPI.util.log("ForEachFrame Err nefunc(): "..tostring(p));
+					extui.print("ForEachFrame Err nefunc(): "..tostring(p));
 				end
 			end
 		end
@@ -519,14 +578,14 @@ function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 						if cfunc then
 							local t,p = pcall(cfunc, k, v, ck, cv, toc, tcc);
 							if not(t) then
-								cwAPI.util.log("ForEachFrame Err cfunc(): "..tostring(p));
+								extui.print("ForEachFrame Err cfunc(): "..tostring(p));
 							end
 						end
 					else
 						if cnfunc then
 							local t,p = pcall(cnfunc, k, v, ck, cv, toc, tcc);
 							if not(t) then
-								cwAPI.util.log("ForEachFrame Err cnfunc(): "..tostring(p));
+								extui.print("ForEachFrame Err cnfunc(): "..tostring(p));
 							end
 						end
 					end
@@ -534,7 +593,7 @@ function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 					if cnefunc then
 						local t,p = pcall(cnefunc, k, v, ck, cv, toc, tcc);
 						if not(t) then
-							cwAPI.util.log("ForEachFrame Err cnefunc(): "..tostring(p));
+							extui.print("ForEachFrame Err cnefunc(): "..tostring(p));
 						end
 					end
 				end
@@ -550,24 +609,27 @@ function extui.listframes()
 		extui.SavePositions();
 	end
 
-	extui.framepos = cwAPI.json.load("extendedui")["frames"];
+	extui.UpdateCheck();
+
 
 	EXTENDEDUI_LOAD_POSITIONS(nil,"GAME_START");
-	cwAPI.util.log("Reloaded UI");
+	extui.print("Reloaded UI");
 end
 
 function extui.reload()
-	extui.framepos = cwAPI.json.load("extendedui")["frames"];
+	extui.UpdateCheck();
+
 	EXTENDEDUI_LOAD_POSITIONS(nil,"GAME_START");
 end
 
 function EXTENDEDUI_ON_RELOADUI()
 	extui.isReload = true;
 	extui.oldSlider = {};
-	extui.framepos = cwAPI.json.load("extendedui")["frames"];
+	extui.UpdateCheck();
+
 	EXTENDEDUI_LOAD_POSITIONS(nil,"GAME_START");
 	extui.UpdateSliders();
-	cwAPI.util.log("Reloaded UI");
+	extui.print("Reloaded UI");
 	extui.isReload = false;
 end
 
@@ -603,7 +665,11 @@ function EXTENDEDUI_ON_RESTORE()
 end
 
 function EXTENDEDUI_ON_SAVE()
-	extui.SavePositions();
+	local s, bl = pcall(extui.SavePositions);
+	if not(s) then
+		extui.print("ERROR: "..bl);
+	end
+
 end
 
 function EXTENDEDUI_ON_DRAGGING(frame)
@@ -827,7 +893,7 @@ end
 function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr)
 	local t,p = pcall(topcall, frame, ctrl, argStr);
 	if not(t) then
-		cwAPI.util.log(tostring(p));
+		extui.print(tostring(p));
 	end
 end
 
@@ -840,112 +906,111 @@ end
 function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 	local hasNew = false;
 
-	if not(msg == "TAKE_DAMAGE" or msg == "TAKE_HEAL") then
+	extui.ForEachFrame(
+		function(k,v,toc)
+			local x = extui.framepos[tostring(k)].x;
+			local y = extui.framepos[tostring(k)].y;
+			local w = extui.framepos[tostring(k)].w;
+			local h = extui.framepos[tostring(k)].h;
 
-		extui.ForEachFrame(
-			function(k,v,toc)
-				local x = extui.framepos[tostring(k)].x;
-				local y = extui.framepos[tostring(k)].y;
-				local w = extui.framepos[tostring(k)].w;
-				local h = extui.framepos[tostring(k)].h;
+			local xs = toc:GetX() or 0;
+			local ys = toc:GetY() or 0;
+			local ws = toc:GetWidth() or 0;
+			local hs = toc:GetHeight() or 0;
+			
+			toc:MoveFrame(x, y);
+			if not(v.noResize) then
+				toc:Resize(w, h);
+			end
 
-				local xs = toc:GetX() or 0;
-				local ys = toc:GetY() or 0;
-				local ws = toc:GetWidth() or 0;
-				local hs = toc:GetHeight() or 0;
-				
-				toc:MoveFrame(x, y);
-				if not(v.noResize) then
-					toc:Resize(w, h);
+			if not(extui.firstStart) then
+				extui.defaultFrames[tostring(k)] = {};
+				extui.defaultFrames[tostring(k)]["x"] = xs;
+				extui.defaultFrames[tostring(k)]["y"] = ys;
+				extui.defaultFrames[tostring(k)]["w"] = ws;
+				extui.defaultFrames[tostring(k)]["h"] = hs;
+				if v.hasChild then
+					extui.defaultFrames[tostring(k)]["child"] = {};
 				end
+			end
 
-				if not(extui.firstStart) then
-					extui.defaultFrames[tostring(k)] = {};
-					extui.defaultFrames[tostring(k)]["x"] = xs;
-					extui.defaultFrames[tostring(k)]["y"] = ys;
-					extui.defaultFrames[tostring(k)]["w"] = ws;
-					extui.defaultFrames[tostring(k)]["h"] = hs;
-					if v.hasChild then
-						extui.defaultFrames[tostring(k)]["child"] = {};
-					end
-				end
+			if v.saveHidden then
+				toc:ShowWindow(extui.framepos[tostring(k)].hidden);
+			end
+		end,
+		function(k,v,toc)
+			local x = toc:GetX() or 0;
+			local y = toc:GetY() or 0;
+			local w = toc:GetWidth() or 0;
+			local h = toc:GetHeight() or 0;
+			extui.framepos[tostring(k)] = {};
+			extui.framepos[tostring(k)]["x"] = x;
+			extui.framepos[tostring(k)]["y"] = y;
+			extui.framepos[tostring(k)]["w"] = w;
+			extui.framepos[tostring(k)]["h"] = h;
 
-				if v.saveHidden then
-					toc:ShowWindow(extui.framepos[tostring(k)].hidden or toc:IsVisible());
-					extui.framepos[tostring(k)]["hidden"] = toc:IsVisible();
-				end
-			end,
-			function(k,v,toc)
-				local x = toc:GetX() or 0;
-				local y = toc:GetY() or 0;
-				local w = toc:GetWidth() or 0;
-				local h = toc:GetHeight() or 0;
+			if not(extui.firstStart) then
+				extui.defaultFrames[tostring(k)] = extui.framepos[tostring(k)];
+			end
+
+			hasNew = true;
+			if v.hasChild then
+				extui.framepos[tostring(k)]["child"] = {};
+			end
+			if v.saveHidden then
+				extui.framepos[tostring(k)]["hidden"] = toc:IsVisible();
+			end
+		end,
+		function(k,v)
+			if extui.framepos[tostring(k)] == nil then
 				extui.framepos[tostring(k)] = {};
-				extui.framepos[tostring(k)]["x"] = x;
-				extui.framepos[tostring(k)]["y"] = y;
-				extui.framepos[tostring(k)]["w"] = w;
-				extui.framepos[tostring(k)]["h"] = h;
-
-				if not(extui.firstStart) then
-					extui.defaultFrames[tostring(k)] = extui.framepos[tostring(k)];
-				end
-
-				hasNew = true;
 				if v.hasChild then
 					extui.framepos[tostring(k)]["child"] = {};
 				end
-				if v.saveHidden then
-					extui.framepos[tostring(k)]["hidden"] = toc:IsVisible();
-				end
-			end,
-			function(k,v)
-				if extui.framepos[tostring(k)] == nil then
-					extui.framepos[tostring(k)] = {};
-					if v.hasChild then
-						extui.framepos[tostring(k)]["child"] = {};
-					end
-				end
-			end,
-			function(k,v,ck,cv,toc,tcc)
-				local x = tcc:GetX() or 0;
-				local y = tcc:GetY() or 0;
-				extui.framepos[tostring(k)]["child"][tostring(ck)] = {};
-				extui.framepos[tostring(k)]["child"][tostring(ck)]["x"] = x;
-				extui.framepos[tostring(k)]["child"][tostring(ck)]["y"] = y;
-
-				if not(extui.firstStart) then
-					extui.defaultFrames[tostring(k)]["child"][tostring(ck)] = extui.framepos[tostring(k)]["child"][tostring(ck)];
-				end
-				hasNew = true;
-			end,
-			function(k,v,ck,cv,toc,tcc)
-				local x = extui.framepos[tostring(k)]["child"][tostring(ck)].x;
-				local y = extui.framepos[tostring(k)]["child"][tostring(ck)].y;
-
-				local xs = tcc:GetX() or 0;
-				local ys = tcc:GetY() or 0;
-
-				if not(extui.firstStart) then
-					extui.defaultFrames[tostring(k)]["child"][tostring(ck)] = {};
-					extui.defaultFrames[tostring(k)]["child"][tostring(ck)].x = xs;
-					extui.defaultFrames[tostring(k)]["child"][tostring(ck)].y = ys;
-				end
-
-
-				tcc:SetOffset(x, y);
-
-				if k == "buff" or k == "targetbuff" then
-					extui.MoveBuffCaption(k, ck);
-				end
-
-			end,
-			function(k,v,ck,cv,toc,tcc)
-				if extui.framepos[tostring(k)]["child"][tostring(ck)] == nil then
-					extui.framepos[tostring(k)]["child"][tostring(ck)] = {};
-				end
 			end
-		);
+		end,
+		function(k,v,ck,cv,toc,tcc)
+			local x = tcc:GetX() or 0;
+			local y = tcc:GetY() or 0;
+			extui.framepos[tostring(k)]["child"][tostring(ck)] = {};
+			extui.framepos[tostring(k)]["child"][tostring(ck)]["x"] = x;
+			extui.framepos[tostring(k)]["child"][tostring(ck)]["y"] = y;
+
+			if not(extui.firstStart) then
+				extui.defaultFrames[tostring(k)]["child"][tostring(ck)] = extui.framepos[tostring(k)]["child"][tostring(ck)];
+			end
+			hasNew = true;
+		end,
+		function(k,v,ck,cv,toc,tcc)
+			local x = extui.framepos[tostring(k)]["child"][tostring(ck)].x;
+			local y = extui.framepos[tostring(k)]["child"][tostring(ck)].y;
+
+			local xs = tcc:GetX() or 0;
+			local ys = tcc:GetY() or 0;
+
+			if not(extui.firstStart) then
+				extui.defaultFrames[tostring(k)]["child"][tostring(ck)] = {};
+				extui.defaultFrames[tostring(k)]["child"][tostring(ck)].x = xs;
+				extui.defaultFrames[tostring(k)]["child"][tostring(ck)].y = ys;
+			end
+
+
+			tcc:SetOffset(x, y);
+
+			if k == "buff" or k == "targetbuff" then
+				extui.MoveBuffCaption(k, ck);
+				local frm = ui.GetFrame(k);
+				local fch = frm:GetChild(ck);
+				fch:Resize(10*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
+			end
+
+		end,
+		function(k,v,ck,cv,toc,tcc)
+			if extui.framepos[tostring(k)]["child"][tostring(ck)] == nil then
+				extui.framepos[tostring(k)]["child"][tostring(ck)] = {};
+			end
 		end
+	);
 
 	if hasNew then
 		extui.SavePositions();
@@ -969,9 +1034,48 @@ function extui.SavePositions()
 	};
 
 
-	local s, bl = pcall(cwAPI.json.save, tosave, "extendedui");
-	if not(s) then
-		cwAPI.util.log("JSON ERROR: "..bl);
+	local file, error = io.open("../addons/extendedui/settings.extui", "w");
+	if file ~= nil then
+		local _str = "";
+
+		for k,v in pairs(extui.ldSettingsUI) do
+			_str = _str..k..","..tostring(v).."\n";
+		end
+
+		file:write(_str);
+		io.close(file);
+	end
+
+	file, error = io.open("../addons/extendedui/frames.extui", "w");
+	if file ~= nil then
+		local _str = "";
+
+		for k,v in pairs(extui.framepos) do
+			local name = k;
+			local x,y = tostring(v.x),tostring(v.y);
+			local w,h = tostring(v.w),tostring(v.h);
+			local hidden = (v.hidden==1) and true or false;
+			local hasChild = extui.frames[k].hasChild or false;
+
+			_str = _str..name..","..x..","..y..","..w..","..h..","..tostring(hidden)..","..tostring(hasChild);
+
+			if hasChild then
+
+				for ck,cv in pairs(v.child) do
+					local cname = ck;
+					local cx,cy = tostring(cv.x),tostring(cv.y);
+
+					_str = _str..","..cname..","..cx..","..cy;
+				end
+
+				_str = _str..",0";
+			end
+
+			_str = _str.."\n";
+		end
+
+		file:write(_str);
+		io.close(file);
 	end
 end
 
@@ -1022,7 +1126,7 @@ function extui.openside()
 
 	local t,p = pcall(extui.InitSideFrame);
 	if not(t) then
-		cwAPI.util.log(tostring(p));
+		extui.print(tostring(p));
 	end
 
 
@@ -1199,6 +1303,9 @@ function EXTUI_ON_SLIDE()
 
 									if k == "buff" or k == "targetbuff" then
 										extui.MoveBuffCaption(k, ch);
+										local frm = ui.GetFrame(k);
+										local fch = frm:GetChild(ck);
+										fch:Resize(10*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
 									end
 								end
 							end
@@ -1229,25 +1336,13 @@ function EXTUI_ON_SLIDE()
 							
 							local doMove = false;
 
-							if extui.GetSetting("confine") then
-								if toc:GetWidth() ~= sliderX:GetMaxLevel() then
-									sliderX:SetMaxSlideLevel(toc:GetWidth()-tcc:GetWidth());
-									sliderX:SetMinSlideLevel(0);
-								end
-								if toc:GetHeight() ~= sliderY:GetMaxLevel() then
-									sliderY:SetMaxSlideLevel(toc:GetHeight()-tcc:GetHeight());
-									sliderY:SetMinSlideLevel(0);
-								end
-							else
-								if toc:GetWidth() ~= sliderX:GetMaxLevel() or toc:GetHeight() ~= sliderY:GetMaxLevel() then
-									sliderX:SetMaxSlideLevel(ui.GetClientInitialWidth());
-									sliderX:SetMinSlideLevel(-ui.GetClientInitialWidth());
-									sliderY:SetMaxSlideLevel(ui.GetClientInitialHeight());
-									sliderY:SetMinSlideLevel(-ui.GetClientInitialHeight());
-								end
+							if toc:GetWidth() ~= sliderX:GetMaxLevel() or toc:GetHeight() ~= sliderY:GetMaxLevel() then
+								sliderX:SetMaxSlideLevel(ui.GetClientInitialWidth());
+								sliderX:SetMinSlideLevel(-ui.GetClientInitialWidth());
+								sliderY:SetMaxSlideLevel(ui.GetClientInitialHeight());
+								sliderY:SetMinSlideLevel(-ui.GetClientInitialHeight());
 							end
 							
-
 							if tcc:GetX() ~= sliderX:GetLevel() then
 								doMove = true;
 							elseif tcc:GetY() ~= sliderY:GetLevel() then
@@ -1266,6 +1361,10 @@ function EXTUI_ON_SLIDE()
 
 								if k == "buff" or k == "targetbuff" then
 									extui.MoveBuffCaption(k, ck);
+									local frm = ui.GetFrame(k);
+									local fch = frm:GetChild(ck);
+									fch:Resize(10*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
+
 								end
 							end
 						end
@@ -1443,11 +1542,11 @@ function extui.InitSideFrame()
 	iny = 10;
 
 
-	ctrls = cbox:CreateOrGetControl("richtext", "extuitxtll"..tostring(k), inx, iny, 300, 30);
+	ctrls = cbox:CreateOrGetControl("richtext", "extuitxtllall", inx, iny, 300, 30);
 	ctrls = tolua.cast(ctrls, "ui::CRichText");
 	ctrls:SetText("{@st43}All Frames{/}");
 	iny = iny+35;
-	ctrls = cbox:CreateOrGetControl("checkbox", "extuictbut"..tostring(k), inx+10, iny, 150, 30);
+	ctrls = cbox:CreateOrGetControl("checkbox", "extuictbutall", inx+10, iny, 150, 30);
 	ctrls = tolua.cast(ctrls, "ui::CCheckBox");
 	ctrls:SetText("{@st42b}Show Frame Area{/}");
 	ctrls:SetClickSound("button_click_big");
@@ -1738,6 +1837,11 @@ function extui.MoveBuffCaption(name, slotname)
 	local clist = buff_ui["captionlist"][typ]
 	for k,v in pairs(clist) do
 		local slot = buff_ui["slotlist"][typ][k];
+
+		local slotsize = extui.GetSetting("iconsize");
+		slot:Resize(slotsize,slotsize);
+		slot:SetOffset((slotsize*k),slot:GetY());
+
 		local x = buff_ui["slotsets"][typ]:GetX() + slot:GetX() + buff_ui["txt_x_offset"];
 		local y = buff_ui["slotsets"][typ]:GetY() + slot:GetY() + slot:GetHeight() + buff_ui["txt_y_offset"];
 
@@ -1747,21 +1851,89 @@ function extui.MoveBuffCaption(name, slotname)
 end
 
 
+function extui.UpdateCheck()
+	local file, error = io.open("../addons/extendedui/settings.extui", "r");
+	if file ~= nil then
+		local _str = file:read("*all");
+
+		if string.len(_str) > 1 then
+
+			local opSettings = StringSplit(_str, "\n");
+			for k,v in pairs(opSettings) do
+				local iSetting = StringSplit(v, ",");
+
+				extui.ldSettingsUI[iSetting[1]] = extui.FromString(iSetting[2]);
+			end
+		end
+		io.close(file);
+	end
+
+	local file, error = io.open("../addons/extendedui/frames.extui", "r");
+	if file ~= nil then
+		local _str = file:read("*all");
+
+		if string.len(_str) > 1 then
+
+			local opFrames = StringSplit(_str, "\n");
+			for k,v in pairs(opFrames) do
+				local iFrames = StringSplit(v, ",");
+
+				local name = iFrames[1];
+				local x = extui.FromString(iFrames[2]);
+				local y = extui.FromString(iFrames[3]);
+				local w = extui.FromString(iFrames[4]);
+				local h = extui.FromString(iFrames[5]);
+				local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
+				local hasChild = extui.FromString(iFrames[7]);
+				local childs = {};
+				if hasChild then
+					local onL = 8;
+					while true do
+						local cname = iFrames[onL];
+
+						if cname == "0" then
+							break;
+						end
+
+						local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
+
+						childs[cname] = {
+								["x"] = cx,
+								["y"] = cy,
+							};
+
+						onL = onL+3;
+					end
+
+				end
+
+				extui.framepos[name] = {
+						["x"] = x,
+						["y"] = y,
+						["w"] = w,
+						["h"] = h,
+						["hidden"] = hidden,
+						["child"] = childs,
+					};
+			end
+		end
+
+		io.close(file);
+	end
+end
+
+
 function EXTENDEDUI_ON_GAME()
-	cwAPI.commands.register("/reloadui",extui.listframes);
-	cwAPI.commands.register("/saveframes",extui.SavePositions);
-	cwAPI.commands.register("/uisettings",extui.openside);
-	cwAPI.commands.register("/uiclose",extui.close);
-	
 	extui.LoadSettings();
 end
 
 --only runs on first startup since *_ON_INIT gets called on map change etc
 if _G["EXTUI_LOADED"] == nil then
-	cwAPI.util.log("ExtendedUI Loaded");
+	extui.print("ExtendedUI Loaded");
 	_G["EXTUI_LOADED"] = true;
 end
 
+extui.UpdateCheck();
 
 function EXTENDEDUI_ON_INIT(addon, frame)
     if _G["ADDONS"] == nil then
@@ -1788,30 +1960,10 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 
 	extui.isSetting = false;
 
-
-	local file, error = io.open("../addons/extendedui/extendedui.json", "r");
-	if file == nil then
-		file, error = io.open("../addons/extendedui/extendedui.json", "w");
-		if not(error) then
-			file:write("{\r\t\"settings\": {\r\t},\r\t\"frames\": {\r\t}\r}");
-		    io.close(file);
-		end
-	else
-		io.close(file);
-	end
-
-	local s, bl = pcall(cwAPI.json.load,"extendedui");
-	if s then
-		extui.framepos = bl["frames"];
-		extui.ldSettingsUI = bl["settings"];
-	else
-		cwAPI.util.log("JSON ERROR: "..bl);
-	end
-
 	
 	s, bl = pcall(EXTENDEDUI_ON_GAME);
 	if not(s) then
-		cwAPI.util.log("all the err"..bl);
+		extui.print("Super Professional Error Text: "..bl);
 	end
 
 	if _G["_PUMP_RECIPE_OPEN_EXTOLD"] == nil then
@@ -1821,6 +1973,19 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 										_G["_PUMP_RECIPE_OPEN_EXTOLD"](...);
 									end
 								end;
+	end
+
+	if _G["QUESTINFOSET_2_AUTO_ALIGN_EXTOLD"] == nil then
+		_G["QUESTINFOSET_2_AUTO_ALIGN_EXTOLD"] = _G["QUESTINFOSET_2_AUTO_ALIGN"];
+		_G["QUESTINFOSET_2_AUTO_ALIGN"] = function(frame, GroupCtrl)
+											if extui.GetSetting("lockquest") == false then
+												_G["QUESTINFOSET_2_AUTO_ALIGN_EXTOLD"](frame, GroupCtrl);
+											else
+												_G["QUESTINFOSET_2_AUTO_ALIGN_EXTOLD"](frame, GroupCtrl);
+												local frm = ui.GetFrame("questinfoset_2");
+												frm:MoveFrame(extui.framepos["questinfoset_2"].x, extui.framepos["questinfoset_2"].y);
+											end
+										end;
 	end
 
 	local frame = ui.GetFrame("systemoption")
