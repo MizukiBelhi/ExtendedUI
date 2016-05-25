@@ -962,12 +962,7 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 			end
 		end,
 		function(k,v)
-			if extui.framepos[tostring(k)] == nil then
-				extui.framepos[tostring(k)] = {};
-				if v.hasChild then
-					extui.framepos[tostring(k)]["child"] = {};
-				end
-			end
+			--do nothing, Fix #5
 		end,
 		function(k,v,ck,cv,toc,tcc)
 			local x = tcc:GetX() or 0;
@@ -1006,9 +1001,7 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 
 		end,
 		function(k,v,ck,cv,toc,tcc)
-			if extui.framepos[tostring(k)]["child"][tostring(ck)] == nil then
-				extui.framepos[tostring(k)]["child"][tostring(ck)] = {};
-			end
+			--do nothing, Fix #5
 		end
 	);
 
