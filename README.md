@@ -19,7 +19,7 @@ Please send me a private message in-game (Server: Klaipeda, Family Name: Belhi) 
 
 ###~~ DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK ~~
 
-Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases) and download the latest version.
+Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases/latest) and download the latest version.
 
 Extract the package into your '\Steam\SteamApps\common\TreeOfSavior\' folder.
 
