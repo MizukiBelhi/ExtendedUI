@@ -9,6 +9,7 @@ extui.frames = {
 			["name"] = "Time",
 			["noResize"] = true,
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["targetinfo"] = {
 			["isMovable"] = true,
@@ -60,6 +61,7 @@ extui.frames = {
 			["name"] = "FPS",
 			["noResize"] = true,
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["minimap"] = {
 			["isMovable"] = true,
@@ -73,6 +75,7 @@ extui.frames = {
 			["hasChild"] = false,
 			["name"] = "Chat Input",
 			["noResize"] = true,
+			["noScale"] = true,
 		},
 		["playtime"] = {
 			["isMovable"] = true,
@@ -80,24 +83,28 @@ extui.frames = {
 			["name"] = "Playtime",
 			["noResize"] = true,
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["chatframe"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Chat Window",
 			["noResize"] = true,
+			["noScale"] = true,
 		},
 		["charbaseinfo"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "EXP Bars",
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["headsupdisplay"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Character Status",
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["sysmenu"] = {
 			["isMovable"] = true,
@@ -105,6 +112,7 @@ extui.frames = {
 			["name"] = "Menu",
 			["noResize"] = true,
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["channel"] = {
 			["isMovable"] = true,
@@ -112,6 +120,7 @@ extui.frames = {
 			["name"] = "Channel",
 			["noResize"] = true,
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["partyinfo"] = {
 			["isMovable"] = true,
@@ -152,6 +161,7 @@ extui.frames = {
 			["hasChild"] = false,
 			["name"] = "TP Shop Button",
 			["saveHidden"] = true,
+			["noScale"] = true,
 		},
 		["quickslotnexpbar"] = {
 			["isMovable"] = true,
@@ -256,6 +266,7 @@ function extui.LoadSettings()
 		["discraft"]	=	false,
 		["iconsize"]	=	32,
 		["extbuff"]		=	true,
+		["uiscale"]		=	100,
 	});
 
 	extui.lSettingsUI = {};
@@ -273,6 +284,39 @@ function extui.LoadSettings()
 			["typedata"] = {
 				["a"] = "newline",
 			}
+		}
+	);
+
+	extui.AddSetting("uiscale", {
+			["name"] = "UI Scale",
+			["tool"] = "Scales UI, does not affect buffs",
+			["typedata"] = {
+				["t"] = "ui::CSlideBar",
+				["a"] = "slidebar",
+			},
+			["val"] = extui.ldSettingsUI["uiscale"],
+			["callback"] = function(frame, ctrl)
+							local newScale = ctrl:GetLevel();
+							extui.SetSetting("uiscale", newScale);
+							extui.ScaleUI(newScale);
+						end,
+			["oncall"] = ui.LBUTTONUP,
+			["max"] = 150,
+			["min"] = 10,
+		}
+	);
+
+	extui.AddSetting("remjoy", {
+			["name"] = "Removes thingies from Joystick Quickslot",
+			["tool"] = "I don't even know.. let me sleep!",
+			["typedata"] = {
+				["t"] = "ui::CCheckBox",
+				["a"] = "checkbox",
+			},
+			["val"] = extui.ldSettingsUI["remjoy"],
+			["callback"] = function(frame, ctrl) extui.SetSetting("remjoy",ctrl:IsChecked() == 1); end,
+			["oncall"] = ui.LBUTTONUP,
+			["disabled"] = true,
 		}
 	);
 
@@ -349,35 +393,22 @@ function extui.LoadSettings()
 			["val"] = extui.ldSettingsUI["iconsize"],
 			["callback"] = function(frame, ctrl)
 							extui.SetSetting("iconsize",ctrl:GetLevel());
-							extui.MoveBuffCaption("buff", "buffcountslot");
-							extui.MoveBuffCaption("buff", "buffslot");
-							extui.MoveBuffCaption("buff", "debuffslot");
-							extui.MoveBuffCaption("targetbuff", "buffcountslot");
-							extui.MoveBuffCaption("targetbuff", "buffslot");
-							extui.MoveBuffCaption("targetbuff", "debuffslot");
-
-							local frm = ui.GetFrame("buff");
-							local ch = frm:GetChild("buffcountslot");
-							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
-							ch = frm:GetChild("buffslot");
-							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
-							ch = frm:GetChild("debuffslot");
-							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
-
-							frm = ui.GetFrame("targetbuff");
-							ch = frm:GetChild("buffcountslot");
-							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
-							ch = frm:GetChild("buffslot");
-							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
-							ch = frm:GetChild("debuffslot");
-							ch:Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
 
 							for k,v in pairs(extui.frames) do
-								if v.isMovable and v.show and (k=="buff" or k=="targetbuff") then
+								if v.isMovable and (k=="buff" or k=="targetbuff") then
 									if extui.frames[k].hasChild then
 										for ch,v in pairs(extui.frames[k]["child"]) do
 											if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
-												ui.GetFrame("extuiframectrls"..k..ch):Resize(10*ctrl:GetLevel(),ctrl:GetLevel());
+
+												extui.MoveBuffCaption(k, ch);
+
+												local frm = ui.GetFrame(k);
+												local fch = frm:GetChild(ch);
+
+												local slotCount = fch:GetSlotCount();
+												fch:Resize(slotCount*ctrl:GetLevel(),ctrl:GetLevel());
+
+												ui.GetFrame("extuiframectrls"..k..ch):Resize(slotCount*ctrl:GetLevel(),ctrl:GetLevel());
 											end
 										end
 									end
@@ -398,7 +429,9 @@ function extui.LoadSettings()
 				["a"] = "checkbox",
 			},
 			["val"] = extui.ldSettingsUI["extbuff"],
-			["callback"] = function(frame, ctrl) extui.SetSetting("extbuff",ctrl:IsChecked() == 1); end,
+			["callback"] = function(frame, ctrl)
+							extui.SetSetting("extbuff",ctrl:IsChecked() == 1);
+						end,
 			["oncall"] = ui.LBUTTONUP,
 			["disabled"] = true,
 		}
@@ -497,6 +530,34 @@ function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
 	return 1;
 end
 
+
+--Fixes #1
+function extui.TargetInfoUpdate(x,y)
+	TARGET_INFO_OFFSET_X = x;
+	TARGET_INFO_OFFSET_BOSS_X = x+415;
+	TARGET_INFO_OFFSET_Y = y;
+end
+
+function extui.ScaleUI(scale)
+
+	local newScale = scale/100;
+
+	for k,v in pairs(extui.frames) do
+		if v.isMovable and not(k=="buff" or k=="targetbuff") and not(v.noScale) then
+			local frm = ui.GetFrame(k);
+			if frm ~= nil then
+				frm:SetScale(newScale, newScale);
+
+				local cnt = frm:GetChildCount();
+				for  i = 0, cnt -1 do
+					local ch = frm:GetChildByIndex(i);
+					ch:SetScale(newScale, newScale);
+				end
+
+			end
+		end
+	end
+end
 
 -- util
 local function round(num, idp)
@@ -722,6 +783,7 @@ end
 function EXTENDEDUI_VOID()
 end
 
+
 function EXTENDEDUI_ON_DRAGGING_CHILD(frame)
 	if extui.closingSettings then return 0;	end
 	if not(extui.IsDragging) then return 1; end
@@ -775,6 +837,7 @@ extui.showAll = false;
 function topcall(frame, ctrl, argStr)
 	if argStr == "*all" then
 		if not(extui.showAll) then
+			extui.OpenMiniFrame();
 			for k,v in pairs(extui.frames) do
 				if v.isMovable then
 					local ss = ui.GetFrame(k);
@@ -869,8 +932,6 @@ function topcall(frame, ctrl, argStr)
 					chfrm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
 					chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 					chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
-					chfrm = tolua.cast(chfrm, "ui::CRichText");
-					chfrm:SetColorTone("FF00FF00");
 				end
 			end
 			
@@ -899,7 +960,24 @@ end
 
 function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	local frm = ui.GetFrame(argStr);
-	frm:ShowWindowToggle();
+	frm:ShowWindow(ctrl:IsChecked());
+	extui.framepos[argStr].hidden = ctrl:IsChecked();
+end
+
+function extui.OverwriteHide(frame)
+	frame.OldShowWindow = frame.ShowWindow;
+
+	function frame:ShowWindow(b)
+		if extui.framepos[self:GetName()] ~= nil then
+			if extui.frames[self:GetName()].saveHidden ~= nil then
+				frame.OldShowWindow(self, extui.framepos[self:GetName()].hidden);
+			else
+				frame.OldShowWindow(self,b);
+			end
+		else
+			frame.OldShowWindow(self,b);
+		end
+	end
 end
 
 
@@ -932,11 +1010,18 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 				if v.hasChild then
 					extui.defaultFrames[tostring(k)]["child"] = {};
 				end
+
+				extui.OverwriteHide(toc);
 			end
 
 			if v.saveHidden then
 				toc:ShowWindow(extui.framepos[tostring(k)].hidden);
 			end
+
+			if k=="targetinfo" then
+				extui.TargetInfoUpdate(x,y);
+			end
+
 		end,
 		function(k,v,toc)
 			local x = toc:GetX() or 0;
@@ -951,6 +1036,7 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 
 			if not(extui.firstStart) then
 				extui.defaultFrames[tostring(k)] = extui.framepos[tostring(k)];
+				extui.OverwriteHide(toc);
 			end
 
 			hasNew = true;
@@ -996,7 +1082,9 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 				extui.MoveBuffCaption(k, ck);
 				local frm = ui.GetFrame(k);
 				local fch = frm:GetChild(ck);
-				fch:Resize(10*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
+
+				local slotCount = fch:GetSlotCount();
+				fch:Resize(slotCount*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
 			end
 
 		end,
@@ -1011,6 +1099,7 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 
 	extui.firstStart = true;
 
+	extui.ScaleUI(extui.GetSetting("uiscale"));
 end
 
 function extui.SavePositions()
@@ -1213,6 +1302,14 @@ end
 
 --TODO: Needs to use ForEachFrame
 function EXTUI_ON_SLIDE()
+	local t,p = pcall(extui.TOPCALL_EXTUI_ON_SLIDE);
+	if not(t) then
+		extui.print("OnSlide(): "..tostring(p));
+	end
+end
+
+
+function extui.TOPCALL_EXTUI_ON_SLIDE()
 	if extui.isReload or extui.IsDragging then return 1; end
 	if extui.isSetting then
 		
@@ -1302,6 +1399,10 @@ function EXTUI_ON_SLIDE()
 									end
 								end
 							end
+
+							if k=="targetinfo" then
+								extui.TargetInfoUpdate(x,y);
+							end
 						end
 						extui.framepos[tostring(k)]["x"] = x;
 						extui.framepos[tostring(k)]["y"] = y;
@@ -1356,7 +1457,9 @@ function EXTUI_ON_SLIDE()
 									extui.MoveBuffCaption(k, ck);
 									local frm = ui.GetFrame(k);
 									local fch = frm:GetChild(ck);
-									fch:Resize(10*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
+
+									local slotCount = fch:GetSlotCount();
+									fch:Resize(slotCount*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
 
 								end
 							end
@@ -1384,6 +1487,47 @@ function EXTUI_ON_TAB_CHANGE(frame, ctrl, argStr, argNum)
 	end
 end
 
+function EXTENDEDUI_ON_MINI_CANCEL()
+	ui.GetFrame("EXTENDEDUI_MINI_FRAME"):ShowWindow(0);
+
+	local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
+	mf:MoveFrame((ui.GetSceneWidth()/2)-400, (ui.GetSceneHeight()/2)-300);
+	local uibox = GET_CHILD(mf, "extuibox", "ui::CGroupBox");
+	local chbox = GET_CHILD(uibox,"extuictbutall","ui::CCheckBox");
+	chbox:SetCheck(0);
+
+	EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
+end
+
+
+function extui.OpenMiniFrame()
+	local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
+	mf:MoveFrame(9999,9999);--move frame out of view
+
+	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_MINI_FRAME");
+	frm:Resize(350 , 100);
+	frm:MoveFrame((ui.GetSceneWidth()/2)-175, (ui.GetSceneHeight()/2)-50);
+	frm:SetSkinName("pip_simple_frame");
+
+	--buttons
+	local ctrls = frm:CreateOrGetControl("button", "extuiminisaveclose", 50, 65, 125, 30);
+	ctrls = tolua.cast(ctrls, "ui::CButton");
+	ctrls:SetText("{@st66b}Save&Close{/}");
+	ctrls:SetClickSound("button_click_big");
+	ctrls:SetOverSound("button_over");
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_SAVE");
+	ctrls:SetSkinName("test_pvp_btn");
+
+	ctrls = frm:CreateOrGetControl("button", "extuiminiclose", 175, 65, 125, 30);
+	ctrls = tolua.cast(ctrls, "ui::CButton");
+	ctrls:SetText("{@st66b}Cancel{/}");
+	ctrls:SetClickSound("button_click_big");
+	ctrls:SetOverSound("button_over");
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_CANCEL");
+	ctrls:SetSkinName("test_pvp_btn");
+
+	frm:Invalidate();
+end
 
 --TODO: Needs to use ForEachFrame
 function extui.InitSideFrame()
@@ -1466,7 +1610,7 @@ function extui.InitSideFrame()
 
 		elseif ctrla == "slidebar" then
 			ctrls:SetMaxSlideLevel(v.max);
-			ctrls:SetMinSlideLevel(0);
+			ctrls:SetMinSlideLevel(v.min or 0);
 			ctrls:SetLevel(value);
 			ctrls:Resize(300,30);
 			ctrls:RunUpdateScript("EXTENDEDUI_ON_SETTINGS_SLIDE");
@@ -1541,7 +1685,7 @@ function extui.InitSideFrame()
 	iny = iny+35;
 	ctrls = cbox:CreateOrGetControl("checkbox", "extuictbutall", inx+10, iny, 150, 30);
 	ctrls = tolua.cast(ctrls, "ui::CCheckBox");
-	ctrls:SetText("{@st42b}Show Frame Area{/}");
+	ctrls:SetText("{@st42b}Edit All Frames{/}");
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_BUTTON_FRAME_PRESS");
@@ -1785,7 +1929,6 @@ function extui.InitSideFrame()
 	
 	extui.sideFrame:GetChild("extuibox"):ShowWindow(0);
 	extui.sideFrame:GetChild("extuiboxs"):ShowWindow(1);
-
 end
 
 function EXTENDEDUI_ON_CLOSE_UI(frame)
@@ -1923,6 +2066,16 @@ end
 --only runs on first startup since *_ON_INIT gets called on map change etc
 if _G["EXTUI_LOADED"] == nil then
 	extui.print("ExtendedUI Loaded");
+
+	extui.OldToggleFrame = ui.ToggleFrame;
+	ui.ToggleFrame = function(frm) 
+						if extui.frames[frm] ~= nil then
+							frm:ShowWindow(ui.GetFrame(frm):IsVisible() and 0 or 1);
+						else
+							extui.OldToggleFrame(frm);
+						end
+					end;
+
 	_G["EXTUI_LOADED"] = true;
 end
 
@@ -1981,6 +2134,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 										end;
 	end
 
+
 	local frame = ui.GetFrame("systemoption")
 	local ctrls = frame:CreateOrGetControl("button", "extuiopenbutton", 50, 271, 208, 35);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
@@ -1989,6 +2143,8 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	ctrls:SetOverSound("button_over");
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPEN_UI");
 	ctrls:SetSkinName("test_pvp_btn");
+
+
 
 
 end
