@@ -53,28 +53,6 @@ function EXTENDEDUI_ON_CHAR_EXP(frame, msg, argStr, argNum)
 
 end
 
-
-
-function EXTENDEDUI_ON_GAME()
-	extui.LoadSettings();
-end
-
---only runs on first startup since *_ON_INIT gets called on map change etc
-if _G["EXTUI_LOADED"] == nil then
-	extui.print("ExtendedUI Loaded");
-
-	extui.OldToggleFrame = ui.ToggleFrame;
-	ui.ToggleFrame = function(frm) 
-						if extui.frames[frm] ~= nil then
-							frm:ShowWindow(ui.GetFrame(frm):IsVisible() and 0 or 1);
-						else
-							extui.OldToggleFrame(frm);
-						end
-					end;
-	
-	_G["EXTUI_LOADED"] = true;
-end
-
 function EXTENDEDUI_ON_INIT(addon, frame)
     if _G["ADDONS"] == nil then
         _G["ADDONS"] = {};
@@ -100,11 +78,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 
 	extui.isSetting = false;
 
-	
-	s, bl = pcall(EXTENDEDUI_ON_GAME);
-	if not(s) then
-		extui.print("Super Professional Error Text: "..bl);
-	end
+	extui.LoadSettings();
 
 	if _G["_PUMP_RECIPE_OPEN_EXTOLD"] == nil then
 		_G["_PUMP_RECIPE_OPEN_EXTOLD"] = _G["_PUMP_RECIPE_OPEN"];
@@ -138,44 +112,48 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPEN_UI");
 	ctrls:SetSkinName("test_pvp_btn");
 
-end
+	--only runs on first startup since *_ON_INIT gets called on map change etc
+	if _G["EXTUI_LOADED"] == nil then
+		if not(extui.GetSetting("remload")) then
+			extui.print("ExtendedUI Loaded");
+		end
 
+		extui.OldToggleFrame = ui.ToggleFrame;
+		ui.ToggleFrame = function(frm) 
+							if extui.frames[frm] == nil then
+								extui.OldToggleFrame(frm);
+							end
+						end;
+		extui.OldGetFrame = ui.GetFrame;
+		ui.GetFrame = function(frm)
+							if extui.frames[frm] ~= nil then
+								local nframe = extui.OldGetFrame(frm);
 
-function DEBUG_TEST_SLOTS()
+								if nframe.OldShowWindow ~= nil then return nframe; end
 
-	local clist = s_buff_ui["captionlist"][1]
-	for k,v in pairs(clist) do
-		v:SetText("{#FFFF00}{ol}{s12}noo{/}");
-		v:ShowWindow(1);
+								nframe.OldShowWindow = nframe.ShowWindow;
+
+								function nframe:ShowWindow(b,ex)
+									if extui.frames[self:GetName()] ~= nil then
+										if extui.frames[self:GetName()].saveHidden ~= nil then
+											if ex then
+												self:OldShowWindow(b);
+											end
+										else
+											self:OldShowWindow(b);
+										end
+									else
+										self:OldShowWindow(b);
+									end
+								end
+
+								return nframe;
+							else
+								return extui.OldGetFrame(frm);
+							end
+						end;
+		
+		_G["EXTUI_LOADED"] = true;
 	end
 
-	local clist = s_buff_ui["captionlist"][2]
-	for k,v in pairs(clist) do
-		v:SetText("{#FFFF00}{ol}{s12}noo{/}");
-		v:ShowWindow(1);
-	end
-
-	local clist = s_buff_ui["captionlist"][0]
-	for k,v in pairs(clist) do
-		v:SetText("{#FFFF00}{ol}{s12}noo{/}");
-		v:ShowWindow(1);
-	end
-
-	local clist = t_buff_ui["captionlist"][1]
-	for k,v in pairs(clist) do
-		v:SetText("{#FFFF00}{ol}{s12}noo{/}");
-		v:ShowWindow(1);
-	end
-
-	local clist = t_buff_ui["captionlist"][2]
-	for k,v in pairs(clist) do
-		v:SetText("{#FFFF00}{ol}{s12}noo{/}");
-		v:ShowWindow(1);
-	end
-
-	local clist = t_buff_ui["captionlist"][0]
-	for k,v in pairs(clist) do
-		v:SetText("{#FFFF00}{ol}{s12}noo{/}");
-		v:ShowWindow(1);
-	end
 end

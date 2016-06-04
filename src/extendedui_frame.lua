@@ -72,7 +72,6 @@ extui.frames = {
 			["hasChild"] = false,
 			["name"] = "Mini Map",
 			["noResize"] = true,
-			["saveHidden"] = true,
 		},
 		["chat"] = {
 			["isMovable"] = true,
@@ -315,6 +314,10 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 				toc:Resize(w, h);
 			end
 
+			if v.saveHidden then
+				toc:ShowWindow(extui.framepos[tostring(k)].hidden, true);
+			end
+
 			if not(extui.firstStart) then
 				extui.defaultFrames[tostring(k)] = {};
 				extui.defaultFrames[tostring(k)]["x"] = xs;
@@ -325,11 +328,6 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 					extui.defaultFrames[tostring(k)]["child"] = {};
 				end
 
-				extui.OverwriteHide(toc);
-			end
-
-			if v.saveHidden then
-				toc:ShowWindow(extui.framepos[tostring(k)].hidden);
 			end
 
 			if k=="targetinfo" then
@@ -348,17 +346,17 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 			extui.framepos[tostring(k)]["w"] = w;
 			extui.framepos[tostring(k)]["h"] = h;
 
+			if v.saveHidden then
+				extui.framepos[tostring(k)]["hidden"] = toc:IsVisible();
+			end
+
 			if not(extui.firstStart) then
 				extui.defaultFrames[tostring(k)] = extui.framepos[tostring(k)];
-				extui.OverwriteHide(toc);
 			end
 
 			hasNew = true;
 			if v.hasChild then
 				extui.framepos[tostring(k)]["child"] = {};
-			end
-			if v.saveHidden then
-				extui.framepos[tostring(k)]["hidden"] = toc:IsVisible();
 			end
 		end,
 		function(k,v)
@@ -420,28 +418,8 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 	INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
 	extui.INIT_BUFF_UI(ui.GetFrame("targetbuff"), t_buff_ui, "TARGET_BUFF_UPDATE");
 
-	DEBUG_TEST_SLOTS();
+	extui.RemoveJoySetting();
 end
-
-
-function extui.OverwriteHide(frame)
-	if frame.OldShowWindow then return; end
-
-	frame.OldShowWindow = frame.ShowWindow;
-
-	function frame:ShowWindow(b)
-		if extui.framepos[frame:GetName()] ~= nil then
-			if extui.frames[frame:GetName()].saveHidden ~= nil then
-				frame.OldShowWindow(self, extui.framepos[frame:GetName()].hidden);
-			else
-				frame.OldShowWindow(self,b);
-			end
-		else
-			frame.OldShowWindow(self,b);
-		end
-	end
-end
-
 
 
 --debuff = 2
@@ -471,8 +449,12 @@ function extui.MoveBuffCaption(name, slotname)
 	local bslot = ui.GetFrame(name):GetChild(slotname);
 	local aslotset = tolua.cast(bslot, 'ui::CSlotSet');
 
-	aslotset:SetColRow(30,1);
-	aslotset:CreateSlots();
+	if extui.GetSetting("extbuff") == true then
+		aslotset:SetColRow(30,1);
+		aslotset:CreateSlots();
+	else
+		aslotset:SetColRow(10,1);
+	end
 
 
 	local clist = buff_ui["captionlist"][typ]
@@ -505,7 +487,7 @@ function extui.INIT_BUFF_UI(frame, buff_ui, updatescp)
 	for i = 0 , buff_ui["buff_group_cnt"] do
 	buff_ui["slotcount"][i] = 0;
 	--buff_ui["slotlist"][i] = {};
-	buff_ui["captionlist"][i] = {};
+	--buff_ui["captionlist"][i] = {};
 		while 1 do
 			if buff_ui["slotsets"][i] == nil then
 				break;

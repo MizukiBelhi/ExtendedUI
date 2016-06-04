@@ -5,7 +5,7 @@ if extui == nil then
 end
 
 
-local function spairs(t, order)
+function extui.spairs(t, order)
     local keys = {}
     for k in pairs(t) do keys[#keys+1] = k end
     if order then
@@ -22,7 +22,7 @@ local function spairs(t, order)
     end
 end
 
-local function round(num, idp)
+function extui.round(num, idp)
 	if idp and idp>0 then
 		local mult = 10^idp;
 		return math.floor(num * mult + 0.5) / mult;

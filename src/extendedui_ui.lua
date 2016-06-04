@@ -7,9 +7,9 @@ end
 
 
 function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
+
 	local frm = ui.GetFrame(argStr);
-	extui.framepos[argStr].hidden = ctrl:IsChecked() and 1 or 0;
-	frm:ShowWindow(ctrl:IsChecked());
+	frm:ShowWindow(ctrl:IsChecked(), true);
 end
 
 
@@ -75,8 +75,8 @@ function extui.tpUpdateSliders()
 			sliderX:SetLevel(xs);
 			sliderY:SetLevel(ys);
 			
-			textX:SetText("{@st42b}"..round(xs).."{/}");
-			textY:SetText("{@st42b}"..round(ys).."{/}");
+			textX:SetText("{@st42b}"..extui.round(xs).."{/}");
+			textY:SetText("{@st42b}"..extui.round(ys).."{/}");
 
 			--local toc = ui.GetFrame(k)
 			local isVisibleCheck = GET_CHILD(uibox,"extuictbuthh"..tostring(k),"ui::CCheckBox");
@@ -94,8 +94,8 @@ function extui.tpUpdateSliders()
 				sliderW:SetLevel(ws);
 				sliderH:SetLevel(hs);
 
-				textW:SetText("{@st42b}"..round(ws).."{/}");
-				textH:SetText("{@st42b}"..round(hs).."{/}");
+				textW:SetText("{@st42b}"..extui.round(ws).."{/}");
+				textH:SetText("{@st42b}"..extui.round(hs).."{/}");
 			end
 		end,
 		nil,nil,nil,
@@ -111,8 +111,8 @@ function extui.tpUpdateSliders()
 			sliderX:SetLevel(xs);
 			sliderY:SetLevel(ys);
 			
-			textX:SetText("{@st42b}"..round(xs).."{/}");
-			textY:SetText("{@st42b}"..round(ys).."{/}");
+			textX:SetText("{@st42b}"..extui.round(xs).."{/}");
+			textY:SetText("{@st42b}"..extui.round(ys).."{/}");
 		end);
 end
 
@@ -133,8 +133,8 @@ function EXTUI_ON_SLIDE()
 					
 					local x = sliderX:GetLevel();
 					local y = sliderY:GetLevel();
-					textX:SetText("{@st42b}"..round(x).."{/}");
-					textY:SetText("{@st42b}"..round(y).."{/}");
+					textX:SetText("{@st42b}"..extui.round(x).."{/}");
+					textY:SetText("{@st42b}"..extui.round(y).."{/}");
 
 					local toc = ui.GetFrame(k)
 					local doMove = false;
@@ -154,8 +154,8 @@ function EXTUI_ON_SLIDE()
 						local w = sliderW:GetLevel();
 						local h = sliderH:GetLevel();
 
-						textW:SetText("{@st42b}"..round(w).."{/}");
-						textH:SetText("{@st42b}"..round(h).."{/}");
+						textW:SetText("{@st42b}"..extui.round(w).."{/}");
+						textH:SetText("{@st42b}"..extui.round(h).."{/}");
 						
 						if toc:GetWidth() ~= sliderW:GetLevel() or toc:GetHeight() ~= sliderH:GetLevel() then
 							doResize = true;
@@ -174,8 +174,8 @@ function EXTUI_ON_SLIDE()
 						end
 					end
 
-					local isVisibleCheck = GET_CHILD(uibox,"extuictbuthh"..tostring(k),"ui::CCheckBox");
-					isVisibleCheck:SetCheck(toc:IsVisible());
+					--local isVisibleCheck = GET_CHILD(uibox,"extuictbuthh"..tostring(k),"ui::CCheckBox");
+					--isVisibleCheck:SetCheck(toc:IsVisible());
 					if v.saveHidden then
 						extui.framepos[tostring(k)]["hidden"] = toc:IsVisible();
 					end
@@ -229,8 +229,8 @@ function EXTUI_ON_SLIDE()
 							local x = sliderX:GetLevel();
 							local y = sliderY:GetLevel();
 							
-							textX:SetText("{@st42b}"..round(x).."{/}");
-							textY:SetText("{@st42b}"..round(y).."{/}");
+							textX:SetText("{@st42b}"..extui.round(x).."{/}");
+							textY:SetText("{@st42b}"..extui.round(y).."{/}");
 							
 							local doMove = false;
 
@@ -371,115 +371,17 @@ function extui.InitSideFrame()
 	cbox = tolua.cast(cbox, "ui::CGroupBox");
 	cbox:SetSkinName("bg2");
 	
-	local ctrls = nil;
-	local inx = 20;
-	local iny = 20;
-	local _settings = extui.GetSettings();
-	local iii = 1;
-	for k,v in spairs(_settings, function(t,a,b) return t[b].order > t[a].order end) do
-		local typedata = v.typedata;
-		local ctrltype = typedata.t;
-		local ctrla = typedata.a;
-		local value = v.val;
-		local name = v.name;
-		local tool = v.tool;
-		local oncall = v.oncall;
-		local oncreate = v.oncreate;
-		local isDisabled = v.disabled;
-		
-		
-		if ctrla ~= "newline" then
-			ctrls = cbox:CreateOrGetControl(ctrla, "extuitnl"..tostring(k), inx, iny, 150, 30);
-		end
-		if ctrltype then
-			ctrls = tolua.cast(ctrls, ctrltype);
-		end
-
-		if tool ~= nil and tool ~= "" then
-			ctrls:SetTextTooltip(string.format("{@st42b}"..tool.."{/}"));
-		end
-
-		if ctrla == "checkbox" then
-			ctrls:SetText("{@st42b}"..tostring(name).."{/}");
-			ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS");
-			ctrls:SetEventScriptArgString(oncall, tostring(k));
-			ctrls:SetCheck(value==true and 1 or 0);
-			ctrls:SetClickSound("button_click_big");
-			ctrls:SetOverSound("button_over");
-
-			if isDisabled then
-				ctrls:SetEventScript(oncall, "EXTENDEDUI_VOID");
-			end
-
-		elseif ctrla == "slidebar" then
-			ctrls:SetMaxSlideLevel(v.max);
-			ctrls:SetMinSlideLevel(v.min or 0);
-			ctrls:SetLevel(value);
-			ctrls:Resize(300,30);
-			ctrls:RunUpdateScript("EXTENDEDUI_ON_SETTINGS_SLIDE");
-
-			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetctrlsl"..tostring(k), inx, iny-12, 150, 30);
-			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
-			ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
-
-			if isDisabled then
-				ctrlst:SetColorTone("FF444444");
-				ctrls:RunUpdateScript("EXTENDEDUI_VOID");
-			end
-
-		elseif ctrla == "richtext" then
-			ctrls:SetText(name);
-		elseif ctrla == "labelline" then
-			inx=20;
-			iny = iny+40;
-
-			if iii%2 ~= 0 then
-				iny = iny-40;
-			end
-
-			ctrls:SetOffset(inx,iny);
-			ctrls:Resize(700,1);
-
-			if iii%2 == 0 then
-				iny = iny-30;
-			else
-				iny = iny-30;
-				iii=iii+1;
-			end
-		end
-
-		if isDisabled then
-			ctrls:SetColorTone("FF444444");
-			ctrls:SetClickSound("");
-			ctrls:SetOverSound("");
-			ctrls:CreateOrGetControl("picture", "extuitctrlpd"..tostring(k), 400, 30, ui.LEFT, ui.TOP, 0, 0, 0, 0)
-		end
-
-		if oncreate ~= nil then
-			oncreate(ctrls, inx, iny);
-		end
-		
-		inx = inx+400;
-		
-		if iii%2 == 0 then
-			iny = iny+40;
-			inx = 20;
-		end
-		
-		iii = iii+1;
-	end
-
+	extui.UIAddSettings(cbox);
 	
 	--frame box
 	cbox = ctrl:CreateOrGetControl("groupbox", "extuibox", 30, 120, 740, 430);
 	cbox = tolua.cast(cbox, "ui::CGroupBox");
 	cbox:SetSkinName("bg2");
 
-
 	--lots of slidersssss yaaay!
-	ctrls = nil;
-	inx = 10;
-	iny = 10;
+	local ctrls = nil;
+	local inx = 10;
+	local iny = 10;
 
 
 	ctrls = cbox:CreateOrGetControl("richtext", "extuitxtllall", inx, iny, 300, 30);
@@ -536,7 +438,7 @@ function extui.InitSideFrame()
 				
 				ctrls = cbox:CreateOrGetControl("richtext", "extuitxtccp"..tostring(k), inx+295, iny+5, 300, 30);
 				ctrls = tolua.cast(ctrls, "ui::CRichText");
-				ctrls:SetText("{@st42b}"..round(x).."{/}");
+				ctrls:SetText("{@st42b}"..extui.round(x).."{/}");
 
 
 				iny = iny+35;
@@ -553,7 +455,7 @@ function extui.InitSideFrame()
 				
 				ctrls = cbox:CreateOrGetControl("richtext", "extuitxtccsp"..tostring(k), inx+295, iny+5, 300, 30);
 				ctrls = tolua.cast(ctrls, "ui::CRichText");
-				ctrls:SetText("{@st42b}"..round(y).."{/}");
+				ctrls:SetText("{@st42b}"..extui.round(y).."{/}");
 				
 				iny = iny+35;
 				
@@ -576,7 +478,7 @@ function extui.InitSideFrame()
 					
 					ctrls = cbox:CreateOrGetControl("richtext", "extuitxtcw"..tostring(k), inx+295, iny+5, 300, 30);
 					ctrls = tolua.cast(ctrls, "ui::CRichText");
-					ctrls:SetText("{@st42b}"..round(w).."{/}");
+					ctrls:SetText("{@st42b}"..extui.round(w).."{/}");
 					
 					iny = iny+35;
 					
@@ -592,7 +494,7 @@ function extui.InitSideFrame()
 					
 					ctrls = cbox:CreateOrGetControl("richtext", "extuitxtch"..tostring(k), inx+295, iny+5, 300, 30);
 					ctrls = tolua.cast(ctrls, "ui::CRichText");
-					ctrls:SetText("{@st42b}"..round(h).."{/}");
+					ctrls:SetText("{@st42b}"..extui.round(h).."{/}");
 					
 					iny = iny+35;
 				
@@ -606,6 +508,11 @@ function extui.InitSideFrame()
 				ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CHECK_HIDE");
 				ctrls:SetEventScriptArgString(ui.LBUTTONUP, tostring(k));
 				ctrls:SetCheck(toc:IsVisible());
+				if extui.frames[tostring(k)].saveHidden then
+					ctrls:SetColorTone("FF00FF00");
+				else
+					ctrls:SetColorTone("FFFF0000");
+				end
 				
 				iny = iny+30;
 				
@@ -661,7 +568,7 @@ function extui.InitSideFrame()
 						
 						ctrls = cbox:CreateOrGetControl("richtext", "extuitxtccp"..tostring(k)..tostring(ck), inx+295, iny+5, 300, 30);
 						ctrls = tolua.cast(ctrls, "ui::CRichText");
-						ctrls:SetText("{@st42b}"..round(x).."{/}");
+						ctrls:SetText("{@st42b}"..extui.round(x).."{/}");
 						
 						iny = iny+35;
 						
@@ -677,7 +584,7 @@ function extui.InitSideFrame()
 						
 						ctrls = cbox:CreateOrGetControl("richtext", "extuitxtccfp"..tostring(k)..tostring(ck), inx+295, iny+5, 300, 30);
 						ctrls = tolua.cast(ctrls, "ui::CRichText");
-						ctrls:SetText("{@st42b}"..round(y).."{/}");
+						ctrls:SetText("{@st42b}"..extui.round(y).."{/}");
 						
 						iny = iny+35;
 					end

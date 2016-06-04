@@ -6,6 +6,7 @@ end
 
 extui.ldSettingsUI = {};
 extui.lSettingsUI = {};
+extui.defaultSettings = {};
 
 function extui.GetSetting(name)
 	return extui.lSettingsUI[name].val;
@@ -25,7 +26,7 @@ function extui.AddSetting(name, tbl)
 
 end
 
-function extui.AddDefaults(tbl)
+function extui.AddDefaults(tbl, adef)
 	if extui.ldSettingsUI == nil then
 		extui.ldSettingsUI = {};
 	end
@@ -36,6 +37,10 @@ function extui.AddDefaults(tbl)
 			extui.ldSettingsUI[tostring(k)] = v;
 
 		end
+	end
+
+	if adef ~= nil then
+		extui.defaultSettings = tbl;
 	end
 end
 
@@ -51,7 +56,9 @@ function extui.LoadSettings()
 		["iconsize"]	=	32,
 		["extbuff"]		=	true,
 		["uiscale"]		=	100,
-	});
+		["remjoy"]		=	false,
+		["remload"]		=	false,
+	}, true);
 
 	extui.lSettingsUI = {};
 
@@ -68,6 +75,20 @@ function extui.LoadSettings()
 			["typedata"] = {
 				["a"] = "newline",
 			}
+		}
+	);
+
+
+	extui.AddSetting("remload", {
+			["name"] = "Remove Loaded Message",
+			["tool"] = "Removes the \"ExtendedUI Loaded\" message on startup",
+			["typedata"] = {
+				["t"] = "ui::CCheckBox",
+				["a"] = "checkbox",
+			},
+			["val"] = extui.ldSettingsUI["remload"],
+			["callback"] = function(frame, ctrl) extui.SetSetting("remload",ctrl:IsChecked() == 1);	end,
+			["oncall"] = ui.LBUTTONUP,
 		}
 	);
 
@@ -91,16 +112,19 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("remjoy", {
-			["name"] = "Removes thingies from Joystick Quickslot",
-			["tool"] = "I don't even know.. let me sleep!",
+			["name"] = "Hide buttons from Joystick Quickslot",
+			["tool"] = "Removes the \"Set 1\"/\"Set 2\" buttons from the Joystick Quickslot",
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
 			},
 			["val"] = extui.ldSettingsUI["remjoy"],
-			["callback"] = function(frame, ctrl) extui.SetSetting("remjoy",ctrl:IsChecked() == 1); end,
+			["callback"] = function(frame, ctrl)
+							extui.SetSetting("remjoy",ctrl:IsChecked() == 1);
+
+							extui.RemoveJoySetting();
+						end,
 			["oncall"] = ui.LBUTTONUP,
-			["disabled"] = true,
 		}
 	);
 
@@ -192,7 +216,9 @@ function extui.LoadSettings()
 												local slotCount = fch:GetSlotCount();
 												fch:Resize(slotCount*ctrl:GetLevel(),ctrl:GetLevel());
 
-												ui.GetFrame("extuiframectrls"..k..ch):Resize(slotCount*ctrl:GetLevel(),ctrl:GetLevel());
+												if ui.GetFrame("extuiframectrls"..k..ch) ~= nil then
+													ui.GetFrame("extuiframectrls"..k..ch):Resize(slotCount*ctrl:GetLevel(),ctrl:GetLevel());
+												end
 											end
 										end
 									end
@@ -217,7 +243,6 @@ function extui.LoadSettings()
 							extui.SetSetting("extbuff",ctrl:IsChecked() == 1);
 						end,
 			["oncall"] = ui.LBUTTONUP,
-			["disabled"] = true,
 		}
 	);
 
@@ -312,4 +337,126 @@ function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
 		end
 	end
 	return 1;
+end
+
+
+function extui.UIAddSettings(cbox)
+	local ctrls = nil;
+	local inx = 20;
+	local iny = 20;
+	local _settings = extui.GetSettings();
+	local iii = 1;
+	for k,v in extui.spairs(_settings, function(t,a,b) return t[b].order > t[a].order end) do
+		local typedata = v.typedata;
+		local ctrltype = typedata.t;
+		local ctrla = typedata.a;
+		local value = v.val;
+		local name = v.name;
+		local tool = v.tool;
+		local oncall = v.oncall;
+		local oncreate = v.oncreate;
+		local isDisabled = v.disabled;
+		
+		
+		if ctrla ~= "newline" then
+			ctrls = cbox:CreateOrGetControl(ctrla, "extuitnl"..tostring(k), inx, iny, 150, 30);
+		end
+		if ctrltype then
+			ctrls = tolua.cast(ctrls, ctrltype);
+		end
+
+		if tool ~= nil and tool ~= "" then
+			ctrls:SetTextTooltip(string.format("{@st42b}"..tool.."{/}"));
+		end
+
+		if ctrla == "checkbox" then
+			ctrls:SetText("{@st42b}"..tostring(name).."{/}");
+			ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS");
+			ctrls:SetEventScriptArgString(oncall, tostring(k));
+			ctrls:SetCheck(value==true and 1 or 0);
+			ctrls:SetClickSound("button_click_big");
+			ctrls:SetOverSound("button_over");
+
+			if isDisabled then
+				ctrls:SetEventScript(oncall, "EXTENDEDUI_VOID");
+			end
+
+		elseif ctrla == "slidebar" then
+			ctrls:SetMaxSlideLevel(v.max);
+			ctrls:SetMinSlideLevel(v.min or 0);
+			ctrls:SetLevel(value);
+			ctrls:Resize(300,30);
+			ctrls:RunUpdateScript("EXTENDEDUI_ON_SETTINGS_SLIDE");
+			iny = iny+5;
+			ctrls:SetOffset(inx,iny);
+
+			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetctrlsl"..tostring(k), inx, iny-12, 150, 30);
+			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+			ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+
+			if isDisabled then
+				ctrlst:SetColorTone("FF444444");
+				ctrls:RunUpdateScript("EXTENDEDUI_VOID");
+			end
+
+			iny = iny-5;
+
+		elseif ctrla == "richtext" then
+			ctrls:SetText(name);
+		elseif ctrla == "labelline" then
+			inx=20;
+			iny = iny+40;
+
+			if iii%2 ~= 0 then
+				iny = iny-40;
+			end
+
+			ctrls:SetOffset(inx,iny);
+			ctrls:Resize(700,1);
+
+			if iii%2 == 0 then
+				iny = iny-30;
+			else
+				iny = iny-30;
+				iii=iii+1;
+			end
+		end
+
+		if isDisabled then
+			ctrls:SetColorTone("FF444444");
+			ctrls:SetClickSound("");
+			ctrls:SetOverSound("");
+			ctrls:CreateOrGetControl("picture", "extuitctrlpd"..tostring(k), 400, 30, ui.LEFT, ui.TOP, 0, 0, 0, 0)
+		end
+
+		if oncreate ~= nil then
+			oncreate(ctrls, inx, iny);
+		end
+		
+		inx = inx+400;
+		
+		if iii%2 == 0 then
+			iny = iny+40;
+			inx = 20;
+		end
+		
+		iii = iii+1;
+	end
+
+end
+
+
+function extui.RemoveJoySetting()
+	local set = extui.GetSetting("remjoy");
+
+	local frm = ui.GetFrame("joystickquickslot");
+	local ch = frm:GetChild("L2R2_Set1");
+	ch:ShowWindow( not(set) and 1 or 0 );
+	ch = frm:GetChild("L2R2_Set2");
+	ch:ShowWindow( not(set) and 1 or 0 );
+	ch = frm:GetChild("L2R2");
+	ch:ShowWindow( not(set) and 1 or 0 );
+	frm = ui.GetFrame("joystickrestquickslot");
+	ch = frm:GetChild("restmode");
+	ch:ShowWindow( not(set) and 1 or 0 );
 end
