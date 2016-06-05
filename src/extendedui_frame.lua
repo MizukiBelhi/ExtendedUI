@@ -208,7 +208,7 @@ extui.frames = {
 			["name"] = "Notice",
 			["noResize"] = true,
 		},
-		["fevercombo"] = {
+		["fevorcombo"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "Fever Combo",

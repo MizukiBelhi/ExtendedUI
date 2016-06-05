@@ -250,6 +250,22 @@ function extui.LoadSettings()
 		}
 	);
 
+	extui.AddSetting("buffsec", {
+			["name"] = "Always Show Seconds",
+			["tool"] = "Shows (x)s instead of (x)m.",
+			["typedata"] = {
+				["t"] = "ui::CCheckBox",
+				["a"] = "checkbox",
+			},
+			["val"] = extui.ldSettingsUI["buffsec"],
+			["callback"] = function(frame, ctrl)
+							extui.SetSetting("buffsec",ctrl:IsChecked() == 1);
+						end,
+			["oncall"] = ui.LBUTTONUP,
+			["disabled"] = true,
+		}
+	);
+
 
 	extui.AddSetting("line", {
 			["typedata"] = {

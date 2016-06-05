@@ -5,6 +5,8 @@ if extui == nil then
 end
 
 extui.unsavedSettings = false;
+extui.selectedFrame = nil;
+extui.selectedFrameParent = nil;
 
 function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	local frm = ui.GetFrame(argStr);
@@ -318,6 +320,61 @@ function EXTENDEDUI_ON_MINI_CANCEL()
 	EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
 end
 
+function EXTENDEDUI_MINI_UPDATE()
+	local frame = extui.selectedFrameParent;
+	local cframe = extui.selectedFrame;
+
+	if frame ~= nil then
+		local minidrop = ui.GetFrame("EXTENDEDUI_MINI_FRAME")
+		if minidrop == nil then return 0; end
+
+		minidrop = minidrop:GetChild("extuiminidrop");
+		minidrop = tolua.cast(minidrop, "ui::CDropList");
+
+		local selFrame = frame:GetName();
+		selFrame = extui.frames[selFrame].name;
+
+		if cframe ~= nil then
+			selFrame = selFrame.."."..extui.frames[frame:GetName()].child[cframe:GetName()].name;
+		end
+
+		if minidrop:GetSelItemCaption() ~= selFrame then
+			minidrop:SelectItemByKey(selFrame);
+			minidrop:Invalidate();
+		end
+	end
+
+	return 1;
+end
+
+function EXTENDEDUI_MINI_ON_SELECT(frame)
+	local droplist = GET_CHILD(frame, "extuiminidrop", "ui::CDropList");
+	local selFrame = droplist:GetSelItemKey();
+
+	if selFrame == "0" then
+		extui.selectedFrameParent = nil;
+		extui.selectedFrame = nil;
+		return;
+	end
+
+	for k,v in pairs(extui.frames) do
+		if v.name == selFrame then
+			extui.selectedFrameParent = ui.GetFrame(v.name);
+			extui.selectedFrame = nil;
+			break;
+		end
+		if v.hasChild then
+			for _k,_v in pairs(v.child) do
+				if v.name..".".._v.name == selFrame then
+					extui.selectedFrame = ui.GetFrame(v.name):GetChild(_v.name);
+					extui.selectedFrameParent = ui.GetFrame(v.name);
+					break;
+				end
+			end
+		end
+	end
+end
+
 function extui.OpenMiniFrame()
 	local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
 	savedFramePosY = mf:GetX();
@@ -346,7 +403,28 @@ function extui.OpenMiniFrame()
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_CANCEL");
 	ctrls:SetSkinName("test_pvp_btn");
 
-	frm:Invalidate();
+	ctrls = frm:CreateOrGetControl("droplist", "extuiminidrop", (350/2)-100, 15, 200, 30);
+	ctrls = tolua.cast(ctrls, "ui::CDropList");
+	ctrls:SetSkinName("droplist_normal");
+	ctrls:SetTextAlign("left", "left");
+	ctrls:AddItem(0, "None Selected");
+
+	for k,v in pairs(extui.frames) do
+		if v.isMovable then
+			ctrls:AddItem(tostring(v.name),tostring(v.name));
+			if v.hasChild then
+				for _k,_v in pairs(v.child) do
+					ctrls:AddItem(tostring(v.name).."."..tostring(_v.name), tostring(v.name).."."..tostring(_v.name));
+				end
+			end
+		end
+	end
+
+	ctrls:SelectItem(0);
+	ctrls:SetSelectedScp("EXTENDEDUI_MINI_ON_SELECT");
+	ctrls:Invalidate();
+
+	frm:RunUpdateScript("EXTENDEDUI_MINI_UPDATE");
 end
 
 --TODO: Needs to use ForEachFrame
@@ -673,8 +751,16 @@ function EXTENDEDUI_ON_OPEN_UI()
 	extui.openside();
 end
 
-function EXTENDEDUI_ON_DRAG_START_END()
+function EXTENDEDUI_ON_DRAG_START_END(frame, argStr)
 	extui.IsDragging = not(extui.IsDragging);
+
+	if argStr == "start" then
+		extui.selectedFrameParent = ui.GetFrame(frame:GetUserValue("FRAME_NAME"));
+		extui.selectedFrame = nil;
+	elseif argStr == "startc" then
+		extui.selectedFrame = ui.GetFrame(frame:GetUserValue("FRAME_NAME")):GetChild(frame:GetUserValue("CHILD_NAME"));
+		extui.selectedFrameParent = ui.GetFrame(frame:GetUserValue("FRAME_NAME"));
+	end
 end
 
 extui.showAll = false;
@@ -697,6 +783,7 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr)
 					frm:MoveFrame(x, y);
 					frm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING");
 					frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
+					frm:SetEventScriptArgString(ui.LBUTTONDOWN, "start");
 					frm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
 					frm:SetUserValue("FRAME_NAME", k);
 
@@ -716,6 +803,7 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr)
 							chfrm:SetUserValue("CHILD_NAME", ch);
 							chfrm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
 							chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
+							chfrm:SetEventScriptArgString(ui.LBUTTONDOWN, "startc");
 							chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
 							chfrm = tolua.cast(chfrm, "ui::CRichText");
 							chfrm:SetColorTone("FF00FF00");
