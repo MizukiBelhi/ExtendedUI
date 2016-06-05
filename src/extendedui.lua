@@ -102,6 +102,11 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 										end;
 	end
 
+	--Minimap.. sorry
+	--uieffect always visible, so we put an update script into there to check for minimap
+	local uieffect_frame = ui.GetFrame("uieffect");
+	uieffect_frame:RunUpdateScript("EXTUI_MINIMAP_VISIBILITY_CHECK");
+
 
 	local _frame = ui.GetFrame("systemoption")
 	local ctrls = _frame:CreateOrGetControl("button", "extuiopenbutton", 50, 271, 208, 35);

@@ -72,6 +72,7 @@ extui.frames = {
 			["hasChild"] = false,
 			["name"] = "Mini Map",
 			["noResize"] = true,
+			["saveHidden"] = true,
 		},
 		["chat"] = {
 			["isMovable"] = true,
@@ -193,6 +194,25 @@ extui.frames = {
 			["name"] = "Joystick Rest Quickslot",
 			["noResize"] = true,
 			["isQuickSlot"] = true,
+		},
+		["ctrltargetui"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "CTRL Target Lock",
+			["noResize"] = true,
+			["saveHidden"] = true,
+		},
+		["notice"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "Notice",
+			["noResize"] = true,
+		},
+		["fevercombo"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "Fever Combo",
+			["noResize"] = true,
 		},
 	};
 
@@ -526,4 +546,26 @@ function extui.INIT_BUFF_UI(frame, buff_ui, updatescp)
 	timer:SetUpdateScript(updatescp);
 	timer:Start(0.45);
 end
+
+
+
+--minimap, sorry..
+--minimap is made visible/hidden by client so we have to do this
+function EXTUI_MINIMAP_VISIBILITY_CHECK()
+	if extui.isSetting then return 1; end
+
+	local minimap_frame = ui.GetFrame("minimap");
+	if extui.framepos["minimap"].hidden == 0 then
+		if minimap_frame:IsVisible() == 1 then
+			minimap_frame:ShowWindow(0, true);
+		end
+	else
+		if minimap_frame:IsVisible() == 0 then
+			minimap_frame:ShowWindow(1, true);
+		end
+	end
+
+	return 1;
+end
+
 

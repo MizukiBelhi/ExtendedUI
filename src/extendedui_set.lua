@@ -12,6 +12,10 @@ function extui.GetSetting(name)
 	return extui.lSettingsUI[name].val;
 end
 
+function extui.GetSavedSetting(name)
+	return extui.ldSettingsUI[name];
+end
+
 function extui.SetSetting(name, val)
 	extui.lSettingsUI[name].val = val;
 end
@@ -301,6 +305,7 @@ function extui.LoadSettings()
 
 end
 
+
 function EXTENDEDUI_ON_SETTINGS_PRESS(frame, ctrl, argStr)
 	
 	local _settings = extui.GetSettings();
@@ -310,31 +315,40 @@ function EXTENDEDUI_ON_SETTINGS_PRESS(frame, ctrl, argStr)
 		if not(t) then
 			extui.print(tostring(p));
 		end
+		extui.unsavedSettings = true;
 	end
 	
 end
 
-function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
-	local _settings = extui.GetSettings();
 
+function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
 	local tabObj		    = extui.sideFrame:GetChild("extuitabs");
 	local itembox_tab		= tolua.cast(tabObj, "ui::CTabControl");
 	local curtabIndex	    = itembox_tab:GetSelectItemIndex();
 	
 	-- make sure it only happens when actually on that tab
 	if curtabIndex == 0 then
-
+		local _settings = extui.GetSettings();
 		local uibox = GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
+		ctrl = tolua.cast(ctrl, "ui::CSlideBar");
 		local n = ctrl:GetName();
-		local argStr = string.sub(tostring(n), string.len("extuitctrl")+1);
+		local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);
 
 		if _settings[argStr] ~= nil then
+			if ctrl:GetLevel() ~= _settings[argStr].val then
+				extui.unsavedSettings = true;
+
+				local labelval = GET_CHILD(uibox,"extuisetlabelval"..argStr,"ui::CRichText");
+				labelval:SetText("{@st42b}"..tostring(ctrl:GetLevel()).."{/}");
+			end
+
 			if _settings[argStr].callback ~= nil then
 
 				_settings[argStr].callback(uibox, ctrl);
 
 			end
 		end
+
 	end
 	return 1;
 end
@@ -350,8 +364,8 @@ function extui.UIAddSettings(cbox)
 		local typedata = v.typedata;
 		local ctrltype = typedata.t;
 		local ctrla = typedata.a;
-		local value = v.val;
 		local name = v.name;
+		local value = extui.GetSavedSetting(tostring(k));
 		local tool = v.tool;
 		local oncall = v.oncall;
 		local oncreate = v.oncreate;
@@ -359,7 +373,7 @@ function extui.UIAddSettings(cbox)
 		
 		
 		if ctrla ~= "newline" then
-			ctrls = cbox:CreateOrGetControl(ctrla, "extuitnl"..tostring(k), inx, iny, 150, 30);
+			ctrls = cbox:CreateOrGetControl(ctrla, "extuisetctrl"..tostring(k), inx, iny, 150, 30);
 		end
 		if ctrltype then
 			ctrls = tolua.cast(ctrls, ctrltype);
@@ -371,32 +385,36 @@ function extui.UIAddSettings(cbox)
 
 		if ctrla == "checkbox" then
 			ctrls:SetText("{@st42b}"..tostring(name).."{/}");
-			ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS");
 			ctrls:SetEventScriptArgString(oncall, tostring(k));
 			ctrls:SetCheck(value==true and 1 or 0);
 			ctrls:SetClickSound("button_click_big");
 			ctrls:SetOverSound("button_over");
 
-			if isDisabled then
-				ctrls:SetEventScript(oncall, "EXTENDEDUI_VOID");
+			if isDisabled == nil then
+				ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS");
 			end
 
 		elseif ctrla == "slidebar" then
 			ctrls:SetMaxSlideLevel(v.max);
 			ctrls:SetMinSlideLevel(v.min or 0);
 			ctrls:SetLevel(value);
-			ctrls:Resize(300,30);
-			ctrls:RunUpdateScript("EXTENDEDUI_ON_SETTINGS_SLIDE");
+			ctrls:Resize(260,30);
 			iny = iny+5;
 			ctrls:SetOffset(inx,iny);
 
-			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetctrlsl"..tostring(k), inx, iny-12, 150, 30);
+			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetlabelval"..tostring(k), inx+255, iny+5, 150, 30);
 			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
-			ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+			ctrlst:SetText("{@st42b}"..tostring(value).."{/}");
+
+			local ctrlsst = cbox:CreateOrGetControl("richtext", "extuisetctrlsl"..tostring(k), inx, iny-12, 150, 30);
+			ctrlsst = tolua.cast(ctrlsst, "ui::CRichText");
+			ctrlsst:SetText("{@st42b}"..tostring(name).."{/}");
 
 			if isDisabled then
 				ctrlst:SetColorTone("FF444444");
-				ctrls:RunUpdateScript("EXTENDEDUI_VOID");
+				ctrlsst:SetColorTone("FF444444");
+			else
+				ctrls:RunUpdateScript("EXTENDEDUI_ON_SETTINGS_SLIDE");
 			end
 
 			iny = iny-5;

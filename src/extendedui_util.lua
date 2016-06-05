@@ -70,12 +70,6 @@ function extui.SavePositions()
 		end
 	end
 	
-	local tosave = {
-		["settings"] = extui.ldSettingsUI,
-		["frames"] = extui.framepos,
-	};
-
-
 	local file, error = io.open("../addons/extendedui/settings.extui", "w");
 	if file ~= nil then
 		local _str = "";
@@ -119,6 +113,7 @@ function extui.SavePositions()
 		file:write(_str);
 		io.close(file);
 	end
+	extui.unsavedSettings = false;
 end
 
 
