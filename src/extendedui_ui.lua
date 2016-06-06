@@ -656,34 +656,6 @@ function EXTENDEDUI_MINI_UPDATE()
 	return 1;
 end
 
-function EXTENDEDUI_MINI_ON_SELECT(frame)
-	local droplist = GET_CHILD(frame, "extuiminidrop", "ui::CDropList");
-	local selFrame = droplist:GetSelItemKey();
-
-	if selFrame == "0" then
-		extui.selectedFrameParent = nil;
-		extui.selectedFrame = nil;
-		return;
-	end
-
-	for k,v in pairs(extui.frames) do
-		if v.name == selFrame then
-			extui.selectedFrameParent = ui.GetFrame(v.name);
-			extui.selectedFrame = nil;
-			break;
-		end
-		if v.hasChild then
-			for _k,_v in pairs(v.child) do
-				if v.name..".".._v.name == selFrame then
-					extui.selectedFrame = ui.GetFrame(v.name):GetChild(_v.name);
-					extui.selectedFrameParent = ui.GetFrame(v.name);
-					break;
-				end
-			end
-		end
-	end
-end
-
 function extui.OpenMiniFrame()
 	local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
 	extui.savedFramePosY = mf:GetX();
