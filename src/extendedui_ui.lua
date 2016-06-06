@@ -305,19 +305,205 @@ function EXTUI_ON_TAB_CHANGE(frame, ctrl, argStr, argNum)
 	end
 end
 
-local savedFramePosX = 0;
-local savedFramePosY = 0;
+extui.savedFramePosX = 0;
+extui.savedFramePosY = 0;
 
 function EXTENDEDUI_ON_MINI_CANCEL()
 	ui.GetFrame("EXTENDEDUI_MINI_FRAME"):ShowWindow(0);
 
 	local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
-	mf:MoveFrame(savedFramePosX, savedFramePosY);
+	mf:MoveFrame(extui.savedFramePosX, extui.savedFramePosY);
 	local uibox = GET_CHILD(mf, "extuibox", "ui::CGroupBox");
 	local chbox = GET_CHILD(uibox,"extuicheckallframes","ui::CCheckBox");
 	chbox:SetCheck(0);
 
+	extui.showAll = true;
 	EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
+	extui.isReload = true;
+	extui.oldSlider = {};
+	extui.UpdateCheck();
+
+	EXTENDEDUI_LOAD_POSITIONS(nil,"GAME_START");
+	extui.UpdateSliders();
+	extui.isReload = false;
+end
+
+function EXTENDEDUI_MINI_ON_SELECT(index, channelID)
+	local droplist = ui.GetDropListFrame("EXTENDEDUI_MINI_ON_SELECT");
+	
+	local selFrame = extui.dropListOptions[index];
+
+	local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
+	local minitext = frm:GetChild("extuiminigrpbox");
+	minitext = minitext:GetChild("extuiminitext");
+	minitext = tolua.cast(minitext, "ui::CRichText");
+
+	if index == 0 then
+		extui.oldSelectedFrameParent = extui.selectedFrameParent;
+		extui.selectedFrameParent = nil;
+		extui.selectedFrame = nil;
+		minitext:SetText(string.format("{@st42b}%s{/}","None Selected"));
+		extui.UpdateMiniBox();
+		return;
+	end
+
+	for k,v in pairs(extui.frames) do
+		if v.name == selFrame then
+			extui.oldSelectedFrameParent = extui.selectedFrameParent;
+			extui.selectedFrameParent = ui.GetFrame(k);
+			extui.selectedFrame = nil;
+			minitext:SetText(string.format("{@st42b}%s{/}",v.name));
+			extui.UpdateMiniBox();
+
+			local check_frames = frm:GetChild("extuicheckfram");
+			check_frames = tolua.cast(check_frames, "ui::CCheckBox");
+			local isChecked = (check_frames:IsChecked() == 1);
+
+			if isChecked then
+				if extui.oldSelectedFrameParent ~= nil and extui.oldSelectedFrameParent:GetName() ~= k then
+					extui.frames[extui.oldSelectedFrameParent:GetName()].show = true;
+					EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, extui.oldSelectedFrameParent:GetName());
+				end
+				extui.frames[k].show = false;
+
+				EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, k);
+			end
+			break;
+		end
+		if v.hasChild then
+			for _k,_v in pairs(v.child) do
+				if v.name..".".._v.name == selFrame then
+					extui.oldSelectedFrameParent = extui.selectedFrameParent;
+					extui.selectedFrame = ui.GetFrame(k):GetChild(_k);
+					extui.selectedFrameParent = ui.GetFrame(k);
+					minitext:SetText(string.format("{@st42b}%s{/}",v.name.." ==> ".._v.name));
+					extui.UpdateMiniBox();
+
+					local check_frames = frm:GetChild("extuicheckfram");
+					check_frames = tolua.cast(check_frames, "ui::CCheckBox");
+					local isChecked = (check_frames:IsChecked() == 1);
+
+					if isChecked then
+						if extui.oldSelectedFrameParent ~= nil and extui.oldSelectedFrameParent:GetName() ~= k then
+							extui.frames[extui.oldSelectedFrameParent:GetName()].show = true;
+							EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, extui.oldSelectedFrameParent:GetName());
+						end
+						extui.frames[k].show = false;
+
+						EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, k);
+					end
+					break;
+				end
+			end
+		end
+	end
+end
+
+extui.dropListOptions = {};
+function EXTENDEDUI_MINI_CREATE_DROPLIST()
+	local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
+	local adv_button = frm:GetChild("extuiminiadv");
+
+	local y = -75;
+
+	if adv_button:GetText() ~= "{@st66b}Advanced{/}" then
+		y = y-280;
+	end
+
+	local ctrls = ui.MakeDropListFrame(frm, 75, y, 200, 30, 10, ui.LEFT, "EXTENDEDUI_MINI_ON_SELECT");
+	ui.AddDropListItem("None Selected", "", 1);
+	local iii = 1;
+
+	for k,v in pairs(extui.frames) do
+		if v.isMovable then
+			ui.AddDropListItem(tostring(v.name),"", iii);
+			extui.dropListOptions[iii] = tostring(v.name);
+			iii = iii+1;
+			if v.hasChild then
+				for _k,_v in pairs(v.child) do
+					ui.AddDropListItem(" ==>"..tostring(_v.name), "", iii);
+					extui.dropListOptions[iii] = tostring(v.name).."."..tostring(_v.name);
+					iii = iii+1;
+				end
+			end
+		end
+	end
+end
+
+function EXTENDEDUI_MINI_ON_CHECK(frame, ctrl)
+	local isChecked = (ctrl:IsChecked() == 1);
+
+	local frm = extui.selectedFrameParent;
+
+	if isChecked and frm ~= nil then
+		extui.showAll = true;
+		EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, "*all", frm:GetName());
+	else
+		extui.showAll = false;
+		EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, "*all");
+	end
+end
+
+function EXTENDEDUI_ON_MINI_ADVANCED()
+	local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
+	frm:Resize(350, 400);
+	frm:MoveFrame(frm:GetX(), frm:GetY()-200);
+
+	local button_adv = frm:GetChild("extuiminiadv");
+	local button_close = frm:GetChild("extuiminiclose");
+	local button_save = frm:GetChild("extuiminisaveclose");
+
+	button_adv:SetOffset((350/2)-(125/2), 400-35-30);
+	button_close:SetOffset(175, 400-35);
+	button_save:SetOffset(50, 400-35);
+
+	button_adv:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_LESS");
+	button_adv:SetText("{@st66b}Less{/}");
+
+	local settingbox = frm:GetChild("extuiminigrpsetbox");
+	settingbox:ShowWindow(1);
+
+	extui.UpdateMiniBox();
+end
+
+function extui.UpdateMiniBox()
+	local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
+	local settingbox = frm:GetChild("extuiminigrpsetbox");
+	settingbox = tolua.cast(settingbox, "ui::CGroupBox");
+	settingbox:DeleteAllControl();
+
+	local frame = extui.selectedFrameParent;
+	local cframe = extui.selectedFrame;
+	local v = extui.frames[frame:GetName()];
+
+	if cframe ~= nil then
+		v = extui.frames[frame:GetName()].child[cframe:GetName()];
+	end
+
+	if frame ~= nil then
+		extui.MiniCreateSliderForFrame(10, 55, settingbox, v);
+	end
+end
+
+function EXTENDEDUI_ON_MINI_LESS()
+	local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
+	frm:Resize(350, 120);
+	frm:MoveFrame(frm:GetX(), frm:GetY()+200);
+
+	local button_adv = frm:GetChild("extuiminiadv");
+	local button_close = frm:GetChild("extuiminiclose");
+	local button_save = frm:GetChild("extuiminisaveclose");
+
+	button_adv:SetOffset((350/2)-(125/2), 85-30);
+	button_close:SetOffset(175, 85);
+	button_save:SetOffset(50, 85);
+
+	button_adv:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_ADVANCED");
+	button_adv:SetText("{@st66b}Advanced{/}");
+
+	local settingbox = frm:GetChild("extuiminigrpsetbox");
+	settingbox:ShowWindow(0);
+	settingbox:DeleteAllControl();
 end
 
 function EXTENDEDUI_MINI_UPDATE()
@@ -325,23 +511,146 @@ function EXTENDEDUI_MINI_UPDATE()
 	local cframe = extui.selectedFrame;
 
 	if frame ~= nil then
-		local minidrop = ui.GetFrame("EXTENDEDUI_MINI_FRAME")
-		if minidrop == nil then return 0; end
+		local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
+		if frm == nil then return 0; end
 
-		minidrop = minidrop:GetChild("extuiminidrop");
-		minidrop = tolua.cast(minidrop, "ui::CDropList");
+		local minitext = frm:GetChild("extuiminigrpbox");
+		minitext = minitext:GetChild("extuiminitext");
+		minitext = tolua.cast(minitext, "ui::CRichText");
 
 		local selFrame = frame:GetName();
 		selFrame = extui.frames[selFrame].name;
 
 		if cframe ~= nil then
-			selFrame = selFrame.."."..extui.frames[frame:GetName()].child[cframe:GetName()].name;
+			selFrame = selFrame.." ==> "..extui.frames[frame:GetName()].child[cframe:GetName()].name;
 		end
 
-		if minidrop:GetSelItemCaption() ~= selFrame then
-			minidrop:SelectItemByKey(selFrame);
-			minidrop:Invalidate();
+		selFrame = string.format("{@st42b}%s{/}",selFrame);
+
+		if minitext:GetText() ~= selFrame then
+			local check_frames = frm:GetChild("extuicheckfram");
+			check_frames = tolua.cast(check_frames, "ui::CCheckBox");
+			local isChecked = (check_frames:IsChecked() == 1);
+
+			if isChecked then
+				if extui.oldSelectedFrameParent ~= nil and extui.oldSelectedFrameParent:GetName() ~= frame:GetName() then
+					extui.frames[extui.oldSelectedFrameParent:GetName()].show = true;
+					EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, extui.oldSelectedFrameParent:GetName());
+				end
+				extui.frames[frame:GetName()].show = false;
+
+				EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, frame:GetName());
+			end
+			minitext:SetText(selFrame);
+			extui.UpdateMiniBox();
 		end
+
+		local frameName = frame:GetName();
+		if cframe ~= nil then
+			frameName = cframe:GetName();
+		end
+
+
+		local settingbox = frm:GetChild("extuiminigrpsetbox");
+		local labelvalx = settingbox:GetChild("extuilabelvalx");
+		if labelvalx then
+			local sliderx = settingbox:GetChild("extuislidex");
+			sliderx = tolua.cast(sliderx, "ui::CSlideBar");
+			local labelvaly = settingbox:GetChild("extuilabelvaly");
+			local slidery = settingbox:GetChild("extuislidey");
+			slidery = tolua.cast(slidery, "ui::CSlideBar");
+
+			local x = 0;
+			local y = 0;
+			if cframe == nil then
+				x = extui.framepos[frameName].x;
+				y = extui.framepos[frameName].y;
+			else
+				x = extui.framepos[frame:GetName()].child[frameName].x;
+				y = extui.framepos[frame:GetName()].child[frameName].y;
+			end
+
+
+			if (x ~= sliderx:GetLevel() or y ~= slidery:GetLevel()) and not(extui.IsDragging) then
+
+				if cframe == nil then
+					extui.framepos[frameName].x = sliderx:GetLevel();
+					extui.framepos[frameName].y = slidery:GetLevel();
+					x = extui.framepos[frameName].x;
+					y = extui.framepos[frameName].y;
+
+					local tcc = ui.GetFrame("extuidragframe"..frameName);
+					if tcc ~= nil then
+						tcc:MoveFrame(x, y);
+						if frameName=="targetinfo" then
+							extui.TargetInfoUpdate(x,y);
+						end
+					end
+
+					frame:MoveFrame(x, y);
+				else
+					extui.framepos[frame:GetName()].child[frameName].x = sliderx:GetLevel();
+					extui.framepos[frame:GetName()].child[frameName].y = slidery:GetLevel();
+					x = extui.framepos[frame:GetName()].child[frameName].x;
+					y = extui.framepos[frame:GetName()].child[frameName].y;
+
+					local tcc = ui.GetFrame("extuidragframe"..frame:GetName()..frameName);
+					if tcc ~= nil then
+						tcc:MoveFrame(x, y);
+						if k=="targetinfo" then
+							extui.TargetInfoUpdate(x,y);
+						end
+
+						if frame:GetName() == "buff" or frame:GetName() == "targetbuff" then
+							extui.MoveBuffCaption(frame:GetName(), frameName);
+							cframe:Resize(10*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
+						end
+					end
+					cframe:SetOffset(x, y);
+				end
+			end
+
+			labelvalx:SetText(string.format("{@st42b}%d{/}",extui.round(x)));
+			labelvaly:SetText(string.format("{@st42b}%d{/}",extui.round(y)));
+			sliderx:SetLevel(x);
+			slidery:SetLevel(y);
+
+
+			if cframe == nil then
+				if not(extui.frames[frameName].noResize) then
+					local labelvalw = settingbox:GetChild("extuilabelvalw");
+					local sliderw = settingbox:GetChild("extuislidew");
+					sliderw = tolua.cast(sliderw, "ui::CSlideBar");
+					local labelvalh = settingbox:GetChild("extuilabelvalh");
+					local sliderh = settingbox:GetChild("extuislideh");
+					sliderh = tolua.cast(sliderh, "ui::CSlideBar");
+
+					local w = extui.framepos[frameName].w;
+					local h = extui.framepos[frameName].h;
+
+					if (w ~= sliderx:GetLevel() or h ~= slidery:GetLevel()) and not(extui.IsDragging)  then
+						extui.framepos[frameName].w = sliderw:GetLevel();
+						extui.framepos[frameName].h = sliderh:GetLevel();
+						w = extui.framepos[frameName].w;
+						h = extui.framepos[frameName].h;
+						local tcc = ui.GetFrame("extuidragframe"..frameName);
+						if tcc ~= nil then
+							tcc:Resize(w, h);
+						end
+
+						frame:Resize(w, h);
+					end
+
+
+					labelvalw:SetText(string.format("{@st42b}%d{/}",extui.round(w)));
+					labelvalh:SetText(string.format("{@st42b}%d{/}",extui.round(h)));
+					sliderw:SetLevel(w);
+					sliderh:SetLevel(h);
+				end
+			end
+
+		end
+
 	end
 
 	return 1;
@@ -377,17 +686,17 @@ end
 
 function extui.OpenMiniFrame()
 	local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
-	savedFramePosY = mf:GetX();
-	savedFramePosX = mf:GetY();
+	extui.savedFramePosY = mf:GetX();
+	extui.savedFramePosX = mf:GetY();
 	mf:MoveFrame(9999,9999);--move frame out of view
 
 	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_MINI_FRAME");
-	frm:Resize(350 , 100);
+	frm:Resize(350 , 120);
 	frm:MoveFrame((ui.GetSceneWidth()/2)-175, (ui.GetSceneHeight()/2)-50);
 	frm:SetSkinName("pip_simple_frame");
 
 	--buttons
-	local ctrls = frm:CreateOrGetControl("button", "extuiminisaveclose", 50, 65, 125, 30);
+	local ctrls = frm:CreateOrGetControl("button", "extuiminisaveclose", 50, 85, 125, 30);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
 	ctrls:SetText("{@st66b}Save&Close{/}");
 	ctrls:SetClickSound("button_click_big");
@@ -395,7 +704,7 @@ function extui.OpenMiniFrame()
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_SAVE");
 	ctrls:SetSkinName("test_pvp_btn");
 
-	ctrls = frm:CreateOrGetControl("button", "extuiminiclose", 175, 65, 125, 30);
+	ctrls = frm:CreateOrGetControl("button", "extuiminiclose", 175, 85, 125, 30);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
 	ctrls:SetText("{@st66b}Cancel{/}");
 	ctrls:SetClickSound("button_click_big");
@@ -403,29 +712,171 @@ function extui.OpenMiniFrame()
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_CANCEL");
 	ctrls:SetSkinName("test_pvp_btn");
 
-	ctrls = frm:CreateOrGetControl("droplist", "extuiminidrop", (350/2)-100, 15, 200, 30);
-	ctrls = tolua.cast(ctrls, "ui::CDropList");
-	ctrls:SetSkinName("droplist_normal");
-	ctrls:SetTextAlign("left", "left");
-	ctrls:AddItem(0, "None Selected");
+	ctrls = frm:CreateOrGetControl("button", "extuiminiadv", (350/2)-(125/2), 85-30, 125, 30);
+	ctrls = tolua.cast(ctrls, "ui::CButton");
+	ctrls:SetText("{@st66b}Advanced{/}");
+	ctrls:SetClickSound("button_click_big");
+	ctrls:SetOverSound("button_over");
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_ADVANCED");
+	ctrls:SetSkinName("test_pvp_btn");
 
-	for k,v in pairs(extui.frames) do
-		if v.isMovable then
-			ctrls:AddItem(tostring(v.name),tostring(v.name));
-			if v.hasChild then
-				for _k,_v in pairs(v.child) do
-					ctrls:AddItem(tostring(v.name).."."..tostring(_v.name), tostring(v.name).."."..tostring(_v.name));
-				end
-			end
-		end
-	end
 
-	ctrls:SelectItem(0);
-	ctrls:SetSelectedScp("EXTENDEDUI_MINI_ON_SELECT");
-	ctrls:Invalidate();
+	ctrls = frm:CreateOrGetControl("checkbox", "extuicheckfram", (350/2)+110, 15, 150, 30);
+	ctrls = tolua.cast(ctrls, "ui::CCheckBox");
+	--ctrls:SetText(" ");
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_ON_CHECK");
+	ctrls:SetClickSound("button_click_big");
+	ctrls:SetOverSound("button_over");
+	ctrls:SetTextTooltip(string.format("{@st42b}Only edit selected frame{/}"));
+
+	ctrls = frm:CreateOrGetControl("groupbox", "extuiminigrpbox", (350/2)-100, 15, 200, 30);
+	ctrls = tolua.cast(ctrls, "ui::CGroupBox");
+	ctrls:SetSkinName("property_screenbg");
+	ctrls:EnableScrollBar(0);
+	ctrls:EnableHittestGroupBox(false);
+
+	local ctrlss = ctrls:CreateOrGetControl("richtext", "extuiminitext", 5, 5, 30, 30);
+	ctrlss = tolua.cast(ctrlss, "ui::CRichText");
+	ctrlss:SetText("{@st42b}None Selected{/}");
+
+	local ctrlss = ctrls:CreateOrGetControl("button", "extuiminidropbut", 200-35, 0, 30, 30);
+	ctrlss = tolua.cast(ctrlss, "ui::CButton");
+	ctrlss:EnableImageStretch(false);
+	ctrlss:SetImage("count_down_btn");
+	ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_CREATE_DROPLIST");
 
 	frm:RunUpdateScript("EXTENDEDUI_MINI_UPDATE");
+
+
+	local gbox = frm:CreateOrGetControl("groupbox", "extuiminigrpsetbox", 0, 0, 350, 400);
+	gbox = tolua.cast(gbox, "ui::CGroupBox");
+	gbox:SetSkinName("");
+	gbox:EnableScrollBar(0);
+	gbox:EnableHittestGroupBox(false);	
+	gbox:ShowWindow(0);
 end
+
+
+
+function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
+	local cframe = extui.selectedFrame;
+	local frame = extui.selectedFrameParent;
+
+	local x = frame:GetX();
+	local y = frame:GetY();
+
+	if cframe ~= nil then
+		x = cframe:GetX();
+		y = cframe:GetY();
+	end
+
+	ctrls = gbox:CreateOrGetControl("richtext", "extuilabelpos", inx, iny, 300, 30);
+	ctrls = tolua.cast(ctrls, "ui::CRichText");
+	ctrls:SetText("{@st42b}Position{/}");
+	
+	iny = iny+10;
+	
+	ctrls = gbox:CreateOrGetControl("richtext", "extuilabelx", inx, iny+5, 300, 30);
+	ctrls = tolua.cast(ctrls, "ui::CRichText");
+	ctrls:SetText("{@st42b}x{/}");
+	
+	ctrls = gbox:CreateOrGetControl("slidebar", "extuislidex", inx+12, iny, 300, 30);
+	ctrls = tolua.cast(ctrls, "ui::CSlideBar");
+	ctrls:SetMaxSlideLevel(ui.GetClientInitialWidth());
+	ctrls:SetMinSlideLevel(0);
+	ctrls:SetLevel(x);
+	ctrls:SetTextTooltip(string.format("{@st42b}Left/Right Position{/}"));
+	
+	ctrls = gbox:CreateOrGetControl("richtext", "extuilabelvalx", inx+295, iny+5, 300, 30);
+	ctrls = tolua.cast(ctrls, "ui::CRichText");
+	ctrls:SetText("{@st42b}"..extui.round(x).."{/}");
+
+	iny = iny+35;
+	
+	ctrls = gbox:CreateOrGetControl("richtext", "extuilabely", inx, iny+5, 300, 30);
+	ctrls = tolua.cast(ctrls, "ui::CRichText");
+	ctrls:SetText("{@st42b}y{/}");
+
+	ctrls = gbox:CreateOrGetControl("slidebar", "extuislidey", inx+12, iny, 300, 30);
+	ctrls = tolua.cast(ctrls, "ui::CSlideBar");
+	ctrls:SetMaxSlideLevel(ui.GetClientInitialHeight());
+	ctrls:SetMinSlideLevel(0);
+	ctrls:SetLevel(y);
+	ctrls:SetTextTooltip(string.format("{@st42b}Up/Down Position{/}"));
+	
+	ctrls = gbox:CreateOrGetControl("richtext", "extuilabelvaly", inx+295, iny+5, 300, 30);
+	ctrls = tolua.cast(ctrls, "ui::CRichText");
+	ctrls:SetText("{@st42b}"..extui.round(y).."{/}");
+
+	iny = iny+35;
+
+	if cframe == nil then
+		if not(v.noResize) then
+			local w = frame:GetWidth();
+			local h = frame:GetHeight();
+
+			ctrls = gbox:CreateOrGetControl("richtext", "extuilabelsize", inx, iny, 300, 30);
+			ctrls = tolua.cast(ctrls, "ui::CRichText");
+			ctrls:SetText("{@st42b}Size{/}");
+			
+			iny = iny+10;
+			
+			ctrls = gbox:CreateOrGetControl("richtext", "extuilabelw", inx, iny+5, 300, 30);
+			ctrls = tolua.cast(ctrls, "ui::CRichText");
+			ctrls:SetText("{@st42b}w{/}");
+			
+			ctrls = gbox:CreateOrGetControl("slidebar", "extuislidew", inx+12, iny, 300, 30);
+			ctrls = tolua.cast(ctrls, "ui::CSlideBar");
+			ctrls:SetMaxSlideLevel(ui.GetClientInitialWidth());
+			ctrls:SetMinSlideLevel(0);
+			ctrls:SetLevel(w);
+			ctrls:SetTextTooltip(string.format("{@st42b}Width{/}"));
+			
+			ctrls = gbox:CreateOrGetControl("richtext", "extuilabelvalw", inx+295, iny+5, 300, 30);
+			ctrls = tolua.cast(ctrls, "ui::CRichText");
+			ctrls:SetText("{@st42b}"..extui.round(w).."{/}");
+			
+			iny = iny+35;
+			
+			ctrls = gbox:CreateOrGetControl("richtext", "extuilabelh", inx, iny+5, 300, 30);
+			ctrls = tolua.cast(ctrls, "ui::CRichText");
+			ctrls:SetText("{@st42b}h{/}");
+			
+			ctrls = gbox:CreateOrGetControl("slidebar", "extuislideh", inx+12, iny, 300, 30);
+			ctrls = tolua.cast(ctrls, "ui::CSlideBar");
+			ctrls:SetMaxSlideLevel(ui.GetClientInitialHeight());
+			ctrls:SetMinSlideLevel(0);
+			ctrls:SetLevel(h);
+			ctrls:SetTextTooltip(string.format("{@st42b}Height{/}"));
+			
+			ctrls = gbox:CreateOrGetControl("richtext", "extuilabelvalh", inx+295, iny+5, 300, 30);
+			ctrls = tolua.cast(ctrls, "ui::CRichText");
+			ctrls:SetText("{@st42b}"..extui.round(h).."{/}");
+			
+			iny = iny+35;
+		
+		end
+
+
+		ctrls = gbox:CreateOrGetControl("checkbox", "extuicheckvis", inx+10, iny, 150, 30);
+		ctrls = tolua.cast(ctrls, "ui::CCheckBox");
+		ctrls:SetText("{@st42b}Show Frame{/}");
+		ctrls:SetClickSound("button_click_big");
+		ctrls:SetOverSound("button_over");
+		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CHECK_HIDE");
+		ctrls:SetEventScriptArgString(ui.LBUTTONUP, frame:GetName());
+		ctrls:SetCheck(frame:IsVisible());
+		if v.saveHidden then
+			ctrls:SetColorTone("FF00FF00");
+			ctrls:SetTextTooltip(string.format("{@st42b}Visibility will be saved{/}"));
+		else
+			ctrls:SetColorTone("FFFF0000");
+			ctrls:SetTextTooltip(string.format("{@st42b}Visibility will not be saved{/}"));
+		end
+	end
+end
+
+
 
 --TODO: Needs to use ForEachFrame
 function extui.InitSideFrame()
@@ -751,24 +1202,35 @@ function EXTENDEDUI_ON_OPEN_UI()
 	extui.openside();
 end
 
-function EXTENDEDUI_ON_DRAG_START_END(frame, argStr)
-	extui.IsDragging = not(extui.IsDragging);
+extui.oldSelectedFrameParent = nil;
 
+function EXTENDEDUI_ON_DRAG_START_END(frame, argStr)
 	if argStr == "start" then
+		extui.oldSelectedFrameParent = extui.selectedFrameParent;
 		extui.selectedFrameParent = ui.GetFrame(frame:GetUserValue("FRAME_NAME"));
 		extui.selectedFrame = nil;
+		extui.IsDragging = true;
 	elseif argStr == "startc" then
+		extui.oldSelectedFrameParent = extui.selectedFrameParent;
 		extui.selectedFrame = ui.GetFrame(frame:GetUserValue("FRAME_NAME")):GetChild(frame:GetUserValue("CHILD_NAME"));
 		extui.selectedFrameParent = ui.GetFrame(frame:GetUserValue("FRAME_NAME"));
+		extui.IsDragging = true;
+	else
+		extui.IsDragging = false;
 	end
 end
 
 extui.showAll = false;
 --TODO: Needs to use ForEachFrame
-function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr)
+function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
+	if exclude == nil then exclude = ""; end
+
 	if argStr == "*all" then
 		if not(extui.showAll) then
-			extui.OpenMiniFrame();
+			if ui.GetFrame("EXTENDEDUI_MINI_FRAME") == nil then
+				extui.OpenMiniFrame();
+			end
+
 			for k,v in pairs(extui.frames) do
 				if v.isMovable then
 					local ss = ui.GetFrame(k);
@@ -817,16 +1279,18 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr)
 		else
 			for k,v in pairs(extui.frames) do
 				if v.isMovable and v.show then
-					local tocc = ui.GetFrame("extuidragframe"..tostring(k));
-					if tocc ~= nil then
-						tocc:ShowWindow(0);
-						if extui.frames[k].hasChild then
-							for ch,_ in pairs(extui.frames[k]["child"]) do
-								 ui.GetFrame("extuidragframe"..k..ch):ShowWindow(0);
+					if k ~= exclude then
+						local tocc = ui.GetFrame("extuidragframe"..tostring(k));
+						if tocc ~= nil then
+							tocc:ShowWindow(0);
+							if extui.frames[k].hasChild then
+								for ch,_ in pairs(extui.frames[k]["child"]) do
+									 ui.GetFrame("extuidragframe"..k..ch):ShowWindow(0);
+								end
 							end
 						end
+						v.show = false;
 					end
-					v.show = false;
 				end
 			end
 			extui.showAll = false;
@@ -978,7 +1442,7 @@ function EXTENDEDUI_ON_DRAGGING(frame)
 					local xc = ssc:GetX();
 					local yc = ssc:GetY();
 
-					chfrm:SetOffset(x+xc, y+yc);
+					chfrm:MoveFrame(x+xc, y+yc);
 
 					if isFrame == "buff" or isFrame == "targetbuff" then
 						extui.MoveBuffCaption(isFrame, ch);

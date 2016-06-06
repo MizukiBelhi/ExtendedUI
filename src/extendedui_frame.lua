@@ -214,6 +214,13 @@ extui.frames = {
 			["name"] = "Fever Combo",
 			["noResize"] = true,
 		},
+		["beatkeyboard"] = {
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["name"] = "QTE.. tap.. key thing",
+			["noResize"] = true,
+			["saveHidden"] = true,
+		},
 	};
 
 
