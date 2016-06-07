@@ -3,8 +3,8 @@
 		"name" : "ExtendedUI",
 		"file" : "extendedui",
 		"extension" : "ipf",
-		"fileVersion" : "v1.2.1",
-		"releaseTag" : "1.2.1",
+		"fileVersion" : "v1.2.2",
+		"releaseTag" : "1.2.2",
 		"unicode" : "⚗",
 		"description" : "ExtendedUI allows you to move most UI elements on your screen to wherever you want them.",
 		"tags" : [
