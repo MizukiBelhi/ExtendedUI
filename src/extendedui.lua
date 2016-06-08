@@ -109,7 +109,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 
 
 	local _frame = ui.GetFrame("systemoption")
-	local ctrls = _frame:CreateOrGetControl("button", "extuiopenbutton", 50, 271, 208, 35);
+	local ctrls = _frame:CreateOrGetControl("button", "extuiopenbutton", 332, 320, 208, 35);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
 	ctrls:SetText("{@st66b}ExtendedUI{/}");
 	ctrls:SetClickSound("button_click_big");
