@@ -46,6 +46,11 @@ function extui.tablelength(T)
   	return count
 end
 
+function extui.intable(t,v)
+	for _,__ in pairs(t) do if __==v then return true; end end
+	return false;
+end
+
 function extui.FromString(s)
 	if s == "false" then
 		return false;
@@ -84,36 +89,43 @@ function extui.SavePositions()
 
 	file, error = io.open("../addons/extendedui/frames.extui", "w");
 	if file ~= nil then
-		local _str = "";
+		local _str = "//exts 1.0\n";
 
 		for k,v in pairs(extui.framepos) do
-			local name = k;
-			local x,y = tostring(v.x),tostring(v.y);
-			local w,h = tostring(v.w),tostring(v.h);
-			local hidden = (v.hidden==1) and true or false;
-			local hasChild = extui.frames[k].hasChild or false;
+			if extui.frames[k] then
+				local name = k;
+				local x,y = tostring(v.x),tostring(v.y);
+				local w,h = tostring(v.w),tostring(v.h);
+				local hidden = (v.hidden==1 or v.hidden == true) and true or false;
+				local scale = v.scale or 100;
+				local skin = v.skin or "@default";
+				local hasChild = extui.frames[k].hasChild or false;
 
-			_str = _str..name..","..x..","..y..","..w..","..h..","..tostring(hidden)..","..tostring(hasChild);
+				--if string.sub(skin, 1, 4) == "@dic" then
+					skin = dictionary.ReplaceDicIDInCompStr(skin);
+				--end
 
-			if hasChild then
+				_str = _str..name..","..x..","..y..","..w..","..h..","..tostring(hidden)..","..tostring(scale)..","..tostring(skin)..","..tostring(hasChild);
 
-				for ck,cv in pairs(v.child) do
-					local cname = ck;
-					local cx,cy = tostring(cv.x),tostring(cv.y);
+				if hasChild then
 
-					_str = _str..","..cname..","..cx..","..cy;
+					for ck,cv in pairs(v.child) do
+						local cname = ck;
+						local cx,cy = tostring(cv.x),tostring(cv.y);
+
+						_str = _str..","..cname..","..cx..","..cy;
+					end
+
+					_str = _str..",0";
 				end
 
-				_str = _str..",0";
+				_str = _str.."\n";
 			end
-
-			_str = _str.."\n";
 		end
 
 		file:write(_str);
 		io.close(file);
 	end
-	extui.unsavedSettings = false;
 end
 
 
@@ -134,47 +146,99 @@ function extui.UpdateCheck()
 
 		if string.len(_str) > 1 then
 
+			local version = 0;
+
 			local opFrames = StringSplit(_str, "\n");
 			for k,v in pairs(opFrames) do
-				local iFrames = StringSplit(v, ",");
+				if string.sub(v, 1, 2) == "//" then
+					version = 1;
+				else
+					if version == 0 then
+						local iFrames = StringSplit(v, ",");
 
-				local name = iFrames[1];
-				local x = extui.FromString(iFrames[2]);
-				local y = extui.FromString(iFrames[3]);
-				local w = extui.FromString(iFrames[4]);
-				local h = extui.FromString(iFrames[5]);
-				local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
-				local hasChild = extui.FromString(iFrames[7]);
-				local childs = {};
-				if hasChild then
-					local onL = 8;
-					while true do
-						local cname = iFrames[onL];
+						local name = iFrames[1];
+						local x = extui.FromString(iFrames[2]);
+						local y = extui.FromString(iFrames[3]);
+						local w = extui.FromString(iFrames[4]);
+						local h = extui.FromString(iFrames[5]);
+						local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
+						local hasChild = extui.FromString(iFrames[7]);
+						local childs = {};
+						if hasChild then
+							local onL = 8;
+							while true do
+								local cname = iFrames[onL];
 
-						if cname == "0" then
-							break;
+								if cname == "0" then
+									break;
+								end
+
+								local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
+
+								childs[cname] = {
+										["x"] = cx,
+										["y"] = cy,
+									};
+
+								onL = onL+3;
+							end
+
 						end
 
-						local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
-
-						childs[cname] = {
-								["x"] = cx,
-								["y"] = cy,
+						extui.framepos[name] = {
+								["x"] = x,
+								["y"] = y,
+								["w"] = w,
+								["h"] = h,
+								["hidden"] = hidden,
+								["child"] = childs,
 							};
+					else
+						local iFrames = StringSplit(v, ",");
 
-						onL = onL+3;
+						local name = iFrames[1];
+						local x = extui.FromString(iFrames[2]);
+						local y = extui.FromString(iFrames[3]);
+						local w = extui.FromString(iFrames[4]);
+						local h = extui.FromString(iFrames[5]);
+						local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
+						local scale = extui.FromString(iFrames[7]);
+						local skin = iFrames[8];
+						local hasChild = extui.FromString(iFrames[9]);
+						local childs = {};
+						if hasChild then
+							local onL = 10;
+							while true do
+								local cname = iFrames[onL];
+
+								if cname == "0" then
+									break;
+								end
+
+								local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
+
+								childs[cname] = {
+										["x"] = cx,
+										["y"] = cy,
+									};
+
+								onL = onL+3;
+							end
+
+						end
+
+						extui.framepos[name] = {
+								["x"] = x,
+								["y"] = y,
+								["w"] = w,
+								["h"] = h,
+								["hidden"] = hidden,
+								["skin"] = skin,
+								["scale"] = scale,
+								["child"] = childs,
+							};
 					end
-
 				end
-
-				extui.framepos[name] = {
-						["x"] = x,
-						["y"] = y,
-						["w"] = w,
-						["h"] = h,
-						["hidden"] = hidden,
-						["child"] = childs,
-					};
 			end
 		end
 

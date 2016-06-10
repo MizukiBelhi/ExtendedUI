@@ -331,7 +331,6 @@ function EXTENDEDUI_ON_SETTINGS_PRESS(frame, ctrl, argStr)
 		if not(t) then
 			extui.print(tostring(p));
 		end
-		extui.unsavedSettings = true;
 	end
 	
 end
@@ -352,8 +351,6 @@ function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
 
 		if _settings[argStr] ~= nil then
 			if ctrl:GetLevel() ~= _settings[argStr].val then
-				extui.unsavedSettings = true;
-
 				local labelval = GET_CHILD(uibox,"extuisetlabelval"..argStr,"ui::CRichText");
 				labelval:SetText("{@st42b}"..tostring(ctrl:GetLevel()).."{/}");
 			end

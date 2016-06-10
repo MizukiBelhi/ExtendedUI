@@ -214,7 +214,7 @@ extui.frames = {
 			["name"] = "Fever Combo",
 			["noResize"] = true,
 		},
-		["beatkeyboard"] = {
+		["keypress"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
 			["name"] = "QTE.. tap.. key thing",
@@ -222,7 +222,36 @@ extui.frames = {
 			["saveHidden"] = true,
 		},
 	};
-
+extui.skins = {
+		"shadow_box",
+		"test_Item_tooltip_normal",
+		"systemmenu_vertical",
+		"chat_window",
+		"popup_rightclick",
+		"persoanl_shop_basicframe",
+		"tutorial_skin",
+		"slot_name",
+		"padslot_onskin",
+		"padslot_offskin2",
+		"monster_skill_bg",
+		"tab2_btn",
+		"fullblack_bg",
+		"testjoo_buttons", --clear
+		"test_skin_01_btn_cursoron",
+		"test_skin_01_btn_clicked",
+		"test_normal_button",
+		"frame_bg",
+		"textview",
+		"listbox",
+		"box_glass",
+		"tooltip1",
+		"textballoon",
+		"quest_box",
+		"guildquest_box",
+		"balloonskin_buy",
+		"barrack_creat_win",
+		"pip_simple_frame",
+	};
 
 
 --Fixes #1
@@ -253,6 +282,9 @@ function extui.ScaleUI(scale)
 	end
 end
 
+function extui.ScaleFrame(frame, scale)
+	local newScale = scale/100;
+end
 
 
 function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
@@ -330,15 +362,31 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 			local y = extui.framepos[tostring(k)].y;
 			local w = extui.framepos[tostring(k)].w;
 			local h = extui.framepos[tostring(k)].h;
+			local nskin = extui.framepos[tostring(k)].skin or "@default";
+			local nscale = extui.framepos[tostring(k)].scale or 100;
 
 			local xs = toc:GetX() or 0;
 			local ys = toc:GetY() or 0;
 			local ws = toc:GetWidth() or 0;
 			local hs = toc:GetHeight() or 0;
+			local scale = 100;
+			local skin = toc:GetSkinName();
 			
 			toc:MoveFrame(x, y);
 			if not(v.noResize) then
 				toc:Resize(w, h);
+			end
+
+			if scale ~= nscale then
+				toc:SetScale(nscale, nscale);
+			end
+
+			if nskin ~= "@default" then
+				nskin = dictionary.ReplaceDicIDInCompStr(nskin);
+				toc:SetSkinName(nskin);
+			else
+				skin = dictionary.ReplaceDicIDInCompStr(skin);
+				extui.framepos[tostring(k)].skin = skin;
 			end
 
 			if v.saveHidden then
@@ -351,10 +399,16 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 				extui.defaultFrames[tostring(k)]["y"] = ys;
 				extui.defaultFrames[tostring(k)]["w"] = ws;
 				extui.defaultFrames[tostring(k)]["h"] = hs;
+				extui.defaultFrames[tostring(k)]["scale"] = scale;
+				extui.defaultFrames[tostring(k)]["skin"] = skin;
 				if v.hasChild then
 					extui.defaultFrames[tostring(k)]["child"] = {};
 				end
 
+			end
+
+			if not extui.intable(extui.skins, skin) then
+				table.insert(extui.skins, skin);
 			end
 
 			if k=="targetinfo" then
@@ -367,11 +421,15 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 			local y = toc:GetY() or 0;
 			local w = toc:GetWidth() or 0;
 			local h = toc:GetHeight() or 0;
+			local scale = 100;
+			local skin = dictionary.ReplaceDicIDInCompStr(toc:GetSkinName());
 			extui.framepos[tostring(k)] = {};
 			extui.framepos[tostring(k)]["x"] = x;
 			extui.framepos[tostring(k)]["y"] = y;
 			extui.framepos[tostring(k)]["w"] = w;
 			extui.framepos[tostring(k)]["h"] = h;
+			extui.framepos[tostring(k)]["skin"] = skin;
+			extui.framepos[tostring(k)]["scale"] = scale;
 
 			if v.saveHidden then
 				extui.framepos[tostring(k)]["hidden"] = toc:IsVisible();
@@ -379,6 +437,10 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 
 			if not(extui.firstStart) then
 				extui.defaultFrames[tostring(k)] = extui.framepos[tostring(k)];
+			end
+
+			if not extui.intable(extui.skins, skin) then
+				table.insert(extui.skins, skin);
 			end
 
 			hasNew = true;
@@ -417,7 +479,7 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 
 			tcc:SetOffset(x, y);
 
-			if k == "buff" or k == "targetbuff" then
+			if k == "buff" then
 				extui.MoveBuffCaption(k, ck);
 				local frm = ui.GetFrame(k);
 				local fch = frm:GetChild(ck);
@@ -443,7 +505,6 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 	--re-init buff ui to get more slots!
 	extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
 	INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
-	extui.INIT_BUFF_UI(ui.GetFrame("targetbuff"), t_buff_ui, "TARGET_BUFF_UPDATE");
 
 	extui.RemoveJoySetting();
 end
@@ -476,11 +537,13 @@ function extui.MoveBuffCaption(name, slotname)
 	local bslot = ui.GetFrame(name):GetChild(slotname);
 	local aslotset = tolua.cast(bslot, 'ui::CSlotSet');
 
-	if extui.GetSetting("extbuff") == true then
-		aslotset:SetColRow(30,1);
-		aslotset:CreateSlots();
-	else
-		aslotset:SetColRow(10,1);
+	if name == "buff" then
+		if extui.GetSetting("extbuff") == true then
+			aslotset:SetColRow(30,1);
+			aslotset:CreateSlots();
+		else
+			aslotset:SetColRow(10,1);
+		end
 	end
 
 
@@ -565,10 +628,6 @@ function EXTUI_MINIMAP_VISIBILITY_CHECK()
 	if extui.framepos["minimap"].hidden == 0 then
 		if minimap_frame:IsVisible() == 1 then
 			minimap_frame:ShowWindow(0, true);
-		end
-	else
-		if minimap_frame:IsVisible() == 0 then
-			minimap_frame:ShowWindow(1, true);
 		end
 	end
 
