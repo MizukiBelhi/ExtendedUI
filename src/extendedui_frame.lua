@@ -221,6 +221,12 @@ extui.frames = {
 			["noResize"] = true,
 			["saveHidden"] = true,
 		},
+		["minimizedalarm"] = {
+			["name"] = "Mini Guild Mission",
+			["isMovable"] = true,
+			["hasChild"] = false,
+			["noResize"] = true,
+		},
 	};
 extui.skins = {
 		"shadow_box",
@@ -262,28 +268,11 @@ function extui.TargetInfoUpdate(x,y)
 end
 
 function extui.ScaleUI(scale)
-
-	local newScale = scale/100;
-
-	for k,v in pairs(extui.frames) do
-		if v.isMovable and not(k=="buff" or k=="targetbuff") and not(v.noScale) then
-			local frm = ui.GetFrame(k);
-			if frm ~= nil then
-				frm:SetScale(newScale, newScale);
-
-				local cnt = frm:GetChildCount();
-				for  i = 0, cnt -1 do
-					local ch = frm:GetChildByIndex(i);
-					ch:SetScale(newScale, newScale);
-				end
-
-			end
-		end
-	end
+--todo
 end
 
 function extui.ScaleFrame(frame, scale)
-	local newScale = scale/100;
+--todo
 end
 
 
@@ -499,8 +488,6 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 	end
 
 	extui.firstStart = true;
-
-	extui.ScaleUI(extui.GetSetting("uiscale"));
 
 	--re-init buff ui to get more slots!
 	extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");

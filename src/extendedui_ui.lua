@@ -345,6 +345,21 @@ function EXTENDEDUI_MINI_UPDATE()
 					local tcc = ui.GetFrame("extuidragframe"..frameName);
 					if tcc ~= nil then
 						tcc:MoveFrame(x, y);
+						if extui.frames[frameName].hasChild then
+							for ch,v in pairs(extui.frames[frameName]["child"]) do
+								local chfrm = ui.GetFrame("extuidragframe"..frameName..ch);
+
+								local ssc = frame:GetChild(ch);
+								local xc = ssc:GetX();
+								local yc = ssc:GetY();
+
+								chfrm:MoveFrame(x+xc, y+yc);
+
+								if frameName == "buff" or frameName == "targetbuff" then
+									extui.MoveBuffCaption(frameName, ch);
+								end
+							end
+						end
 					end
 
 					if frameName == "targetinfo" then
@@ -608,7 +623,6 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 		
 		end
 
-
 		ctrls = gbox:CreateOrGetControl("richtext", "extuilabelskin", inx, iny, 300, 30);
 		ctrls = tolua.cast(ctrls, "ui::CRichText");
 		ctrls:SetText( string.format("{@st42b}Current Skin: %s{/}", tostring(extui.framepos[frame:GetName()].skin)) );
@@ -645,7 +659,7 @@ end
 
 
 function EXTENDEDUI_OPEN_CONTEXT()
-	local ctx = ui.CreateContextMenu("EXTENDEDUI_CONTEXT", "extendedui", 0, 0, 300, 100);
+	local ctx = ui.CreateContextMenu("EXTENDEDUI_CONTEXT", "Choose Skin", 0, 0, 300, 100);
 
 	for i = 1,#extui.skins do
 		ui.AddContextMenuItem(ctx, extui.skins[i], string.format("EXTENDEDUI_SKIN('%s')", extui.skins[i]));
@@ -693,7 +707,6 @@ function EXTENDEDUI_ON_DRAG_START_END(frame, argStr)
 end
 
 
-
 extui.showAll = false;
 --TODO: Needs to use ForEachFrame
 function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
@@ -705,7 +718,6 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 			for k,v in pairs(extui.frames) do
 				if v.isMovable then
 					local ss = ui.GetFrame(k);
-
 					local w = ss:GetWidth();
 					local h = ss:GetHeight();
 					local x = ss:GetX();
@@ -722,14 +734,13 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 
 					if extui.frames[k].hasChild then
 						for ch,_ in pairs(extui.frames[k]["child"]) do
-							local chfrm = ui.CreateNewFrame("extendedui", "extuidragframe"..k..ch);
 							local ssc = ss:GetChild(ch);
-
 							local wc = ssc:GetWidth();
 							local hc = ssc:GetHeight();
 							local xc = ssc:GetX();
 							local yc = ssc:GetY();
 
+							local chfrm = ui.CreateNewFrame("extendedui", "extuidragframe"..k..ch);
 							chfrm:Resize(wc , hc);
 							chfrm:SetOffset(x+xc, y+yc);
 							chfrm:SetUserValue("FRAME_NAME", k);
@@ -738,8 +749,6 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 							chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 							chfrm:SetEventScriptArgString(ui.LBUTTONDOWN, "startc");
 							chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
-							chfrm = tolua.cast(chfrm, "ui::CRichText");
-							chfrm:SetColorTone("FF00FF00");
 						end
 					end
 					

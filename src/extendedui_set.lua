@@ -54,12 +54,9 @@ function extui.LoadSettings()
 	extui.AddDefaults( {
 		["showexp"]		=	true,
 		["lockquest"]	=	true,
-		["nopet"]		=	true,
-		["extquest"]	=	true,
 		["discraft"]	=	false,
 		["iconsize"]	=	32,
 		["extbuff"]		=	true,
-		["uiscale"]		=	100,
 		["remjoy"]		=	false,
 		["remload"]		=	false,
 	}, true);
@@ -93,25 +90,6 @@ function extui.LoadSettings()
 			["val"] = extui.ldSettingsUI["remload"],
 			["callback"] = function(frame, ctrl) extui.SetSetting("remload",ctrl:IsChecked() == 1);	end,
 			["oncall"] = ui.LBUTTONUP,
-		}
-	);
-
-	extui.AddSetting("uiscale", {
-			["name"] = "UI Scale",
-			["tool"] = "Scales UI, does not affect buffs",
-			["typedata"] = {
-				["t"] = "ui::CSlideBar",
-				["a"] = "slidebar",
-			},
-			["val"] = extui.ldSettingsUI["uiscale"],
-			["callback"] = function(frame, ctrl)
-							local newScale = ctrl:GetLevel();
-							extui.SetSetting("uiscale", newScale);
-							extui.ScaleUI(newScale);
-						end,
-			["oncall"] = ui.LBUTTONUP,
-			["max"] = 150,
-			["min"] = 10,
 		}
 	);
 
@@ -261,59 +239,6 @@ function extui.LoadSettings()
 			["callback"] = function(frame, ctrl)
 							extui.SetSetting("buffsec",ctrl:IsChecked() == 1);
 						end,
-			["oncall"] = ui.LBUTTONUP,
-			["disabled"] = true,
-		}
-	);
-
-
-	extui.AddSetting("line", {
-			["typedata"] = {
-				["a"] = "labelline",
-			},
-		}
-	);
-
-
-	extui.AddSetting("label2", {
-			["name"] = "{@st43}Future Features{/}",
-			["typedata"] = {
-				["t"] = "ui::CRichText",
-				["a"] = "richtext",
-			},
-		}
-	);
-
-	extui.AddSetting("newline2", {
-			["typedata"] = {
-				["a"] = "newline",
-			}
-		}
-	);
-	
-	extui.AddSetting("nopet", {
-			["name"] = "Remove Pet Click",
-			["tool"] = "Makes pets non-clickable.",
-			["typedata"] = {
-				["t"] = "ui::CCheckBox",
-				["a"] = "checkbox",
-			},
-			["val"] = extui.ldSettingsUI["nopet"],
-			["callback"] = function(frame, ctrl) extui.SetSetting("nopet",ctrl:IsChecked() == 1); end,
-			["oncall"] = ui.LBUTTONUP,
-			["disabled"] = true,
-		}
-	);
-	
-	extui.AddSetting("extquest", {
-			["name"] = "Extended Quest Log",
-			["tool"] = "Allows for more quests tracked.",
-			["typedata"] = {
-				["t"] = "ui::CCheckBox",
-				["a"] = "checkbox",
-			},
-			["val"] = extui.ldSettingsUI["extquest"],
-			["callback"] = function(frame, ctrl) extui.SetSetting("extquest",ctrl:IsChecked() == 1); end,
 			["oncall"] = ui.LBUTTONUP,
 			["disabled"] = true,
 		}
