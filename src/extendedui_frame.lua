@@ -473,8 +473,10 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 				local frm = ui.GetFrame(k);
 				local fch = frm:GetChild(ck);
 
-				local slotCount = fch:GetSlotCount();
-				fch:Resize(slotCount*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
+				local slotc = extui.GetSetting("rowamt");
+				local rowc = extui.round(30/slotc);
+
+				fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
 			end
 
 		end,
@@ -501,110 +503,132 @@ end
 --temp = 0
 --perm = 1
 function extui.MoveBuffCaption(name, slotname)
-	local typ = -1;
-	local buff_ui = nil;
-	if slotname == "debuffslot" then
-		typ = 2;
-	elseif slotname == "buffslot" then
-		typ = 1;
-	elseif slotname == "buffcountslot" then
-		typ = 0;
-	end
+    local typ = -1;
+    local buff_ui = nil;
+    if slotname == "debuffslot" then
+        typ = 2;
+    elseif slotname == "buffslot" then
+        typ = 1;
+    elseif slotname == "buffcountslot" then
+        typ = 0;
+    end
 
-	if typ == -1 then return; end
+    if typ == -1 then return; end
 
-	if name == "buff" then
-		buff_ui = s_buff_ui;
-	elseif name == "targetbuff" then
-		buff_ui = t_buff_ui;
-	end
+    if name == "buff" then
+        buff_ui = s_buff_ui;
+    elseif name == "targetbuff" then
+        buff_ui = t_buff_ui;
+    end
 
-	if buff_ui == nil then return; end
+    if buff_ui == nil then return; end
 
-	local bslot = ui.GetFrame(name):GetChild(slotname);
-	local aslotset = tolua.cast(bslot, 'ui::CSlotSet');
+    local bslot = ui.GetFrame(name):GetChild(slotname);
+    local aslotset = tolua.cast(bslot, 'ui::CSlotSet');
 
-	if name == "buff" then
-		if extui.GetSetting("extbuff") == true then
-			aslotset:SetColRow(30,1);
-			aslotset:CreateSlots();
-		else
-			aslotset:SetColRow(10,1);
-		end
-	end
+    if name == "buff" then
+        if extui.GetSetting("extbuff") == true then
+            local slotc = extui.GetSetting("rowamt");
+            local rowc = extui.round(30/slotc);
 
+            aslotset:SetColRow(slotc,rowc);
+            aslotset:CreateSlots();
+        else
+            aslotset:SetColRow(10,1);
+        end
+    end
 
-	local clist = buff_ui["captionlist"][typ]
-	for k,v in pairs(clist) do
-		local slot = buff_ui["slotlist"][typ][k];
+    local clist = buff_ui["captionlist"][typ]
+    local onrow = 0;
+    local ncount = 0;
+    for k,v in pairs(clist) do
+        local slot = buff_ui["slotlist"][typ][k-1];
 
-		local slotsize = extui.GetSetting("iconsize");
-		slot:Resize(slotsize,slotsize);
-		slot:SetOffset((slotsize*k),slot:GetY());
+        local slotsize = extui.GetSetting("iconsize");
+        if slot ~= nil then
+            slot:Resize(slotsize,slotsize);
+        end
 
-		local x = buff_ui["slotsets"][typ]:GetX() + slot:GetX() + buff_ui["txt_x_offset"];
-		local y = buff_ui["slotsets"][typ]:GetY() + slot:GetY() + slot:GetHeight() + buff_ui["txt_y_offset"];
+        local sy = 0;
+        local sx = slotsize*k;
 
+        if extui.GetSetting("extbuff") == true then
+            local slotc = extui.GetSetting("rowamt")+1;
 
-		v:SetOffset(x, y);
-	end
+            if (ncount+1)%slotc == 0 then
+                onrow = onrow+1;
+                ncount = 0;
+            end
+
+            sy = (slotsize+15)*onrow;
+            sx = slotsize*ncount;
+        end
+
+        if slot ~= nil then
+            slot:SetOffset(sx,sy);
+
+            local x = buff_ui["slotsets"][typ]:GetX() + sx + buff_ui["txt_x_offset"];
+            local y = buff_ui["slotsets"][typ]:GetY() + sy + slot:GetHeight() + buff_ui["txt_y_offset"];
+            v:SetOffset(x, y);
+        end
+
+        ncount = ncount+1;
+    end
 end
 
 --directly taken from lib_uiscp with some minor modifications
 function extui.INIT_BUFF_UI(frame, buff_ui, updatescp)
 
-	local slotcountSetPt		= frame:GetChild('buffcountslot');
-	local slotSetPt				= frame:GetChild('buffslot');
-	local deslotSetPt			= frame:GetChild('debuffslot');
+    local slotcountSetPt        = frame:GetChild('buffcountslot');
+    local slotSetPt             = frame:GetChild('buffslot');
+    local deslotSetPt           = frame:GetChild('debuffslot');
 
-	buff_ui["slotsets"][0]			= tolua.cast(slotcountSetPt, 'ui::CSlotSet');
-	buff_ui["slotsets"][1]			= tolua.cast(slotSetPt, 'ui::CSlotSet');
-	buff_ui["slotsets"][2]			= tolua.cast(deslotSetPt, 'ui::CSlotSet');
+    buff_ui["slotsets"][0]          = tolua.cast(slotcountSetPt, 'ui::CSlotSet');
+    buff_ui["slotsets"][1]          = tolua.cast(slotSetPt, 'ui::CSlotSet');
+    buff_ui["slotsets"][2]          = tolua.cast(deslotSetPt, 'ui::CSlotSet');
 
-	for i = 0 , buff_ui["buff_group_cnt"] do
-	buff_ui["slotcount"][i] = 0;
-	--buff_ui["slotlist"][i] = {};
-	--buff_ui["captionlist"][i] = {};
-		while 1 do
-			if buff_ui["slotsets"][i] == nil then
-				break;
-			end
+    for i = 0 , buff_ui["buff_group_cnt"] do
 
-			local slot = buff_ui["slotsets"][i]:GetSlotByIndex(buff_ui["slotcount"][i]);
-			if slot == nil then
-				break;
-			end
+        buff_ui["slotcount"][i] = 0;
+        buff_ui["slotlist"][i] = {};
+        buff_ui["captionlist"][i] = {};
 
-			--we just add new ones
-			if buff_ui["slotlist"][i][buff_ui["slotcount"][i]] == nil then
-				buff_ui["slotlist"][i][buff_ui["slotcount"][i]] = slot;
+        while 1 do
+            if buff_ui["slotsets"][i] == nil then
+                break;
+            end
 
-				slot:ShowWindow(0);
-				local icon = CreateIcon(slot);
-				icon:SetDrawCoolTimeText(0);
+            local slot = buff_ui["slotsets"][i]:GetSlotByIndex(buff_ui["slotcount"][i]);
+            if slot == nil then
+                break;
+            end
 
+            buff_ui["slotlist"][i][buff_ui["slotcount"][i]] = slot;
 
-				local x = buff_ui["slotsets"][i]:GetX() + slot:GetX() + buff_ui["txt_x_offset"];
-				local y = buff_ui["slotsets"][i]:GetY() + slot:GetY() + slot:GetHeight() + buff_ui["txt_y_offset"];
+            if buff_ui["slotlist"][i][buff_ui["slotcount"][i]] == nil then
+                slot:ShowWindow(0);
+                local icon = CreateIcon(slot);
+                icon:SetDrawCoolTimeText(0);
+            end
 
-				local capt = frame:CreateOrGetControl('richtext', "_t_" .. i .. "_".. buff_ui["slotcount"][i], x, y, 50, 20);
+            local x = buff_ui["slotsets"][i]:GetX() + slot:GetX() + buff_ui["txt_x_offset"];
+            local y = buff_ui["slotsets"][i]:GetY() + slot:GetY() + slot:GetHeight() + buff_ui["txt_y_offset"];
 
-				capt:SetFontName("yellow_13");
-				buff_ui["captionlist"][i][buff_ui["slotcount"][i]] = capt;
+            local capt = frame:CreateOrGetControl('richtext', "_t_" .. i .. "_".. buff_ui["slotcount"][i], x, y, 50, 20);
 
-			end
-			buff_ui["slotcount"][i] = buff_ui["slotcount"][i] + 1;
-		end
+            capt:SetFontName("yellow_13");
+            buff_ui["captionlist"][i][buff_ui["slotcount"][i]] = capt;
 
-	end
+            buff_ui["slotcount"][i] = buff_ui["slotcount"][i] + 1;
+        end
 
-	local timer = frame:GetChild("addontimer");
-	tolua.cast(timer, "ui::CAddOnTimer");
-	timer:SetUpdateScript(updatescp);
-	timer:Start(0.45);
+    end
+
+    local timer = frame:GetChild("addontimer");
+    tolua.cast(timer, "ui::CAddOnTimer");
+    timer:SetUpdateScript(updatescp);
+    timer:Start(0.45);
 end
-
-
 
 --minimap, sorry..
 --minimap is made visible/hidden by client so we have to do this

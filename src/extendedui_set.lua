@@ -59,6 +59,8 @@ function extui.LoadSettings()
 		["extbuff"]		=	true,
 		["remjoy"]		=	false,
 		["remload"]		=	false,
+		["rowamt"]		=	15,
+		["buffsec"]		=	false,
 	}, true);
 
 	extui.lSettingsUI = {};
@@ -185,7 +187,7 @@ function extui.LoadSettings()
 							extui.SetSetting("iconsize",ctrl:GetLevel());
 
 							for k,v in pairs(extui.frames) do
-								if v.isMovable and (k=="buff" or k=="targetbuff") then
+								if v.isMovable and k=="buff" then
 									if extui.frames[k].hasChild then
 										for ch,v in pairs(extui.frames[k]["child"]) do
 											if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
@@ -195,12 +197,10 @@ function extui.LoadSettings()
 												local frm = ui.GetFrame(k);
 												local fch = frm:GetChild(ch);
 
-												local slotCount = fch:GetSlotCount();
-												fch:Resize(slotCount*ctrl:GetLevel(),ctrl:GetLevel());
+												local slotc = extui.GetSetting("rowamt");
+												local rowc = extui.round(30/slotc);
 
-												if ui.GetFrame("extuiframectrls"..k..ch) ~= nil then
-													ui.GetFrame("extuiframectrls"..k..ch):Resize(slotCount*ctrl:GetLevel(),ctrl:GetLevel());
-												end
+												fch:Resize(slotc*ctrl:GetLevel(),rowc*ctrl:GetLevel());
 											end
 										end
 									end
@@ -228,6 +228,48 @@ function extui.LoadSettings()
 		}
 	);
 
+	extui.AddSetting("rowamt", {
+			["name"] = "Amount of Buffs in a row",
+			["tool"] = "Creates new rows with this amount of buffs.",
+			["typedata"] = {
+				["t"] = "ui::CSlideBar",
+				["a"] = "slidebar",
+			},
+			["val"] = extui.ldSettingsUI["rowamt"],
+			["callback"] = function(frame, ctrl)
+							extui.SetSetting("rowamt",ctrl:GetLevel());
+
+							for k,v in pairs(extui.frames) do
+								if v.isMovable and k=="buff" then
+									if extui.frames[k].hasChild then
+										for ch,v in pairs(extui.frames[k]["child"]) do
+											if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+
+												extui.MoveBuffCaption(k, ch);
+
+												local frm = ui.GetFrame(k);
+												local fch = frm:GetChild(ch);
+
+												local slotc = extui.GetSetting("rowamt");
+												local rowc = extui.round(30/slotc);
+
+												fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+											end
+										end
+									end
+								end
+							end
+
+							extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+							INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+
+						end,
+			["oncall"] = ui.LBUTTONUP,
+			["min"] = 1,
+			["max"] = 30,
+		}
+	);
+
 	extui.AddSetting("buffsec", {
 			["name"] = "Always Show Seconds",
 			["tool"] = "Shows (x)s instead of (x)m.",
@@ -240,7 +282,6 @@ function extui.LoadSettings()
 							extui.SetSetting("buffsec",ctrl:IsChecked() == 1);
 						end,
 			["oncall"] = ui.LBUTTONUP,
-			["disabled"] = true,
 		}
 	);
 

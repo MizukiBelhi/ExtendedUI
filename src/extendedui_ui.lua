@@ -34,16 +34,13 @@ function extui.close()
 	if extui.sideFrame then
 		extui.closingSettings = true;
 
-		--settings
-		local _settings = extui.GetSettings();
-		for k,v in pairs(_settings) do
-			v.val = extui.GetSavedSetting(k);
-		end
-		
+		EXTENDEDUI_ON_SAVE();
+
 		local frm = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
 		frm:ShowWindow(0);
 		extui.isSetting = false;
 		extui.showAll = false;
+
 	end
 end
 

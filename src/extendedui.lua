@@ -101,6 +101,28 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 											end
 										end;
 	end
+	if _G["GET_BUFF_TIME_TXT_EXTOLD"] == nil then
+		_G["GET_BUFF_TIME_TXT_EXTOLD"] = _G["GET_BUFF_TIME_TXT"];
+		_G["GET_BUFF_TIME_TXT"] = function(time, istooltip)
+									if extui.GetSetting("buffsec") == false then
+										return _G["GET_BUFF_TIME_TXT_EXTOLD"](time, istooltip);
+									else
+										if time == 0.0 then
+											return "";
+										end
+
+										local sec = math.floor(time / 1000);
+
+										local txt = "{#FFFF00}{ol}{s12}";
+
+										if sec < 0 then
+											sec = 0;
+										end
+
+										return txt .. sec .. ScpArgMsg("Auto_Cho");
+									end
+								end;
+	end
 
 	--Minimap.. sorry
 	--uieffect always visible, so we put an update script into there to check for minimap
