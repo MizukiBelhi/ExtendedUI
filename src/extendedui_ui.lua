@@ -1036,7 +1036,7 @@ function extui.InitSideFrame()
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_RELOADUI");
 	ctrls:SetSkinName("test_pvp_btn");
 
-	local ctrls = ctrl:CreateOrGetControl("button", "extuibuttonrestore", 400-165, 600-45, 150, 30);
+	local ctrls = ctrl:CreateOrGetControl("button", "extuibuttonrestore", 400-75, 600-45, 150, 30);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
 	ctrls:SetText("{@st66b}Restore Defaults{/}");
 	ctrls:SetClickSound("button_click_big");

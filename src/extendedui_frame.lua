@@ -217,7 +217,7 @@ extui.frames = {
 		["keypress"] = {
 			["isMovable"] = true,
 			["hasChild"] = false,
-			["name"] = "QTE.. tap.. key thing",
+			["name"] = "Tapping Key",
 			["noResize"] = true,
 			["saveHidden"] = true,
 		},

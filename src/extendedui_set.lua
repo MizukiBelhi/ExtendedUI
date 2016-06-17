@@ -229,8 +229,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("rowamt", {
-			["name"] = "Amount of Buffs in a row",
-			["tool"] = "Creates new rows with this amount of buffs.",
+			["name"] = "Amount In Row",
+			["tool"] = "Creates new rows with this amount of buffs. (Only works with extended buff display on)",
 			["typedata"] = {
 				["t"] = "ui::CSlideBar",
 				["a"] = "slidebar",
