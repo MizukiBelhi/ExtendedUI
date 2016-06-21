@@ -372,12 +372,17 @@ function EXTENDEDUI_MINI_UPDATE()
 
 					local tcc = ui.GetFrame("extuidragframe"..frame:GetName()..frameName);
 					if tcc ~= nil then
-						tcc:MoveFrame(x, y);
+						local xm = frame:GetX();
+						local ym = frame:GetY();
+						tcc:MoveFrame(xm+x, ym+y);
 					end
 
 					if frame:GetName() == "buff" or frame:GetName() == "targetbuff" then
 						extui.MoveBuffCaption(frame:GetName(), frameName);
-						cframe:Resize(10*extui.GetSetting("iconsize"),extui.GetSetting("iconsize"));
+						local slotc = extui.GetSetting("rowamt");
+						local rowc = extui.round(30/slotc);
+
+						cframe:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
 					end
 					
 					cframe:SetOffset(x, y);
@@ -669,6 +674,8 @@ end
 function EXTENDEDUI_SKIN(skin)
 	local frm = extui.selectedFrameParent;
 	frm:SetSkinName(skin);
+	--oops!
+	extui.framepos[frm:GetName()].skin = skin;
 
 	frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
 	local box = frm:GetChild("extuiminigrpsetbox");
@@ -678,6 +685,9 @@ function EXTENDEDUI_SKIN(skin)
 end
 
 function EXTENDEDUI_ON_CLOSE_UI()
+	if ui.GetFrame("EXTENDEDUI_MINI_FRAME") ~= nil then
+		EXTENDEDUI_ON_MINI_CANCEL();
+	end
 	extui.close();
 end
 

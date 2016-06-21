@@ -605,7 +605,7 @@ function extui.INIT_BUFF_UI(frame, buff_ui, updatescp)
 
             buff_ui["slotlist"][i][buff_ui["slotcount"][i]] = slot;
 
-            if buff_ui["slotlist"][i][buff_ui["slotcount"][i]] == nil then
+            if slot:GetIcon() == nil then
                 slot:ShowWindow(0);
                 local icon = CreateIcon(slot);
                 icon:SetDrawCoolTimeText(0);

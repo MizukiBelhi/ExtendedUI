@@ -237,31 +237,33 @@ function extui.LoadSettings()
 			},
 			["val"] = extui.ldSettingsUI["rowamt"],
 			["callback"] = function(frame, ctrl)
-							extui.SetSetting("rowamt",ctrl:GetLevel());
+							if ctrl:GetLevel() ~= extui.GetSetting("rowamt") then
+								extui.SetSetting("rowamt",ctrl:GetLevel());
 
-							for k,v in pairs(extui.frames) do
-								if v.isMovable and k=="buff" then
-									if extui.frames[k].hasChild then
-										for ch,v in pairs(extui.frames[k]["child"]) do
-											if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+								for k,v in pairs(extui.frames) do
+									if v.isMovable and k=="buff" then
+										if extui.frames[k].hasChild then
+											for ch,v in pairs(extui.frames[k]["child"]) do
+												if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
-												extui.MoveBuffCaption(k, ch);
+													extui.MoveBuffCaption(k, ch);
 
-												local frm = ui.GetFrame(k);
-												local fch = frm:GetChild(ch);
+													local frm = ui.GetFrame(k);
+													local fch = frm:GetChild(ch);
 
-												local slotc = extui.GetSetting("rowamt");
-												local rowc = extui.round(30/slotc);
+													local slotc = extui.GetSetting("rowamt");
+													local rowc = extui.round(30/slotc);
 
-												fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+													fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+												end
 											end
 										end
 									end
 								end
-							end
 
-							extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
-							INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+								extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+								INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+							end
 
 						end,
 			["oncall"] = ui.LBUTTONUP,
