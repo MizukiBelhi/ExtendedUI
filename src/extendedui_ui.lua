@@ -127,7 +127,7 @@ function EXTENDEDUI_MINI_ON_SELECT(index, channelID)
 
 						EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, k);
 					end
-					break;
+					return;
 				end
 				if v.hasChild then
 					for _k,_v in pairs(v.child) do
@@ -151,7 +151,7 @@ function EXTENDEDUI_MINI_ON_SELECT(index, channelID)
 
 								EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, k);
 							end
-							break;
+							return;
 						end
 					end
 				end

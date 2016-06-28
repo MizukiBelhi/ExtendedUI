@@ -81,8 +81,6 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 
 	extui.LoadSettings();
 
-	imcAddOn.BroadMsg("EXTENDEDUI_ON_FRAME_LOAD");
-
 	if _G["_PUMP_RECIPE_OPEN_EXTOLD"] == nil then
 		_G["_PUMP_RECIPE_OPEN_EXTOLD"] = _G["_PUMP_RECIPE_OPEN"];
 		_G["_PUMP_RECIPE_OPEN"] = function(...) 
@@ -147,6 +145,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 		if not(extui.GetSetting("remload")) then
 			extui.print("ExtendedUI Loaded");
 		end
+
 
 		extui.OldToggleFrame = ui.ToggleFrame;
 		ui.ToggleFrame = function(frm) 

@@ -6,228 +6,7 @@ end
 
 extui.framepos = {};
 extui.defaultFrames = {};
-extui.frames = {
-		["time"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Time",
-			["noResize"] = true,
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["targetinfo"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Target Info",
-			["noResize"] = true,
-		},
-		["buff"] = {
-			["isMovable"] = true,
-			["hasChild"] = true,
-			["name"] = "Buffs",
-			["child"] = {
-				["buffcountslot"] = {
-					["isMovable"] = true,
-					["name"] = "Temp Buffs",
-				},
-				["buffslot"] = {
-					["isMovable"] = true,
-					["name"] = "Perm Buffs",
-				},
-				["debuffslot"] = {
-					["isMovable"] = true,
-					["name"] = "Debuffs",
-				},
-			},
-		},
-		["targetbuff"] = {
-			["isMovable"] = true,
-			["hasChild"] = true,
-			["name"] = "Target Buffs",
-			["child"] = {
-				["buffcountslot"] = {
-					["isMovable"] = true,
-					["name"] = "Temp Buffs",
-				},
-				["buffslot"] = {
-					["isMovable"] = true,
-					["name"] = "Perm Buffs",
-				},
-				["debuffslot"] = {
-					["isMovable"] = true,
-					["name"] = "Debuffs",
-				},
-			},
-		},
-		["fps"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "FPS",
-			["noResize"] = true,
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["minimap"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Mini Map",
-			["noResize"] = true,
-			["saveHidden"] = true,
-		},
-		["chat"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Chat Input",
-			["noResize"] = true,
-			["noScale"] = true,
-		},
-		["playtime"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Playtime",
-			["noResize"] = true,
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["chatframe"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Chat Window",
-			["noResize"] = true,
-			["noScale"] = true,
-		},
-		["charbaseinfo"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "EXP Bars",
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["headsupdisplay"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Character Status",
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["sysmenu"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Menu",
-			["noResize"] = true,
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["channel"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Channel",
-			["noResize"] = true,
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["partyinfo"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Party",
-			["noResize"] = true,
-			["saveHidden"] = true,
-		},
-		["questinfoset_2"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Quest Log",
-			["noResize"] = true,
-			["saveHidden"] = true,
-		},
-		["weaponswap"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Weaponswap",
-			["noResize"] = true,
-			["saveHidden"] = true,
-		},
-		["castingbar"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Castbar",
-			["noResize"] = true,
-		},
-		["durnotify"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Durability",
-			["noResize"] = true,
-			["saveHidden"] = true,
-		},
-		["openingameshopbtn"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "TP Shop Button",
-			["saveHidden"] = true,
-			["noScale"] = true,
-		},
-		["quickslotnexpbar"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Keyboard/Mouse Quickslot",
-			["noResize"] = true,
-			["isQuickSlot"] = true,
-		},
-		["restquickslot"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Rest Quickslot",
-			["noResize"] = true,
-			["isQuickSlot"] = true,
-		},
-		["joystickquickslot"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Joystick Quickslot",
-			["noResize"] = true,
-			["isQuickSlot"] = true,
-		},
-		["joystickrestquickslot"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Joystick Rest Quickslot",
-			["noResize"] = true,
-			["isQuickSlot"] = true,
-		},
-		["ctrltargetui"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "CTRL Target Lock",
-			["noResize"] = true,
-			["saveHidden"] = true,
-		},
-		["notice"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Notice",
-			["noResize"] = true,
-		},
-		["fevorcombo"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Fever Combo",
-			["noResize"] = true,
-		},
-		["keypress"] = {
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["name"] = "Tapping Key",
-			["noResize"] = true,
-			["saveHidden"] = true,
-		},
-		["minimizedalarm"] = {
-			["name"] = "Mini Guild Mission",
-			["isMovable"] = true,
-			["hasChild"] = false,
-			["noResize"] = true,
-		},
-	};
+
 extui.skins = {
 		"shadow_box",
 		"test_Item_tooltip_normal",
@@ -290,21 +69,22 @@ extui_Frame.show = false;
 extui_Frame.child = {};
 extui_Frame.onUpdate = function(x,y,w,h) end;
 
+
 function extui_Frame:AddChild(child, displayName)
 	self.hasChild = true;
 
-	self.child[child:match( "^%s*(.-)%s*$" )] = {
+	self.child[string.gsub(child , "%s", "")] = {
 			["name"] = string.gsub(displayName or child, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end),
 			["isMovable"] = true,
 		};
 end
 
--- Add a frame
-function extui_Addon:AddFrame(name, frameTbl)
-	local fName = name:match( "^%s*(.-)%s*$" );
 
+function extui_Addon:AddFrame(name, frameTbl)
+	local fName = string.gsub(name , "%s", "");
+
+	extui_Frame.__index = extui_Frame;
 	self.frames[fName] = setmetatable({}, extui_Frame);
-	self.frames[fName].__index = extui_Frame;
 
 	if type(frameTbl) == "table" then
 		local function _thething(_to,_tbl)
@@ -331,7 +111,7 @@ function extui_Addon:AddFrame(name, frameTbl)
 		return nil;
 	end
 
-	return self.frames[name];
+	return self.frames[fName];
 end
 
 function extui_Addon:RemoveFrame(name)
@@ -349,8 +129,8 @@ end
 function extui.CreateNewAddon(addon)
 	if extui.Addons[addon] ~= nil then return extui.Addons[addon]; end
 
+	extui_Addon.__index = extui_Addon;
 	extui.Addons[addon] = setmetatable({}, extui_Addon);
-	extui.Addons[addon].__index = extui_Addon;
 	extui.Addons[addon].name = addon;
 
 	return extui.Addons[addon];
@@ -379,30 +159,6 @@ function extui.ForceFrameUpdate()
 
 end
 
---[[
-local fun = {};
-fun._funcs = {};
-fun.__add = function(a,b)
-				if type(b) ~= "function" then
-					extui.print(string.format("Error: \"%s\" has to be a function.",tostring(b)));
-					return a;
-				end
-				table.insert(getmetatable(a)._funcs, b);
-				return a;
-			end;
-fun.__call = function(a)
-				for _,v in pairs(getmetatable(a)._funcs) do
-					v();
-				end
-			end;
-setmetatable(fun, fun);
-
-fun = fun+function() extui.print("woah1") end;
-fun = fun+function() extui.print("woah2") end;
-fun = fun+function() extui.print("woah3") end;
-
-fun();
---]]
 
 function EXTENDEDUI_ON_FRAME_LOADS()
 
@@ -427,9 +183,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("durnotify", "Durability");
 	euiAddon:AddFrame("chatframe", "Chat Window");
 	euiAddon:AddFrame("chat", "Chat Input");
-	euiAddon:AddFrame("mini map");
 	euiAddon:AddFrame("notice");
-	euiAddon:AddFrame("time");
 
 	euiFrame = euiAddon:AddFrame("target info");
 	euiFrame.onUpdate = function(x,y,w,h)
@@ -465,6 +219,11 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.noResize = false;
 	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Shop Button");
 	euiFrame.noResize = false;
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("mini map");
+    euiFrame.saveHidden = true;
+    euiFrame = euiAddon:AddFrame("time");
+    euiFrame.saveHidden = true;
 end
 
 function extui.ForEachFrameN(func)
