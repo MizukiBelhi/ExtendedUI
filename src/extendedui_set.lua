@@ -30,6 +30,24 @@ function extui.AddSetting(name, tbl)
 
 end
 
+function extui.AddNewLine()
+	extui.AddSetting("newline_"..tostring(math.random(999999)).."_"..tostring(math.random(999999)), {
+			["typedata"] = {
+				["a"] = "newline",
+			}
+		}
+	);
+end
+
+function extui.AddLabelLine()
+	extui.AddSetting("line_"..tostring(math.random(999999)).."_"..tostring(math.random(999999)), {
+			["typedata"] = {
+				["a"] = "labelline",
+			}
+		}
+	);
+end
+
 function extui.AddDefaults(tbl, adef)
 	if extui.ldSettingsUI == nil then
 		extui.ldSettingsUI = {};
@@ -74,13 +92,7 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddSetting("newline", {
-			["typedata"] = {
-				["a"] = "newline",
-			}
-		}
-	);
-
+	extui.AddNewLine();
 
 	extui.AddSetting("remload", {
 			["name"] = "Remove Loaded Message",
@@ -151,13 +163,7 @@ function extui.LoadSettings()
 		}
 	);
 
-
-	extui.AddSetting("line4", {
-			["typedata"] = {
-				["a"] = "labelline",
-			},
-		}
-	);
+	extui.AddLabelLine();
 
 	extui.AddSetting("label3", {
 			["name"] = "{@st43}Buffs{/}",
@@ -168,13 +174,7 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddSetting("newline3", {
-			["typedata"] = {
-				["a"] = "newline",
-			}
-		}
-	);
-
+	extui.AddNewLine();
 
 	extui.AddSetting("iconsize", {
 			["name"] = "Buff Icon Size",
@@ -186,23 +186,20 @@ function extui.LoadSettings()
 			["callback"] = function(frame, ctrl)
 							extui.SetSetting("iconsize",ctrl:GetLevel());
 
-							for k,v in pairs(extui.frames) do
-								if v.isMovable and k=="buff" then
-									if extui.frames[k].hasChild then
-										for ch,v in pairs(extui.frames[k]["child"]) do
-											if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+							local eframe = extui.GetFrame("buff");
+							if eframe ~= nil then
+								for ch,_ in pairs(eframe.child) do
+									if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
-												extui.MoveBuffCaption(k, ch);
+										extui.MoveBuffCaption("buff", ch);
 
-												local frm = ui.GetFrame(k);
-												local fch = frm:GetChild(ch);
+										local frm = ui.GetFrame("buff");
+										local fch = frm:GetChild(ch);
 
-												local slotc = extui.GetSetting("rowamt");
-												local rowc = extui.round(30/slotc);
+										local slotc = extui.GetSetting("rowamt");
+										local rowc = extui.round(30/slotc);
 
-												fch:Resize(slotc*ctrl:GetLevel(),rowc*ctrl:GetLevel());
-											end
-										end
+										fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
 									end
 								end
 							end
@@ -210,6 +207,7 @@ function extui.LoadSettings()
 						end,
 			["oncall"] = ui.LBUTTONUP,
 			["max"] = 100,
+			["min"] = 16,
 		}
 	);
 
@@ -240,23 +238,20 @@ function extui.LoadSettings()
 							if ctrl:GetLevel() ~= extui.GetSetting("rowamt") then
 								extui.SetSetting("rowamt",ctrl:GetLevel());
 
-								for k,v in pairs(extui.frames) do
-									if v.isMovable and k=="buff" then
-										if extui.frames[k].hasChild then
-											for ch,v in pairs(extui.frames[k]["child"]) do
-												if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+								local eframe = extui.GetFrame("buff");
+								if eframe ~= nil then
+									for ch,_ in pairs(eframe.child) do
+										if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
-													extui.MoveBuffCaption(k, ch);
+											extui.MoveBuffCaption("buff", ch);
 
-													local frm = ui.GetFrame(k);
-													local fch = frm:GetChild(ch);
+											local frm = ui.GetFrame("buff");
+											local fch = frm:GetChild(ch);
 
-													local slotc = extui.GetSetting("rowamt");
-													local rowc = extui.round(30/slotc);
+											local slotc = extui.GetSetting("rowamt");
+											local rowc = extui.round(30/slotc);
 
-													fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
-												end
-											end
+											fch:Resize(slotc*extui.GetSetting("iconsize"),(rowc*extui.GetSetting("iconsize"))+(rowc*15));
 										end
 									end
 								end
@@ -269,6 +264,7 @@ function extui.LoadSettings()
 			["oncall"] = ui.LBUTTONUP,
 			["min"] = 1,
 			["max"] = 30,
+			["disabled"] = function() return not(extui.GetSetting("extbuff")); end,
 		}
 	);
 
@@ -298,6 +294,36 @@ function EXTENDEDUI_ON_SETTINGS_PRESS(frame, ctrl, argStr)
 		local t,p = pcall(_settings[argStr].callback, frame, ctrl);
 		if not(t) then
 			extui.print(tostring(p));
+		end
+	end
+
+	--also update all disabled
+	for k,v in extui.spairs(_settings, function(t,a,b) return t[b].order > t[a].order end) do
+		local typedata = v.typedata;
+		local ctrla = typedata.a;
+		local isDisabled = v.disabled;
+
+		if type(isDisabled) == "function" then
+			isDisabled = isDisabled();
+		end
+
+		local cbox = extui.sideFrame:GetChild("extuiboxs");
+		local ctrls = cbox:GetChild("extuisetctrl"..tostring(k));
+
+		if isDisabled then
+			ctrls:SetColorTone("FF444444");
+			ctrls:SetClickSound("");
+			ctrls:SetOverSound("");
+			ctrls:CreateOrGetControl("picture", "extuitctrlpd"..tostring(k), 400, 30, ui.LEFT, ui.TOP, 0, 0, 0, 0)
+		else
+			ctrls:SetColorTone("FFFFFFFF");
+
+			if ctrla == "checkbox" then
+				ctrls:SetClickSound("button_click_big");
+				ctrls:SetOverSound("button_over");
+			end
+
+			ctrls:RemoveChild("extuitctrlpd"..tostring(k));
 		end
 	end
 	
@@ -351,7 +377,10 @@ function extui.UIAddSettings(cbox)
 		local oncall = v.oncall;
 		local oncreate = v.oncreate;
 		local isDisabled = v.disabled;
-		
+
+		if type(isDisabled) == "function" then
+			isDisabled = isDisabled();
+		end
 		
 		if ctrla ~= "newline" then
 			ctrls = cbox:CreateOrGetControl(ctrla, "extuisetctrl"..tostring(k), inx, iny, 150, 30);

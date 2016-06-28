@@ -92,14 +92,14 @@ function extui.SavePositions()
 		local _str = "//exts 1.0\n";
 
 		for k,v in pairs(extui.framepos) do
-			if extui.frames[k] then
+			if extui.FrameExists(k) then
 				local name = k;
 				local x,y = tostring(v.x),tostring(v.y);
 				local w,h = tostring(v.w),tostring(v.h);
 				local hidden = (v.hidden==1 or v.hidden == true) and true or false;
 				local scale = v.scale or 100;
 				local skin = v.skin or "@default";
-				local hasChild = extui.frames[k].hasChild or false;
+				local hasChild = extui.GetFrame(k).hasChild or false;
 
 				--if string.sub(skin, 1, 4) == "@dic" then
 					skin = dictionary.ReplaceDicIDInCompStr(skin);

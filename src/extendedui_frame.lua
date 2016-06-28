@@ -275,63 +275,270 @@ function extui.ScaleFrame(frame, scale)
 --todo
 end
 
+extui.Addons = {};
+local extui_Addon = {};
+extui_Addon.frames = {};
+extui_Addon.name = "Undefined";
+extui_Addon.inUse = false;
 
-function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
-	local toc = nil;
-	for k,v in pairs(extui.frames) do
-		toc = ui.GetFrame(k);
-		if v.isMovable and toc ~= nil then
-			if extui.framepos[tostring(k)] ~= nil then
-				if func then
-					local t,p = pcall(func, k,v,toc);
-					if not(t) then
-						extui.print("ForEachFrame Err func(): "..tostring(p));
+local extui_Frame = {};
+extui_Frame.name = "Undefined";
+extui_Frame.isMovable = true;
+extui_Frame.hasChild = false;
+extui_Frame.noResize = true;
+extui_Frame.show = false;
+extui_Frame.child = {};
+extui_Frame.onUpdate = function(x,y,w,h) end;
+
+function extui_Frame:AddChild(child, displayName)
+	self.hasChild = true;
+
+	self.child[child:match( "^%s*(.-)%s*$" )] = {
+			["name"] = string.gsub(displayName or child, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end),
+			["isMovable"] = true,
+		};
+end
+
+-- Add a frame
+function extui_Addon:AddFrame(name, frameTbl)
+	local fName = name:match( "^%s*(.-)%s*$" );
+
+	self.frames[fName] = setmetatable({}, extui_Frame);
+	self.frames[fName].__index = extui_Frame;
+
+	if type(frameTbl) == "table" then
+		local function _thething(_to,_tbl)
+			for k,v in pairs(_tbl) do
+				if type(v) == "table" then
+					if _to[k] == nil then
+						_to[k] = {};
 					end
-				end
-			else
-				if nfunc then
-					local t,p = pcall(nfunc, k,v,toc);
-					if not(t) then
-						extui.print("ForEachFrame Err nfunc(): "..tostring(p));
-					end
+					_thething(_to[k], _tbl[k]);
+				else
+					_to[k] = v;
 				end
 			end
-		else
-			if nefunc then
-				local t,p = pcall(nefunc, k,v,toc);
+			return _to;
+		end
+
+		self.frames[fName] = _thething(self.frames[fName], frameTbl);
+	elseif type(frameTbl) == "string" then
+		self.frames[fName].name = frameTbl;
+	elseif frameTbl == nil then
+		self.frames[fName].name = string.gsub(name, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end);
+	else
+		extui.print(string.format("Error: Cannot Add Frame, frameTbl of type \"%s\" is invalid.", type(frameTbl)));
+		return nil;
+	end
+
+	return self.frames[name];
+end
+
+function extui_Addon:RemoveFrame(name)
+	if self.frames[name] ~= nil then
+		self.frames[name] = nil;
+	end
+end
+
+
+function extui_Addon:IsInUse()
+	return self.inUse;
+end
+
+--does things
+function extui.CreateNewAddon(addon)
+	if extui.Addons[addon] ~= nil then return extui.Addons[addon]; end
+
+	extui.Addons[addon] = setmetatable({}, extui_Addon);
+	extui.Addons[addon].__index = extui_Addon;
+	extui.Addons[addon].name = addon;
+
+	return extui.Addons[addon];
+end
+
+function extui.FrameExists(frame)
+	for _,addon in pairs(extui.Addons) do
+		for k,_ in pairs(addon.frames) do
+			if k == frame then return true; end
+		end
+	end
+	return false;
+end
+
+function extui.GetFrame(frame)
+	for _,addon in pairs(extui.Addons) do
+		for k,v in pairs(addon.frames) do
+			if k == frame then return v; end
+		end
+	end
+	return nil;	
+end
+
+
+function extui.ForceFrameUpdate()
+
+end
+
+--[[
+local fun = {};
+fun._funcs = {};
+fun.__add = function(a,b)
+				if type(b) ~= "function" then
+					extui.print(string.format("Error: \"%s\" has to be a function.",tostring(b)));
+					return a;
+				end
+				table.insert(getmetatable(a)._funcs, b);
+				return a;
+			end;
+fun.__call = function(a)
+				for _,v in pairs(getmetatable(a)._funcs) do
+					v();
+				end
+			end;
+setmetatable(fun, fun);
+
+fun = fun+function() extui.print("woah1") end;
+fun = fun+function() extui.print("woah2") end;
+fun = fun+function() extui.print("woah3") end;
+
+fun();
+--]]
+
+function EXTENDEDUI_ON_FRAME_LOADS()
+
+	local euiAddon = extui.CreateNewAddon("UI");
+	local euiFrame = euiAddon:AddFrame("buff", "Buffs");
+	euiFrame.noResize = false;
+	euiFrame:AddChild("buffcountslot", "Temp Buffs");
+	euiFrame:AddChild("buffslot", "Perm Buffs");
+	euiFrame:AddChild("debuffslot", "Debuffs");
+	euiFrame = euiAddon:AddFrame("targetbuff", "Target Buffs");
+	euiFrame.noResize = false;
+	euiFrame:AddChild("buffcountslot", "Temp Buffs");
+	euiFrame:AddChild("buffslot", "Perm Buffs");
+	euiFrame:AddChild("debuffslot", "Debuffs");
+
+	euiAddon:AddFrame("minimizedalarm", "Mini Guild Mission");
+	euiAddon:AddFrame("fevorcombo", "Fever Combo");
+	euiAddon:AddFrame("joystick rest quickslot");
+	euiAddon:AddFrame("joystick quickslot");
+	euiAddon:AddFrame("rest quickslot");
+	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
+	euiAddon:AddFrame("durnotify", "Durability");
+	euiAddon:AddFrame("chatframe", "Chat Window");
+	euiAddon:AddFrame("chat", "Chat Input");
+	euiAddon:AddFrame("mini map");
+	euiAddon:AddFrame("notice");
+	euiAddon:AddFrame("time");
+
+	euiFrame = euiAddon:AddFrame("target info");
+	euiFrame.onUpdate = function(x,y,w,h)
+						extui.TargetInfoUpdate(x,y);
+					end;
+
+	euiFrame = euiAddon:AddFrame("questinfoset_2", "Quest Log");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("keypress", "Tapping Key");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("ctrltargetui", "CTRL Target Lock");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("weaponswap");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("partyinfo", "Party");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("channel");
+	euiFrame.saveHidden = true;
+	euiFrame.noResize = false;
+	euiFrame = euiAddon:AddFrame("sysmenu", "Menu");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("headsupdisplay", "Character Status");
+	euiFrame.saveHidden = true;
+	euiFrame.noResize = false;
+	euiFrame = euiAddon:AddFrame("charbaseinfo", "EXP Bars");
+	euiFrame.saveHidden = true;
+	euiFrame.noResize = false;
+	euiFrame = euiAddon:AddFrame("playtime");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("fps", "FPS");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("castingbar", "Castbar");
+	euiFrame.noResize = false;
+	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Shop Button");
+	euiFrame.noResize = false;
+end
+
+function extui.ForEachFrameN(func)
+	for _,addon in pairs(extui.Addons) do
+		for k,v in pairs(addon.frames) do
+			if func then
+				local t,p = pcall(func, k,v);
 				if not(t) then
-					extui.print("ForEachFrame Err nefunc(): "..tostring(p));
+					extui.print("ForEachFrameN func(): "..tostring(p));
 				end
 			end
 		end
-		
-		
-		if v.hasChild and toc ~= nil then
-			local tcc = nil;
-			for ck,cv in pairs(v.child) do
-				tcc = toc:GetChild(tostring(ck));
-				
-				if cv.isMovable and tcc ~= nil then
-					if extui.framepos[tostring(k)]["child"][tostring(ck)] == nil then
-						if cfunc then
-							local t,p = pcall(cfunc, k, v, ck, cv, toc, tcc);
-							if not(t) then
-								extui.print("ForEachFrame Err cfunc(): "..tostring(p));
-							end
-						end
-					else
-						if cnfunc then
-							local t,p = pcall(cnfunc, k, v, ck, cv, toc, tcc);
-							if not(t) then
-								extui.print("ForEachFrame Err cnfunc(): "..tostring(p));
-							end
+	end
+end
+
+function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
+	local toc = nil;
+
+	for _,addon in pairs(extui.Addons) do
+		for k,v in pairs(addon.frames) do
+			toc = ui.GetFrame(k);
+			if v.isMovable and toc ~= nil then
+				if extui.framepos[tostring(k)] ~= nil then
+					if func then
+						local t,p = pcall(func, k,v,toc);
+						if not(t) then
+							extui.print("ForEachFrame Err func(): "..tostring(p));
 						end
 					end
 				else
-					if cnefunc then
-						local t,p = pcall(cnefunc, k, v, ck, cv, toc, tcc);
+					if nfunc then
+						local t,p = pcall(nfunc, k,v,toc);
 						if not(t) then
-							extui.print("ForEachFrame Err cnefunc(): "..tostring(p));
+							extui.print("ForEachFrame Err nfunc(): "..tostring(p));
+						end
+					end
+				end
+			else
+				if nefunc then
+					local t,p = pcall(nefunc, k,v,toc);
+					if not(t) then
+						extui.print("ForEachFrame Err nefunc(): "..tostring(p));
+					end
+				end
+			end
+			
+			
+			if v.hasChild and toc ~= nil then
+				local tcc = nil;
+				for ck,cv in pairs(v.child) do
+					tcc = toc:GetChild(tostring(ck));
+					
+					if cv.isMovable and tcc ~= nil then
+						if extui.framepos[tostring(k)]["child"][tostring(ck)] == nil then
+							if cfunc then
+								local t,p = pcall(cfunc, k, v, ck, cv, toc, tcc);
+								if not(t) then
+									extui.print("ForEachFrame Err cfunc(): "..tostring(p));
+								end
+							end
+						else
+							if cnfunc then
+								local t,p = pcall(cnfunc, k, v, ck, cv, toc, tcc);
+								if not(t) then
+									extui.print("ForEachFrame Err cnfunc(): "..tostring(p));
+								end
+							end
+						end
+					else
+						if cnefunc then
+							local t,p = pcall(cnefunc, k, v, ck, cv, toc, tcc);
+							if not(t) then
+								extui.print("ForEachFrame Err cnefunc(): "..tostring(p));
+							end
 						end
 					end
 				end
@@ -344,6 +551,8 @@ end
 
 function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 	local hasNew = false;
+
+	imcAddOn.BroadMsg("EXTENDEDUI_ON_FRAME_LOAD");
 
 	extui.ForEachFrame(
 		function(k,v,toc)
@@ -400,9 +609,10 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 				table.insert(extui.skins, skin);
 			end
 
-			if k=="targetinfo" then
-				extui.TargetInfoUpdate(x,y);
-			end
+			v.onUpdate(x,y,w,h);
+			--if k=="targetinfo" then
+			--	extui.TargetInfoUpdate(x,y);
+			--end
 
 		end,
 		function(k,v,toc)
@@ -436,6 +646,8 @@ function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
 			if v.hasChild then
 				extui.framepos[tostring(k)]["child"] = {};
 			end
+
+			v.onUpdate(x,y,w,h);
 		end,
 		function(k,v)
 			--do nothing, Fix #5

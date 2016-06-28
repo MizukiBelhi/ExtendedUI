@@ -73,12 +73,15 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	addon:RegisterMsg("JOB_EXP_ADD", "EXTENDEDUI_ON_JOB_EXP");
 	addon:RegisterMsg("CHANGE_COUNTRY", "EXTENDEDUI_ON_CHAR_EXP");
 	addon:RegisterMsg("ESCAPE_PRESSED", "EXTENDEDUI_ON_CLOSE_UI");
+	addon:RegisterMsg("EXTENDEDUI_ON_FRAME_LOAD", "EXTENDEDUI_ON_FRAME_LOADS");
 
 	extui.UpdateCheck();
 
 	extui.isSetting = false;
 
 	extui.LoadSettings();
+
+	imcAddOn.BroadMsg("EXTENDEDUI_ON_FRAME_LOAD");
 
 	if _G["_PUMP_RECIPE_OPEN_EXTOLD"] == nil then
 		_G["_PUMP_RECIPE_OPEN_EXTOLD"] = _G["_PUMP_RECIPE_OPEN"];
@@ -147,13 +150,13 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 
 		extui.OldToggleFrame = ui.ToggleFrame;
 		ui.ToggleFrame = function(frm) 
-							if extui.frames[frm] == nil then
+							if extui.GetFrame(frm) == nil then
 								extui.OldToggleFrame(frm);
 							end
 						end;
 		extui.OldGetFrame = ui.GetFrame;
 		ui.GetFrame = function(frm)
-							if extui.frames[frm] ~= nil then
+							if extui.GetFrame(frm) ~= nil then
 								local nframe = extui.OldGetFrame(frm);
 
 								if nframe.OldShowWindow ~= nil then return nframe; end
@@ -161,8 +164,9 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 								nframe.OldShowWindow = nframe.ShowWindow;
 
 								function nframe:ShowWindow(b,ex)
-									if extui.frames[self:GetName()] ~= nil then
-										if extui.frames[self:GetName()].saveHidden ~= nil then
+									local eframe = extui.GetFrame(self:GetName());
+									if eframe ~= nil then
+										if eframe.saveHidden ~= nil then
 											if ex then
 												self:OldShowWindow(b);
 											end
