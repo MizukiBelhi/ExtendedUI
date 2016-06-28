@@ -857,14 +857,14 @@ function extui.listframes()
 	extui.UpdateCheck();
 
 
-	EXTENDEDUI_LOAD_POSITIONS(nil,"GAME_START");
+	EXTENDEDUI_LOAD_POSITIONS();
 	extui.print("Reloaded UI");
 end
 
 function extui.reload()
 	extui.UpdateCheck();
 
-	EXTENDEDUI_LOAD_POSITIONS(nil,"GAME_START");
+	EXTENDEDUI_LOAD_POSITIONS();
 end
 
 function EXTENDEDUI_ON_RELOADUI()
@@ -872,7 +872,7 @@ function EXTENDEDUI_ON_RELOADUI()
 	extui.oldSlider = {};
 	extui.UpdateCheck();
 
-	EXTENDEDUI_LOAD_POSITIONS(nil,"GAME_START");
+	EXTENDEDUI_LOAD_POSITIONS();
 	extui.UpdateSliders();
 	extui.print("Reloaded UI");
 	extui.isReload = false;

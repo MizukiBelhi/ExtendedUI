@@ -156,7 +156,7 @@ end
 
 
 function extui.ForceFrameUpdate()
-
+	EXTENDEDUI_LOAD_POSITIONS();
 end
 
 
@@ -308,7 +308,7 @@ end
 
 
 
-function EXTENDEDUI_LOAD_POSITIONS(_frame, msg)
+function EXTENDEDUI_LOAD_POSITIONS()
 	local hasNew = false;
 
 	imcAddOn.BroadMsg("EXTENDEDUI_ON_FRAME_LOAD");
