@@ -156,7 +156,18 @@ end
 
 
 function extui.ForceFrameUpdate()
-	EXTENDEDUI_LOAD_POSITIONS();
+	for _,addon in pairs(extui.Addons) do
+		for k,v in pairs(addon.frames) do
+			local toc = ui.GetFrame(k);
+			if toc ~= nil then
+				local x = toc:GetX() or 0;
+				local y = toc:GetY() or 0;
+				local w = toc:GetWidth() or 0;
+				local h = toc:GetHeight() or 0;
+				v.onUpdate(x,y,w,h);
+			end
+		end
+	end
 end
 
 
