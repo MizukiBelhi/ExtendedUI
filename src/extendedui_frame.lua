@@ -56,7 +56,6 @@ end
 
 extui.Addons = {};
 local extui_Addon = {};
-extui_Addon.frames = {};
 extui_Addon.name = "Undefined";
 extui_Addon.inUse = false;
 
@@ -83,8 +82,7 @@ end
 function extui_Addon:AddFrame(name, frameTbl)
 	local fName = string.gsub(name , "%s", "");
 
-	extui_Frame.__index = extui_Frame;
-	self.frames[fName] = setmetatable({}, extui_Frame);
+	self.frames[fName] = setmetatable({}, { __index = extui_Frame });
 
 	if type(frameTbl) == "table" then
 		local function _thething(_to,_tbl)
@@ -129,9 +127,9 @@ end
 function extui.CreateNewAddon(addon)
 	if extui.Addons[addon] ~= nil then return extui.Addons[addon]; end
 
-	extui_Addon.__index = extui_Addon;
-	extui.Addons[addon] = setmetatable({}, extui_Addon);
+	extui.Addons[addon] = setmetatable({}, { __index = extui_Addon });
 	extui.Addons[addon].name = addon;
+	extui.Addons[addon].frames = {};
 
 	return extui.Addons[addon];
 end
@@ -245,6 +243,17 @@ function extui.ForEachFrameN(func)
 				if not(t) then
 					extui.print("ForEachFrameN func(): "..tostring(p));
 				end
+			end
+		end
+	end
+end
+
+function extui.ForEachFrameS(addon, func)
+	for k,v in pairs(extui.Addons[addon].frames) do
+		if func then
+			local t,p = pcall(func, k,v);
+			if not(t) then
+				extui.print("ForEachFrameS func(): "..tostring(p));
 			end
 		end
 	end

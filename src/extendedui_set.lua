@@ -335,28 +335,25 @@ function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
 	local itembox_tab		= tolua.cast(tabObj, "ui::CTabControl");
 	local curtabIndex	    = itembox_tab:GetSelectItemIndex();
 	
-	-- make sure it only happens when actually on that tab
-	if curtabIndex == 0 then
-		local _settings = extui.GetSettings();
-		local uibox = GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
-		ctrl = tolua.cast(ctrl, "ui::CSlideBar");
-		local n = ctrl:GetName();
-		local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);
+	local _settings = extui.GetSettings();
+	local uibox = GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
+	ctrl = tolua.cast(ctrl, "ui::CSlideBar");
+	local n = ctrl:GetName();
+	local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);
 
-		if _settings[argStr] ~= nil then
-			if ctrl:GetLevel() ~= _settings[argStr].val then
-				local labelval = GET_CHILD(uibox,"extuisetlabelval"..argStr,"ui::CRichText");
-				labelval:SetText("{@st42b}"..tostring(ctrl:GetLevel()).."{/}");
-			end
-
-			if _settings[argStr].callback ~= nil then
-
-				_settings[argStr].callback(uibox, ctrl);
-
-			end
+	if _settings[argStr] ~= nil then
+		if ctrl:GetLevel() ~= _settings[argStr].val then
+			local labelval = GET_CHILD(uibox,"extuisetlabelval"..argStr,"ui::CRichText");
+			labelval:SetText("{@st42b}"..tostring(ctrl:GetLevel()).."{/}");
 		end
 
-	end
+		if _settings[argStr].callback ~= nil then
+
+			_settings[argStr].callback(uibox, ctrl);
+
+		end
+		end
+
 	return 1;
 end
 

@@ -6,6 +6,7 @@ end
 
 extui.selectedFrame = nil;
 extui.selectedFrameParent = nil;
+extui.selectedAddon = nil;
 
 function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	local frm = ui.GetFrame(argStr);
@@ -54,15 +55,18 @@ function EXTUI_ON_TAB_CHANGE(frame, ctrl, argStr, argNum)
 	local tabObj		    = frame:GetChild("extuitabs");
 	local itembox_tab		= tolua.cast(tabObj, "ui::CTabControl");
 	local curtabIndex	    = itembox_tab:GetSelectItemIndex();
-	
-	if curtabIndex == 1 then
-		if ui.GetFrame("EXTENDEDUI_MINI_FRAME") == nil then
-			extui.showAll = false;
-			EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
-			extui.OpenMiniFrame();
-		end
-		tabObj:SelectTab(0);
+	local curtabName		= itembox_tab:GetSelectItemName();
+
+
+	if ui.GetFrame("EXTENDEDUI_MINI_FRAME") == nil then
+		curtabName = string.gsub(curtabName, "%s", "");
+		extui.selectedAddon = string.gsub(curtabName, "({@[%w_']*})([%w_']*)({/})", function(_,d) return d; end);
+		extui.print(extui.selectedAddon);
+		extui.showAll = false;
+		EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
+		extui.OpenMiniFrame();
 	end
+
 end
 
 extui.savedFramePosX = 0;
@@ -106,7 +110,7 @@ function EXTENDEDUI_MINI_ON_SELECT(index, channelID)
 
 	local selFrame = extui.dropListOptions[index];
 
-	extui.ForEachFrameN(function(k,v)
+	extui.ForEachFrameS(extui.selectedAddon, function(k,v)
 				if v.name == selFrame then
 					extui.oldSelectedFrameParent = extui.selectedFrameParent;
 					extui.selectedFrameParent = ui.GetFrame(k);
@@ -173,7 +177,8 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST()
 	ui.AddDropListItem("None Selected", "", 1);
 	local iii = 1;
 
-	extui.ForEachFrameN(function(k,v)
+	extui.ForEachFrameS(extui.selectedAddon, function(_,v)
+				extui.print(string.format("adding %s for %s",v.name, extui.selectedAddon));
 				if v.isMovable then
 					ui.AddDropListItem(tostring(v.name),"", iii);
 					extui.dropListOptions[iii] = tostring(v.name);
@@ -725,7 +730,7 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 	if argStr == "*all" then
 		if not(extui.showAll) then
 
-			extui.ForEachFrameN(function(k,v)
+			extui.ForEachFrameS(extui.selectedAddon, function(k,v)
 					if v.isMovable then
 						local ss = ui.GetFrame(k);
 						local w = ss:GetWidth();
@@ -767,7 +772,7 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 				end);
 			extui.showAll = true;
 		else
-			extui.ForEachFrameN(function(k,v)
+			extui.ForEachFrameS(extui.selectedAddon, function(k,v)
 					if v.isMovable and v.show then
 						if k ~= exclude then
 							local tocc = ui.GetFrame("extuidragframe"..tostring(k));
@@ -1029,8 +1034,10 @@ function extui.InitSideFrame()
 	local ctab = ctrl:CreateOrGetControl("tab", "extuitabs", 50, 90, 740, 30);
 	ctab = tolua.cast(ctab, "ui::CTabControl");
 	ctab:SetEventScript(ui.LBUTTONDOWN, "EXTUI_ON_TAB_CHANGE");
-	ctab:AddItem("{@st66b}    Settings    {/}"); --yay hacks
-	ctab:AddItem("{@st66b}     Frames     {/}");
+	--ctab:AddItem("{@st66b}    Settings    {/}"); --yay hacks
+	for _,addon in pairs(extui.Addons) do
+		ctab:AddItem(string.format("{@st66b}     %s     {/}", addon.name));
+	end
 	ctab:SetClickSound("button_click_big");
 	ctab:SetOverSound("button_over");
 	ctab:SetSkinName("tab2");
@@ -1067,7 +1074,7 @@ function extui.InitSideFrame()
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CLOSE_UI");
 	ctrls:SetSkinName("test_pvp_btn");
 	
-	ctab:SelectTab(0);
+	--ctab:SelectTab(0);
 	extui.sideFrame = ctrl;
 
 	extui.sideFrame:GetChild("extuiboxs"):ShowWindow(1);
