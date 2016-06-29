@@ -14,7 +14,7 @@ function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	local eframe = extui.GetFrame(argStr);
 	if eframe then
 		if eframe.saveHidden then
-			eframe.hidden = ctrl:IsChecked();
+			extui.framepos[argStr].hidden = ctrl:IsChecked();
 		end
 	end
 end
