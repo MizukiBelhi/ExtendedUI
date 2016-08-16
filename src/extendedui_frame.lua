@@ -190,7 +190,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("rest quickslot");
 	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
 	euiAddon:AddFrame("durnotify", "Durability");
-	euiAddon:AddFrame("chatframe", "Chat Window");
+	--euiAddon:AddFrame("chatframe", "Chat Window");
 	euiAddon:AddFrame("chat", "Chat Input");
 	euiAddon:AddFrame("notice");
 
