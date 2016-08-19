@@ -61,7 +61,6 @@ function EXTUI_ON_TAB_CHANGE(frame, ctrl, argStr, argNum)
 	if ui.GetFrame("EXTENDEDUI_MINI_FRAME") == nil then
 		curtabName = string.gsub(curtabName, "%s", "");
 		extui.selectedAddon = string.gsub(curtabName, "({@[%w_']*})([%w_']*)({/})", function(_,d) return d; end);
-		extui.print(extui.selectedAddon);
 		extui.showAll = false;
 		EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
 		extui.OpenMiniFrame();
@@ -178,7 +177,6 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST()
 	local iii = 1;
 
 	extui.ForEachFrameS(extui.selectedAddon, function(_,v)
-				extui.print(string.format("adding %s for %s",v.name, extui.selectedAddon));
 				if v.isMovable then
 					ui.AddDropListItem(tostring(v.name),"", iii);
 					extui.dropListOptions[iii] = tostring(v.name);

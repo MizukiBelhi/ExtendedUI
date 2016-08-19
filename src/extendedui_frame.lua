@@ -193,6 +193,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	--euiAddon:AddFrame("chatframe", "Chat Window");
 	euiAddon:AddFrame("chat", "Chat Input");
 	euiAddon:AddFrame("notice");
+	euiAddon:AddFrame("indunautomatch", "Queue Window");
 
 	euiFrame = euiAddon:AddFrame("target info");
 	euiFrame.onUpdate = function(x,y,w,h)
@@ -200,7 +201,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 					end;
 
 	euiFrame = euiAddon:AddFrame("questinfoset_2", "Quest Log");
-	euiFrame.saveHidden = true;
+	--euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("keypress", "Tapping Key");
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("ctrltargetui", "CTRL Target Lock");
@@ -210,7 +211,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame = euiAddon:AddFrame("partyinfo", "Party");
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("channel");
-	euiFrame.saveHidden = true;
+	--euiFrame.saveHidden = true;
 	euiFrame.noResize = false;
 	euiFrame = euiAddon:AddFrame("sysmenu", "Menu");
 	euiFrame.saveHidden = true;
@@ -218,8 +219,8 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame.noResize = false;
 	euiFrame = euiAddon:AddFrame("charbaseinfo", "EXP Bars");
-	euiFrame.saveHidden = true;
-	euiFrame.noResize = false;
+	--euiFrame.saveHidden = true;
+	--euiFrame.noResize = false;
 	euiFrame = euiAddon:AddFrame("playtime");
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("fps", "FPS");

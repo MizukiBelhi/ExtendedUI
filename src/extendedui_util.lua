@@ -68,181 +68,167 @@ end
 
 
 function extui.SavePositions()
-	
-	for k,v in pairs(extui.lSettingsUI) do
-		if extui.ldSettingsUI[tostring(k)] ~= nil then
-			extui.ldSettingsUI[tostring(k)] = v.val;
+	local acutil = require("acutil");
+
+	acutil.saveJSON("../addons/extendedui/settings.json", extui.ldSettingsUI);
+
+	--clean frame settings
+	local frmTbl = {};
+	for k,v in pairs(extui.framepos) do
+		if extui.FrameExists(k) then
+			frmTbl[k] = v;
+			frmTbl[k].hidden = (frmTbl[k].hidden==1 or frmTbl[k].hidden == true) and true or false;
+			frmTbl[k].scale = frmTbl[k].scale or 100;
+			frmTbl[k].skin = frmTbl[k].skin or "@default";
+
+			frmTbl[k].skin = dictionary.ReplaceDicIDInCompStr(frmTbl[k].skin);
 		end
 	end
-	
-	local file, error = io.open("../addons/extendedui/settings.extui", "w");
-	if file ~= nil then
-		local _str = "";
 
-		for k,v in pairs(extui.ldSettingsUI) do
-			_str = _str..k..","..tostring(v).."\n";
-		end
-
-		file:write(_str);
-		io.close(file);
-	end
-
-	file, error = io.open("../addons/extendedui/frames.extui", "w");
-	if file ~= nil then
-		local _str = "//exts 1.0\n";
-
-		for k,v in pairs(extui.framepos) do
-			if extui.FrameExists(k) then
-				local name = k;
-				local x,y = tostring(v.x),tostring(v.y);
-				local w,h = tostring(v.w),tostring(v.h);
-				local hidden = (v.hidden==1 or v.hidden == true) and true or false;
-				local scale = v.scale or 100;
-				local skin = v.skin or "@default";
-				local hasChild = extui.GetFrame(k).hasChild or false;
-
-				--if string.sub(skin, 1, 4) == "@dic" then
-					skin = dictionary.ReplaceDicIDInCompStr(skin);
-				--end
-
-				_str = _str..name..","..x..","..y..","..w..","..h..","..tostring(hidden)..","..tostring(scale)..","..tostring(skin)..","..tostring(hasChild);
-
-				if hasChild then
-
-					for ck,cv in pairs(v.child) do
-						local cname = ck;
-						local cx,cy = tostring(cv.x),tostring(cv.y);
-
-						_str = _str..","..cname..","..cx..","..cy;
-					end
-
-					_str = _str..",0";
-				end
-
-				_str = _str.."\n";
-			end
-		end
-
-		file:write(_str);
-		io.close(file);
-	end
+	acutil.saveJSON("../addons/extendedui/frames.json", frmTbl);
 end
 
 
-function extui.UpdateCheck()
-	local file, error = io.open("../addons/extendedui/settings.extui", "r");
-	if file ~= nil then
-		for line in file:lines() do
-	    	local k,v = string.match(line,"(%w+),(%w+)");
-			extui.ldSettingsUI[k] = extui.FromString(v);
-	    end
+function extui.tUpdateCheck()
+	local acutil = require("acutil");
 
-		io.close(file);
-	end
+	local file, _err = io.open("../addons/extendedui/settings.extui", "r");
 
-	local file, error = io.open("../addons/extendedui/frames.extui", "r");
-	if file ~= nil then
-		local _str = file:read("*all");
+	if file == nil then
 
-		if string.len(_str) > 1 then
+		local tload, error = acutil.loadJSON("../addons/extendedui/settings.json");
+		if not error then
+			extui.ldSettingsUI = tload;
+		end
 
-			local version = 0;
+		tload, error = acutil.loadJSON("../addons/extendedui/frames.json");
+		if not error then
+			for _,v in pairs(tload) do
+				v.hidden = (v.hidden==true) and 1 or 0;
+			end
+			extui.framepos = tload;
+		else
+			EXTENDEDUI_ON_SAVE();
+		end
 
-			local opFrames = StringSplit(_str, "\n");
-			for k,v in pairs(opFrames) do
-				if string.sub(v, 1, 2) == "//" then
-					version = 1;
-				else
-					if version == 0 then
-						local iFrames = StringSplit(v, ",");
+	else
 
-						local name = iFrames[1];
-						local x = extui.FromString(iFrames[2]);
-						local y = extui.FromString(iFrames[3]);
-						local w = extui.FromString(iFrames[4]);
-						local h = extui.FromString(iFrames[5]);
-						local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
-						local hasChild = extui.FromString(iFrames[7]);
-						local childs = {};
-						if hasChild then
-							local onL = 8;
-							while true do
-								local cname = iFrames[onL];
+		if file ~= nil then
+			for line in file:lines() do
+		    	local k,v = string.match(line,"(%w+),(%w+)");
+				extui.ldSettingsUI[k] = extui.FromString(v);
+		    end
 
-								if cname == "0" then
-									break;
-								end
+			io.close(file);
 
-								local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
+			os.remove("../addons/extendedui/settings.extui");
+		end
 
-								childs[cname] = {
-										["x"] = cx,
-										["y"] = cy,
-									};
+		local file, _err = io.open("../addons/extendedui/frames.extui", "r");
+		if file ~= nil then
+			local _str = file:read("*all");
 
-								onL = onL+3;
-							end
+			if string.len(_str) > 1 then
 
-						end
+				local version = 0;
 
-						extui.framepos[name] = {
-								["x"] = x,
-								["y"] = y,
-								["w"] = w,
-								["h"] = h,
-								["hidden"] = hidden,
-								["child"] = childs,
-							};
+				local opFrames = StringSplit(_str, "\n");
+				for k,v in pairs(opFrames) do
+					if string.sub(v, 1, 2) == "//" then
+						version = 1;
 					else
-						local iFrames = StringSplit(v, ",");
+						if version == 0 then
+							local iFrames = StringSplit(v, ",");
 
-						local name = iFrames[1];
-						local x = extui.FromString(iFrames[2]);
-						local y = extui.FromString(iFrames[3]);
-						local w = extui.FromString(iFrames[4]);
-						local h = extui.FromString(iFrames[5]);
-						local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
-						local scale = extui.FromString(iFrames[7]);
-						local skin = iFrames[8];
-						local hasChild = extui.FromString(iFrames[9]);
-						local childs = {};
-						if hasChild then
-							local onL = 10;
-							while true do
-								local cname = iFrames[onL];
+							local name = iFrames[1];
+							local x = extui.FromString(iFrames[2]);
+							local y = extui.FromString(iFrames[3]);
+							local w = extui.FromString(iFrames[4]);
+							local h = extui.FromString(iFrames[5]);
+							local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
+							local hasChild = extui.FromString(iFrames[7]);
+							local childs = {};
+							if hasChild then
+								local onL = 8;
+								while true do
+									local cname = iFrames[onL];
 
-								if cname == "0" then
-									break;
+									if cname == "0" then
+										break;
+									end
+
+									local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
+
+									childs[cname] = {
+											["x"] = cx,
+											["y"] = cy,
+										};
+
+									onL = onL+3;
 								end
 
-								local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
-
-								childs[cname] = {
-										["x"] = cx,
-										["y"] = cy,
-									};
-
-								onL = onL+3;
 							end
 
-						end
+							extui.framepos[name] = {
+									["x"] = x,
+									["y"] = y,
+									["w"] = w,
+									["h"] = h,
+									["hidden"] = hidden,
+									["child"] = childs,
+								};
+						else
+							local iFrames = StringSplit(v, ",");
 
-						extui.framepos[name] = {
-								["x"] = x,
-								["y"] = y,
-								["w"] = w,
-								["h"] = h,
-								["hidden"] = hidden,
-								["skin"] = skin,
-								["scale"] = scale,
-								["child"] = childs,
-							};
+							local name = iFrames[1];
+							local x = extui.FromString(iFrames[2]);
+							local y = extui.FromString(iFrames[3]);
+							local w = extui.FromString(iFrames[4]);
+							local h = extui.FromString(iFrames[5]);
+							local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
+							local scale = extui.FromString(iFrames[7]);
+							local skin = iFrames[8];
+							local hasChild = extui.FromString(iFrames[9]);
+							local childs = {};
+							if hasChild then
+								local onL = 10;
+								while true do
+									local cname = iFrames[onL];
+
+									if cname == "0" then
+										break;
+									end
+
+									local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
+
+									childs[cname] = {
+											["x"] = cx,
+											["y"] = cy,
+										};
+
+									onL = onL+3;
+								end
+
+							end
+
+							extui.framepos[name] = {
+									["x"] = x,
+									["y"] = y,
+									["w"] = w,
+									["h"] = h,
+									["hidden"] = hidden,
+									["skin"] = skin,
+									["scale"] = scale,
+									["child"] = childs,
+								};
+						end
 					end
 				end
 			end
-		end
 
-		io.close(file);
+			io.close(file);
+			os.remove("../addons/extendedui/frames.extui");
+		end
 	end
 end
 
@@ -250,6 +236,13 @@ end
 
 function EXTENDEDUI_ON_SAVE()
 	local s, bl = pcall(extui.SavePositions);
+	if not(s) then
+		extui.print("ERROR: "..bl);
+	end
+end
+
+function extui.UpdateCheck()
+	local s, bl = pcall(extui.tUpdateCheck);
 	if not(s) then
 		extui.print("ERROR: "..bl);
 	end
