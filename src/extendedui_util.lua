@@ -89,7 +89,7 @@ function extui.SavePositions()
 end
 
 
-function extui.tUpdateCheck()
+function extui.UpdateCheck()
 	local acutil = require("acutil");
 
 	local file, _err = io.open("../addons/extendedui/settings.extui", "r");
@@ -230,19 +230,13 @@ function extui.tUpdateCheck()
 			os.remove("../addons/extendedui/frames.extui");
 		end
 	end
+	extui.language.LoadFile();
 end
 
 
 
 function EXTENDEDUI_ON_SAVE()
 	local s, bl = pcall(extui.SavePositions);
-	if not(s) then
-		extui.print("ERROR: "..bl);
-	end
-end
-
-function extui.UpdateCheck()
-	local s, bl = pcall(extui.tUpdateCheck);
 	if not(s) then
 		extui.print("ERROR: "..bl);
 	end
