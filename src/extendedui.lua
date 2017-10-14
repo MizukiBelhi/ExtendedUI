@@ -131,8 +131,9 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	uieffect_frame:RunUpdateScript("EXTUI_MINIMAP_VISIBILITY_CHECK");
 
 
-	local _frame = ui.GetFrame("systemoption")
-	local ctrls = _frame:CreateOrGetControl("button", "extuiopenbutton", 332, 320, 208, 35);
+	local _frame = ui.GetFrame("systemoption");
+	local _box = GET_CHILD_RECURSIVELY(_frame, "gameBox", "ui::CGroupBox");
+	local ctrls = _box:CreateOrGetControl("button", "extuiopenbutton", 20, 315, 208, 35);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
 	ctrls:SetText("{@st66b}ExtendedUI{/}");
 	ctrls:SetClickSound("button_click_big");

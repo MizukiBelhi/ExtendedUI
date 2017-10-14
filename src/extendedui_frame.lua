@@ -193,7 +193,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	--euiAddon:AddFrame("chatframe", "Chat Window");
 	euiAddon:AddFrame("chat", "Chat Input");
 	euiAddon:AddFrame("notice");
-	euiAddon:AddFrame("indunautomatch", "Queue Window");
+	--euiAddon:AddFrame("indunautomatch", "Queue Window");
 
 	euiFrame = euiAddon:AddFrame("target info");
 	euiFrame.onUpdate = function(x,y,w,h)
@@ -233,6 +233,8 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame = euiAddon:AddFrame("mini map");
     euiFrame.saveHidden = true;
     euiFrame = euiAddon:AddFrame("time");
+    euiFrame.saveHidden = true;
+    euiFrame = euiAddon:AddFrame("minimizedeventbanner", "Event Button");
     euiFrame.saveHidden = true;
 end
 

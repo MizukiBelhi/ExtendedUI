@@ -79,12 +79,15 @@ function extui.LoadSettings()
 		["remload"]		=	false,
 		["rowamt"]		=	15,
 		["buffsec"]		=	false,
+		["lang"]		=	"eng",
 	}, true);
 
 	extui.lSettingsUI = {};
 
+	extui.AddNewLine();
+
 	extui.AddSetting("label1", {
-			["name"] = "{@st43}General{/}",
+			["name"] = "{@st43}"..extui.TLang("general").."{/}",
 			["typedata"] = {
 				["t"] = "ui::CRichText",
 				["a"] = "richtext",
@@ -92,11 +95,9 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddNewLine();
-
 	extui.AddSetting("remload", {
-			["name"] = "Remove Loaded Message",
-			["tool"] = "Removes the \"ExtendedUI Loaded\" message on startup",
+			["name"] = extui.TLang("loadMessage"),
+			["tool"] = extui.TLang("loadMessageDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -108,8 +109,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("remjoy", {
-			["name"] = "Hide buttons from Joystick Quickslot",
-			["tool"] = "Removes the \"Set 1\"/\"Set 2\" buttons from the Joystick Quickslot",
+			["name"] = extui.TLang("hideJoy"),
+			["tool"] = extui.TLang("hideJoyDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -125,8 +126,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("showexp", {
-			["name"] = "Show EXP Numbers",
-			["tool"] = "Shows exact exp numbers when hovering over the exp bars. (Updates after map change)",
+			["name"] = extui.TLang("showExp"),
+			["tool"] = extui.TLang("showExpDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -138,8 +139,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("discraft", {
-			["name"] = "Disable Recipe Item Popup",
-			["tool"] = "Disables the popup when getting an item for crafting.",
+			["name"] = extui.TLang("disablePop"),
+			["tool"] = extui.TLang("disablePopDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -151,8 +152,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("lockquest", {
-			["name"] = "Lock Quest Log Position",
-			["tool"] = "Locks the Quest Log so it no longer moves in both directions when new quests are added or removed.",
+			["name"] = extui.TLang("lockQuest"),
+			["tool"] = extui.TLang("lockQuestDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -163,10 +164,21 @@ function extui.LoadSettings()
 		}
 	);
 
+	extui.AddSetting("lang", {
+			["name"] = extui.TLang("lang"),
+			["typedata"] = {
+				["a"] = "dropdown",
+			},
+			["val"] = extui.ldSettingsUI["lang"],
+			["dropcall"] = EXTENDEDUI_ON_LANGUAGE_SELECT,
+			["callback"] = "EXTENDEDUI_CHOOSE_LANGUAGE",
+		}
+	);
+
 	extui.AddLabelLine();
 
 	extui.AddSetting("label3", {
-			["name"] = "{@st43}Buffs{/}",
+			["name"] = "{@st43}"..extui.TLang("buffs").."{/}",
 			["typedata"] = {
 				["t"] = "ui::CRichText",
 				["a"] = "richtext",
@@ -174,10 +186,10 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddNewLine();
+	--extui.AddNewLine();
 
 	extui.AddSetting("iconsize", {
-			["name"] = "Buff Icon Size",
+			["name"] = extui.TLang("bIconSize"),
 			["typedata"] = {
 				["t"] = "ui::CSlideBar",
 				["a"] = "slidebar",
@@ -212,8 +224,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("extbuff", {
-			["name"] = "Extend Buff Display",
-			["tool"] = "Extends the buff display to show a maximum of 30 buffs.",
+			["name"] = extui.TLang("extBuff"),
+			["tool"] = extui.TLang("extBuffDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -227,8 +239,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("rowamt", {
-			["name"] = "Amount In Row",
-			["tool"] = "Creates new rows with this amount of buffs. (Only works with extended buff display on)",
+			["name"] = extui.TLang("buffAmt"),
+			["tool"] = extui.TLang("buffAmtDesc"),
 			["typedata"] = {
 				["t"] = "ui::CSlideBar",
 				["a"] = "slidebar",
@@ -269,8 +281,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("buffsec", {
-			["name"] = "Always Show Seconds",
-			["tool"] = "Shows (x)s instead of (x)m.",
+			["name"] = extui.TLang("buffSec"),
+			["tool"] = extui.TLang("buffSecDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -307,7 +319,7 @@ function EXTENDEDUI_ON_SETTINGS_PRESS(frame, ctrl, argStr)
 			isDisabled = isDisabled();
 		end
 
-		local cbox = extui.sideFrame:GetChild("extuiboxs");
+		local cbox = extui.sideFrame; --extui.sideFrame:GetChild("extuiboxs");
 		local ctrls = cbox:GetChild("extuisetctrl"..tostring(k));
 
 		if isDisabled then
@@ -336,7 +348,7 @@ function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
 	local curtabIndex	    = itembox_tab:GetSelectItemIndex();
 	
 	local _settings = extui.GetSettings();
-	local uibox = GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
+	local uibox = extui.sideFrame; --GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
 	ctrl = tolua.cast(ctrl, "ui::CSlideBar");
 	local n = ctrl:GetName();
 	local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);
@@ -352,7 +364,7 @@ function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
 			_settings[argStr].callback(uibox, ctrl);
 
 		end
-		end
+	end
 
 	return 1;
 end
@@ -378,8 +390,9 @@ function extui.UIAddSettings(cbox)
 		if type(isDisabled) == "function" then
 			isDisabled = isDisabled();
 		end
+
 		
-		if ctrla ~= "newline" then
+		if ctrla ~= "newline" and ctrla ~= "dropdown" then
 			ctrls = cbox:CreateOrGetControl(ctrla, "extuisetctrl"..tostring(k), inx, iny, 150, 30);
 		end
 		if ctrltype then
@@ -429,22 +442,19 @@ function extui.UIAddSettings(cbox)
 		elseif ctrla == "richtext" then
 			ctrls:SetText(name);
 		elseif ctrla == "labelline" then
-			inx=20;
-			iny = iny+40;
-
-			if iii%2 ~= 0 then
-				iny = iny-40;
-			end
 
 			ctrls:SetOffset(inx,iny);
-			ctrls:Resize(700,1);
+			ctrls:Resize(330,4);
 
-			if iii%2 == 0 then
-				iny = iny-30;
-			else
-				iny = iny-30;
-				iii=iii+1;
-			end
+			iny = iny-30;
+
+		elseif ctrla == "dropdown" then
+			ctrlss = cbox:CreateOrGetControl("droplist", "extuiminidropdown"..tostring(k), inx+20, iny, 200, 40);
+			ctrlss = tolua.cast(ctrlss, "ui::CDropList");
+			ctrlss:SetSkinName("droplist_normal");
+			ctrlss:SetSelectedScp(v.callback);
+			v.dropcall();
+			
 		end
 
 		if isDisabled then
@@ -457,15 +467,10 @@ function extui.UIAddSettings(cbox)
 		if oncreate ~= nil then
 			oncreate(ctrls, inx, iny);
 		end
-		
-		inx = inx+400;
-		
-		if iii%2 == 0 then
-			iny = iny+40;
-			inx = 20;
-		end
-		
-		iii = iii+1;
+
+		iny = iny+40;
+		inx = 20;
+
 	end
 
 end
