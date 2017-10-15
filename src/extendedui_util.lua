@@ -65,12 +65,21 @@ function extui.FromString(s)
 	return s;
 end
 
+function extui.SaveSettings()
+	local acutil = require("acutil");
 
+
+	for k,v in pairs(extui.lSettingsUI) do
+		extui.ldSettingsUI[k] = v.val;
+	end
+	acutil.saveJSON("../addons/extendedui/settings.json", extui.ldSettingsUI);
+end
 
 function extui.SavePositions()
 	local acutil = require("acutil");
 
-	acutil.saveJSON("../addons/extendedui/settings.json", extui.ldSettingsUI);
+
+	extui.SaveSettings();
 
 	--clean frame settings
 	local frmTbl = {};

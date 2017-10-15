@@ -25,13 +25,24 @@ function extui.GetSettings()
 end
 
 function extui.AddSetting(name, tbl)
-	extui.lSettingsUI[name] = tbl;
-	extui.lSettingsUI[name].order = extui.tablelength(extui.lSettingsUI);
-
+	if extui.lSettingsUI[name] ~= nil then
+		if tbl.name ~= nil then
+			extui.lSettingsUI[name].name = tbl.name;
+		end
+		if tbl.tool ~= nil then
+			extui.lSettingsUI[name].tool = tbl.tool;
+		end
+	else
+		extui.lSettingsUI[name] = tbl;
+		extui.lSettingsUI[name].order = extui.tablelength(extui.lSettingsUI);
+	end
 end
 
-function extui.AddNewLine()
-	extui.AddSetting("newline_"..tostring(math.random(999999)).."_"..tostring(math.random(999999)), {
+function extui.AddNewLine(n)
+	if n == nil then
+		n = tostring(math.random(999999)).."_"..tostring(math.random(999999));
+	end
+	extui.AddSetting("newline_"..tostring(n), {
 			["typedata"] = {
 				["a"] = "newline",
 			}
@@ -39,8 +50,11 @@ function extui.AddNewLine()
 	);
 end
 
-function extui.AddLabelLine()
-	extui.AddSetting("line_"..tostring(math.random(999999)).."_"..tostring(math.random(999999)), {
+function extui.AddLabelLine(n)
+	if n == nil then
+		n = tostring(math.random(999999)).."_"..tostring(math.random(999999));
+	end
+	extui.AddSetting("line_"..tostring(n), {
 			["typedata"] = {
 				["a"] = "labelline",
 			}
@@ -51,6 +65,10 @@ end
 function extui.AddDefaults(tbl, adef)
 	if extui.ldSettingsUI == nil then
 		extui.ldSettingsUI = {};
+	end
+
+	if #extui.ldSettingsUI > 0 then
+		return;
 	end
 
 	for k,v in pairs(tbl) do
@@ -175,7 +193,7 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddLabelLine();
+	extui.AddLabelLine(1);
 
 	extui.AddSetting("label3", {
 			["name"] = "{@st43}"..extui.TLang("buffs").."{/}",
@@ -212,6 +230,11 @@ function extui.LoadSettings()
 										local rowc = extui.round(30/slotc);
 
 										fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
+
+										local chfrm = ui.GetFrame("extuidragframebuff"..ch);
+										if chfrm ~= nil then
+											chfrm:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel()));
+										end
 									end
 								end
 							end
@@ -343,9 +366,9 @@ end
 
 
 function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
-	local tabObj		    = extui.sideFrame:GetChild("extuitabs");
-	local itembox_tab		= tolua.cast(tabObj, "ui::CTabControl");
-	local curtabIndex	    = itembox_tab:GetSelectItemIndex();
+	--local tabObj		    = extui.sideFrame:GetChild("extuitabs");
+	--local itembox_tab		= tolua.cast(tabObj, "ui::CTabControl");
+	--local curtabIndex	    = itembox_tab:GetSelectItemIndex();
 	
 	local _settings = extui.GetSettings();
 	local uibox = extui.sideFrame; --GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
@@ -442,19 +465,24 @@ function extui.UIAddSettings(cbox)
 		elseif ctrla == "richtext" then
 			ctrls:SetText(name);
 		elseif ctrla == "labelline" then
-
 			ctrls:SetOffset(inx,iny);
-			ctrls:Resize(330,4);
+			ctrls:Resize(300,4);
 
 			iny = iny-30;
-
 		elseif ctrla == "dropdown" then
-			ctrlss = cbox:CreateOrGetControl("droplist", "extuiminidropdown"..tostring(k), inx+20, iny, 200, 40);
-			ctrlss = tolua.cast(ctrlss, "ui::CDropList");
-			ctrlss:SetSkinName("droplist_normal");
-			ctrlss:SetSelectedScp(v.callback);
-			v.dropcall();
-			
+			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetdroplabel"..tostring(k), inx+5, iny, 150, 30);
+			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+			ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+
+			if extui.isInDrop == false then
+				cbox:CreateOrGetControl("richtext", "extuisetctrl"..tostring(k), inx, iny, 0, 0); --needed
+				ctrlss = cbox:CreateOrGetControl("droplist", "extuiminidropdown"..tostring(k), inx+100, iny, 200, 40);
+				ctrlss = tolua.cast(ctrlss, "ui::CDropList");
+				ctrlss:SetSkinName("droplist_normal");
+				ctrlss:SetTextAlign("left","center");
+				ctrlss:SetSelectedScp(v.callback);
+				v.dropcall();
+			end
 		end
 
 		if isDisabled then

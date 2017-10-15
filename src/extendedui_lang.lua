@@ -89,7 +89,7 @@ extui.language.defaultFile = [[{
 			"visfalse": "Sichtbarkeit wird nicht gespeichert",
 			"loadMessage": "Lade Nachricht entfernen",
 			"loadMessageDesc": "Entfernt die \"ExtendedUI Loaded\" Nachricht beim start.",
-			"hideJoy": "Tasten vom Joystick Quickslot ausblenden",
+			"hideJoy": "Joystick Quickslot Tasten ausblenden",
 			"hideJoyDesc": "Entfernt die \"Set 1\"/\"Set 2\" Tasten vom Joystick Quickslot.",
 			"showExp": "Zeige EXP Zahlen",
 			"showExpDesc": "Zeigt exakte EXP beim hovern über den EXP-Balken an (Updates nach map änderung).",
