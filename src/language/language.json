@@ -49,7 +49,7 @@
 		}
 	},
 	"ger": {
-		"name": "German",
+		"name": "German - Deutsch",
 		"data": {
 			"euiSettings": "Einstellungen",
 			"noSelect": "Nichts Ausgewählt",
@@ -95,6 +95,55 @@
 			"confirmReset": "Sind Sie sicher, dass Sie{nl}alle frames auf ihre Standardposition zurücksetzen möchten?",
 			"options": "Optionen",
 			"lang": "Sprache"
+		}
+	},
+	"ch": {
+        "name": "Chinese - 華文",
+        "data": {
+			"euiSettings": "設定",
+			"noSelect": "未選",
+			"reloadUI": "刷新介面",
+			"restore": "重置成預設",
+			"savenclose": "儲存並關閉",
+			"cancel": "取消",
+			"close": "關閉",
+			"general": "一般",
+			"advanced": "進階",
+			"less": "減少",
+			"onlySelect": "只編輯己選介面",
+			"position": "位置",
+			"posxDesc": "左/右 位置",
+			"posyDesc": "上/下 位置",
+			"size": "大小",
+			"width": "寬度",
+			"height": "高度",
+			"curSkin": "目前外觀",
+			"setSkin": "設定外觀",
+			"chooseSkin": "選擇外觀",
+			"showFrame": "顯示介面",
+			"vistrue": "將設為顯示",
+			"visfalse": "將設為不顯示",
+			"loadMessage": "移除己載入的訊息",
+			"loadMessageDesc": "開啟遊戲時 將不會顯示 \"己載入 ExtendedUI\" 的訊息",
+			"hideJoy": "隱藏 手把快捷鍵介面",
+			"hideJoyDesc": "隱藏 手把快捷鍵的 \"Set 1\"/\"Set 2\" 按鈕",
+			"showExp": "顯示經驗值數字",
+			"showExpDesc": "當滑鼠移到經驗槽時 顯示確切的經驗值 (過圖後刷新)",
+			"disablePop": "取消跳出 獲得圖紙材料的訊息",
+			"disablePopDesc": "取消跳出 合成後獲得新物品的訊息",
+			"lockQuest": "鎖定任務提示介面",
+			"lockQuestDesc": "鎖定任務提示介面 且不會因為增加或減少新任務而移動",
+			"buffs": "Buffs",
+			"bIconSize": "Buff 圖示大小",
+			"extBuff": "增加 Buff 顯示",
+			"extBuffDesc": "增加 Buff 顯示到最大值30個buffs",
+			"buffAmt": "行數",
+			"buffAmtDesc": "增加新一行去顯示這個數量的buffs (只有在 \"增加 Buff 顯示\" 啟動中適用)",
+			"buffSec": "總是顯示buff的秒數",
+			"buffSecDesc": "不顯示分鐘數 (x)m 而只用秒數 (x)s",
+			"confirmReset": "你確定你想重置{nl}所有視窗到他們的預設位置嗎?",
+			"options": "選項",
+			"lang": "語言"
 		}
 	}
 }
