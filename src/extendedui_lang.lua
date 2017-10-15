@@ -8,12 +8,14 @@ extui.language = {};
 extui.language.selectedLanguage = "eng";
 extui.language.data = {};
 extui.language.names = {};
+extui.language.authors = {};
 extui.language.extuiname = "ExtendedUI-2"
 
 
 extui.language.defaultFile = [[{
 	"eng": {
 		"name": "English",
+		"author": "Mizuki",
 		"data": {
 			"euiSettings": "Settings",
 			"noSelect": "None Selected",
@@ -58,11 +60,13 @@ extui.language.defaultFile = [[{
 			"buffSecDesc": "Shows (x)s instead of (x)m.",
 			"confirmReset": "Are you sure you want to reset{nl}all frames to their default positions?",
 			"options": "Options",
-			"lang": "Language"
+			"lang": "Language",
+			"author": "Author"
 		}
 	},
 	"ger": {
 		"name": "German - Deutsch",
+		"author": "Mizuki",
 		"data": {
 			"euiSettings": "Einstellungen",
 			"noSelect": "Nichts Ausgewählt",
@@ -107,11 +111,13 @@ extui.language.defaultFile = [[{
 			"buffSecDesc": "Zeigs (x)s anstatt (x)m.",
 			"confirmReset": "Sind Sie sicher, dass Sie{nl}alle frames auf ihre Standardposition zurücksetzen möchten?",
 			"options": "Optionen",
-			"lang": "Sprache"
+			"lang": "Sprache",
+			"author": "Autor"
 		}
 	},
 	"ch": {
         "name": "Chinese - 華文",
+        "author": "ersakoz",
         "data": {
 			"euiSettings": "設定",
 			"noSelect": "未選",
@@ -156,7 +162,59 @@ extui.language.defaultFile = [[{
 			"buffSecDesc": "不顯示分鐘數 (x)m 而只用秒數 (x)s",
 			"confirmReset": "你確定你想重置{nl}所有視窗到他們的預設位置嗎?",
 			"options": "選項",
-			"lang": "語言"
+			"lang": "語言",
+			"author": "作者"
+		}
+	},
+	"por": {
+		"name": "Portuguese - Português",
+		"author": "Aru",
+		"data": {
+			"euiSettings": "Configurações",
+			"noSelect": "Nada selecionado",
+			"reloadUI": "Recarregar UI",
+			"restore": "Restaurar Padrões",
+			"savenclose": "Fechar&Salvar",
+			"cancel": "Cancelar",
+			"close": "Fechar",
+			"general": "Geral",
+			"advanced": "Avançado",
+			"less": "Menos",
+			"onlySelect": "Editar apenas o frame selecionado",
+			"position": "Posição",
+			"posxDesc": "Posição Esquerda/Direita",
+			"posyDesc": "Posição Cima/Baixo",
+			"size": "Tamanho",
+			"width": "Largura",
+			"height": "Altura",
+			"curSkin": "Skin Atual",
+			"setSkin": "Definir Skin",
+			"chooseSkin": "Escolher Skin",
+			"showFrame": "Mostrar Frame",
+			"vistrue": "Visibilidade será salva",
+			"visfalse": "Visibilidade não será salva",
+			"loadMessage": "Remover mensagem de inicialização",
+			"loadMessageDesc": "Remove a mensagem \"ExtendedUI Loaded\" ao iniciar",
+			"hideJoy": "Esconder botões do Quickslot do Joystick",
+			"hideJoyDesc": "Remove os botões \"Set 1\"/\"Set 2\" do Quickslot do Joystick",
+			"showExp": "Mostrar Números de EXP",
+			"showExpDesc": "Mostra os valores exatos de experiência ao posicionar o mouse sobre as barras de EXP. (Aplicado após mudar de mapa)",
+			"disablePop": "Desativa Item Pop-up de Recipes",
+			"disablePopDesc": "Desativa a pop-up ao obter items usados para crafting.",
+			"lockQuest": "Travar Posição do Quest Log",
+			"lockQuestDesc": "Trava o Quest Log evitando que ele se mova em ambas as direções quando novas quests são adicionadas ou removidas.",
+			"buffs": "Buffs",
+			"bIconSize": "Tamanho dos Ícones de Buffs",
+			"extBuff": "Estender Barra de Buffs",
+			"extBuffDesc": "Estende a barra de buffs para monstrar um máximo de 30 buffs.",
+			"buffAmt": "Quantidade Por Linha",
+			"buffAmtDesc": "Cria novas linhas com esse número de buffs. (Funciona somente quando estender barra de buffs está ativo)",
+			"buffSec": "Sempre Mostrar Segundos",
+			"buffSecDesc": "Mostra (x)s em vez de (x)m.",
+			"confirmReset": "Tem certeza de que deseja restaurar{nl}todos os frames para suas posições padrões?",
+			"options": "Opções",
+			"lang": "Idioma",
+			"author": "Autor"
 		}
 	}
 }]];
@@ -174,6 +232,14 @@ function extui.language.GetTranslation(transString)
 	return extui.language.data[extui.language.selectedLanguage][transString];
 end
 
+function extui.language.GetAuthor()
+	if extui.language.authors[extui.language.selectedLanguage] == nil then
+		return "NoAuthor#"..tostring(extui.language.selectedLanguage);
+	end
+
+	return extui.language.authors[extui.language.selectedLanguage];
+end
+
 function extui.language.LoadFile()
 	local acutil = require("acutil");
 
@@ -182,6 +248,7 @@ function extui.language.LoadFile()
 		for k,v in pairs(tload) do
 			extui.language.data[k] = v.data;
 			extui.language.names[k] = v.name;
+			extui.language.authors[k] = v.author;
 		end
 	else
 		--Create default

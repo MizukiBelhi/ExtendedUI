@@ -1132,7 +1132,7 @@ function extui.InitSideFrame()
 	end
 
 	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_SIDE_FRAME");
-	frm:Resize(350 , 600);
+	frm:Resize(365 , 600);
 	frm:MoveFrame((ui.GetSceneWidth()/2)-400, (ui.GetSceneHeight()/2)-300);
 	frm:SetSkinName("test_frame_low");
 

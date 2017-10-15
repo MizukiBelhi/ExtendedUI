@@ -184,6 +184,7 @@ function extui.LoadSettings()
 
 	extui.AddSetting("lang", {
 			["name"] = extui.TLang("lang"),
+			["tool"] = extui.language.GetAuthor(),
 			["typedata"] = {
 				["a"] = "dropdown",
 			},
@@ -474,15 +475,20 @@ function extui.UIAddSettings(cbox)
 			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
 			ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
 
+			ctrlst = cbox:CreateOrGetControl("richtext", "extuisetauthorlabel"..tostring(k), inx+100, iny+20, 150, 30);
+			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+			ctrlst:SetText("{@st62}"..extui.TLang("author")..": "..tostring(tool).."{/}");
+
 			if extui.isInDrop == false then
 				cbox:CreateOrGetControl("richtext", "extuisetctrl"..tostring(k), inx, iny, 0, 0); --needed
 				ctrlss = cbox:CreateOrGetControl("droplist", "extuiminidropdown"..tostring(k), inx+100, iny, 200, 40);
 				ctrlss = tolua.cast(ctrlss, "ui::CDropList");
 				ctrlss:SetSkinName("droplist_normal");
-				ctrlss:SetTextAlign("left","center");
+				ctrlss:SetTextAlign("left","left");
 				ctrlss:SetSelectedScp(v.callback);
 				v.dropcall();
 			end
+
 		end
 
 		if isDisabled then
