@@ -435,7 +435,7 @@ function extui.UIAddSettings(cbox)
 			ctrls:SetOverSound("button_over");
 
 			if isDisabled == nil then
-				ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS");
+				ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS", false);
 			end
 
 		elseif ctrla == "slidebar" then

@@ -138,7 +138,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	ctrls:SetText("{@st66b}ExtendedUI{/}");
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPEN_UI");
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPEN_UI", false);
 	ctrls:SetSkinName("test_pvp_btn");
 
 	--only runs on first startup since *_ON_INIT gets called on map change etc
