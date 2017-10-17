@@ -423,7 +423,7 @@ function extui.UIAddSettings(cbox)
 			ctrls = tolua.cast(ctrls, ctrltype);
 		end
 
-		if tool ~= nil and tool ~= "" then
+		if tool ~= nil and tool ~= "" and ctrla ~= "dropdown" then
 			ctrls:SetTextTooltip(string.format("{@st42b}"..tool.."{/}"));
 		end
 

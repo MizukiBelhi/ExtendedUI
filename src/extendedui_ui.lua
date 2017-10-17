@@ -776,6 +776,8 @@ function EXTENDEDUI_ON_OPEN_UI()
 	if ui.GetFrame("EXTENDEDUI_MINI_FRAME") == nil then
 		--curtabName = string.gsub(curtabName, "%s", "");
 		extui.selectedAddon = "UI";--string.gsub(curtabName, "({@[%w_']*})([%w_']*)({/})", function(_,d) return d; end);
+		extui.language.selectedLanguage = extui.GetSetting("lang");
+		extui.LoadSettings();
 		extui.OpenMiniFrame();
 		extui.showAll = true;
 		EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");

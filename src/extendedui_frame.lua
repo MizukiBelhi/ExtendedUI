@@ -190,7 +190,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("rest quickslot");
 	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
 	euiAddon:AddFrame("durnotify", "Durability");
-	--euiAddon:AddFrame("chatframe", "Chat Window");
+	euiAddon:AddFrame("chatframe", "Chat Window");
 	euiAddon:AddFrame("chat", "Chat Input");
 	euiAddon:AddFrame("notice");
 	--euiAddon:AddFrame("indunautomatch", "Queue Window");
@@ -206,8 +206,8 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("ctrltargetui", "CTRL Target Lock");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("weaponswap");
-	euiFrame.saveHidden = true;
+	--euiFrame = euiAddon:AddFrame("weaponswap");
+	--euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("partyinfo", "Party");
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("channel");
