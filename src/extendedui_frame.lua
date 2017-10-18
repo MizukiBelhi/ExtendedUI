@@ -190,7 +190,18 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("rest quickslot");
 	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
 	euiAddon:AddFrame("durnotify", "Durability");
-	euiAddon:AddFrame("chatframe", "Chat Window");
+	euiFrame = euiAddon:AddFrame("chatframe", "Chat Window");
+	euiFrame.onUpdate = function(x,y,w,h)
+						local cheight = config.GetXMLConfig("ChatFrameSizeHeight")-230;
+						local sheight = h-230;
+						local chatFrame = ui.GetFrame("chatframe");
+
+						if cheight ~= sheight then
+							chatFrame:Resize(config.GetXMLConfig("ChatFrameSizeWidth"),h);
+							chatFrame:MoveFrame(x,y);
+							chatFrame:Resize(config.GetXMLConfig("ChatFrameSizeWidth"),config.GetXMLConfig("ChatFrameSizeHeight"));
+						end
+					end;
 	euiAddon:AddFrame("chat", "Chat Input");
 	euiAddon:AddFrame("notice");
 	--euiAddon:AddFrame("indunautomatch", "Queue Window");

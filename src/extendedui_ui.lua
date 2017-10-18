@@ -350,6 +350,9 @@ function EXTENDEDUI_MINI_UPDATE()
 					local tcc = ui.GetFrame("extuidragframe"..frameName);
 					if tcc ~= nil then
 						tcc:MoveFrame(x, y);
+						extui.framepos[frameName].w = frame:GetWidth();
+						extui.framepos[frameName].h = frame:GetHeight();
+
 						local eframe = extui.GetFrame(frameName);
 						if eframe.hasChild then
 							for ch,v in pairs(eframe.child) do
@@ -829,9 +832,9 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 						frm:Resize(w , h);
 						frm:MoveFrame(x, y);
 						frm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING");
-						frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END", false);
+						frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 						frm:SetEventScriptArgString(ui.LBUTTONDOWN, "start");
-						frm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END", false);
+						frm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
 						frm:SetUserValue("FRAME_NAME", k);
 
 						if v.hasChild then
@@ -848,9 +851,9 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 								chfrm:SetUserValue("FRAME_NAME", k);
 								chfrm:SetUserValue("CHILD_NAME", ch);
 								chfrm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
-								chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END", false);
+								chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 								chfrm:SetEventScriptArgString(ui.LBUTTONDOWN, "startc");
-								chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END", false);
+								chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
 
 								if k == "buff" or k == "targetbuff" then
 									extui.MoveBuffCaption(k, chfrm);
@@ -903,9 +906,9 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 			frm:Resize(w , h);
 			frm:MoveFrame(x, y);
 			frm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING");
-			frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END", false);
+			frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 			frm:SetEventScriptArgString(ui.LBUTTONDOWN, "start");
-			frm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END", false);
+			frm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
 			frm:SetUserValue("FRAME_NAME", argStr);
 
 			if eframe.hasChild then
@@ -923,9 +926,9 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 					chfrm:SetUserValue("FRAME_NAME", argStr);
 					chfrm:SetUserValue("CHILD_NAME", ch);
 					chfrm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
-					chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END", false);
+					chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 					chfrm:SetEventScriptArgString(ui.LBUTTONDOWN, "startc");
-					chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END", false);
+					chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
 
 					if argStr == "buff" then
 						extui.MoveBuffCaption(argStr, chfrm);
@@ -1041,6 +1044,8 @@ function EXTENDEDUI_ON_DRAGGING(frame)
 			mFrame:MoveFrame(x,y);
 			extui.framepos[tostring(isFrame)]["x"] = x;
 			extui.framepos[tostring(isFrame)]["y"] = y;
+			extui.framepos[tostring(isFrame)]["w"] = frame:GetWidth();
+			extui.framepos[tostring(isFrame)]["h"] = frame:GetHeight();
 
 			--move the childs
 			local eframe = extui.GetFrame(isFrame);
