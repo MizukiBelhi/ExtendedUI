@@ -108,11 +108,35 @@ function EXTENDEDUI_MINI_ON_SELECT(index, channelID)
 	local selFrame = extui.dropListOptions[index];
 
 	extui.ForEachFrameS(extui.selectedAddon, function(k,v)
-				if v.name == selFrame then
+		if v.name == selFrame then
+			extui.oldSelectedFrameParent = extui.selectedFrameParent;
+			extui.selectedFrameParent = ui.GetFrame(k);
+			extui.selectedFrame = nil;
+			minitext:SetText(string.format("{@st42b}%s{/}",v.name));
+			extui.UpdateMiniBox();
+
+			local check_frames = frm:GetChild("extuicheckfram");
+			check_frames = tolua.cast(check_frames, "ui::CCheckBox");
+			local isChecked = (check_frames:IsChecked() == 1);
+
+			if isChecked then
+				if extui.oldSelectedFrameParent ~= nil and extui.oldSelectedFrameParent:GetName() ~= k then
+					extui.GetFrame(extui.oldSelectedFrameParent:GetName()).show = true;
+					EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, extui.oldSelectedFrameParent:GetName());
+				end
+				v.show = false;
+
+				EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, k);
+			end
+			return;
+		end
+		if v.hasChild then
+			for _k,_v in pairs(v.child) do
+				if v.name..".".._v.name == selFrame then
 					extui.oldSelectedFrameParent = extui.selectedFrameParent;
+					extui.selectedFrame = ui.GetFrame(k):GetChild(_k);
 					extui.selectedFrameParent = ui.GetFrame(k);
-					extui.selectedFrame = nil;
-					minitext:SetText(string.format("{@st42b}%s{/}",v.name));
+					minitext:SetText(string.format("{@st42b}%s{/}",v.name.." ==> ".._v.name));
 					extui.UpdateMiniBox();
 
 					local check_frames = frm:GetChild("extuicheckfram");
@@ -130,33 +154,9 @@ function EXTENDEDUI_MINI_ON_SELECT(index, channelID)
 					end
 					return;
 				end
-				if v.hasChild then
-					for _k,_v in pairs(v.child) do
-						if v.name..".".._v.name == selFrame then
-							extui.oldSelectedFrameParent = extui.selectedFrameParent;
-							extui.selectedFrame = ui.GetFrame(k):GetChild(_k);
-							extui.selectedFrameParent = ui.GetFrame(k);
-							minitext:SetText(string.format("{@st42b}%s{/}",v.name.." ==> ".._v.name));
-							extui.UpdateMiniBox();
-
-							local check_frames = frm:GetChild("extuicheckfram");
-							check_frames = tolua.cast(check_frames, "ui::CCheckBox");
-							local isChecked = (check_frames:IsChecked() == 1);
-
-							if isChecked then
-								if extui.oldSelectedFrameParent ~= nil and extui.oldSelectedFrameParent:GetName() ~= k then
-									extui.GetFrame(extui.oldSelectedFrameParent:GetName()).show = true;
-									EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, extui.oldSelectedFrameParent:GetName());
-								end
-								v.show = false;
-
-								EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil, nil, k);
-							end
-							return;
-						end
-					end
-				end
-			end);
+			end
+		end
+	end);
 end
 
 extui.dropListOptions = {};
@@ -175,19 +175,19 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST()
 	local iii = 1;
 
 	extui.ForEachFrameS(extui.selectedAddon, function(_,v)
-				if v.isMovable then
-					ui.AddDropListItem(tostring(v.name),"", iii);
-					extui.dropListOptions[iii] = tostring(v.name);
+		if v.isMovable then
+			ui.AddDropListItem(tostring(v.name),"", iii);
+			extui.dropListOptions[iii] = tostring(v.name);
+			iii = iii+1;
+			if v.hasChild then
+				for _k,_v in pairs(v.child) do
+					ui.AddDropListItem(" ==>"..tostring(_v.name), "", iii);
+					extui.dropListOptions[iii] = tostring(v.name).."."..tostring(_v.name);
 					iii = iii+1;
-					if v.hasChild then
-						for _k,_v in pairs(v.child) do
-							ui.AddDropListItem(" ==>"..tostring(_v.name), "", iii);
-							extui.dropListOptions[iii] = tostring(v.name).."."..tostring(_v.name);
-							iii = iii+1;
-						end
-					end
 				end
-			end);
+			end
+		end
+	end);
 end
 
 function EXTENDEDUI_MINI_ON_CHECK(frame, ctrl)
@@ -752,9 +752,6 @@ function EXTENDEDUI_SKIN(skin)
 end
 
 function EXTENDEDUI_ON_CLOSE_UI()
-	if ui.GetFrame("EXTENDEDUI_MINI_FRAME") ~= nil then
-		--EXTENDEDUI_ON_MINI_CANCEL();
-	end
 	extui.close();
 end
 
@@ -805,75 +802,75 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 		if not(extui.showAll) then
 
 			extui.ForEachFrameS(extui.selectedAddon, function(k,v)
-					if v.isMovable then
-						local ss = ui.GetFrame(k);
-						local w = ss:GetWidth();
-						local h = ss:GetHeight();
-						local x = ss:GetX();
-						local y = ss:GetY();
+				if v.isMovable then
+					local ss = ui.GetFrame(k);
+					local w = ss:GetWidth();
+					local h = ss:GetHeight();
+					local x = ss:GetX();
+					local y = ss:GetY();
 
-						local frm = ui.CreateNewFrame("extendedui", "extuidragframe"..k);
-						frm:Resize(w , h);
-						frm:MoveFrame(x, y);
-						frm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING");
-						frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
-						frm:SetEventScriptArgString(ui.LBUTTONDOWN, "start");
-						frm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
-						frm:SetUserValue("FRAME_NAME", k);
+					local frm = ui.CreateNewFrame("extendedui", "extuidragframe"..k);
+					frm:Resize(w , h);
+					frm:MoveFrame(x, y);
+					frm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING");
+					frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
+					frm:SetEventScriptArgString(ui.LBUTTONDOWN, "start");
+					frm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
+					frm:SetUserValue("FRAME_NAME", k);
 
-						if v.hasChild then
-							for ch,_ in pairs(v.child) do
-								local ssc = ss:GetChild(ch);
-								local wc = ssc:GetWidth();
-								local hc = ssc:GetHeight();
-								local xc = ssc:GetX();
-								local yc = ssc:GetY();
+					if v.hasChild then
+						for ch,_ in pairs(v.child) do
+							local ssc = ss:GetChild(ch);
+							local wc = ssc:GetWidth();
+							local hc = ssc:GetHeight();
+							local xc = ssc:GetX();
+							local yc = ssc:GetY();
 
-								local chfrm = ui.CreateNewFrame("extendedui", "extuidragframe"..k..ch);
-								chfrm:Resize(wc , hc);
-								chfrm:SetOffset(x+xc, y+yc);
-								chfrm:SetUserValue("FRAME_NAME", k);
-								chfrm:SetUserValue("CHILD_NAME", ch);
-								chfrm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
-								chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
-								chfrm:SetEventScriptArgString(ui.LBUTTONDOWN, "startc");
-								chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
+							local chfrm = ui.CreateNewFrame("extendedui", "extuidragframe"..k..ch);
+							chfrm:Resize(wc , hc);
+							chfrm:SetOffset(x+xc, y+yc);
+							chfrm:SetUserValue("FRAME_NAME", k);
+							chfrm:SetUserValue("CHILD_NAME", ch);
+							chfrm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
+							chfrm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
+							chfrm:SetEventScriptArgString(ui.LBUTTONDOWN, "startc");
+							chfrm:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_DRAG_START_END");
 
-								if k == "buff" or k == "targetbuff" then
-									extui.MoveBuffCaption(k, chfrm);
+							if k == "buff" or k == "targetbuff" then
+								extui.MoveBuffCaption(k, chfrm);
 
-									local slotc = extui.GetSetting("rowamt");
-									local rowc = extui.round(30/slotc);
+								local slotc = extui.GetSetting("rowamt");
+								local rowc = extui.round(30/slotc);
 
-									chfrm:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
-								end
+								chfrm:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
 							end
 						end
-						
-						v.show = true;
 					end
-				end);
+					
+					v.show = true;
+				end
+			end);
 			extui.showAll = true;
 		else
 			extui.ForEachFrameS(extui.selectedAddon, function(k,v)
-					if v.isMovable and v.show then
-						if k ~= exclude then
-							local tocc = ui.GetFrame("extuidragframe"..tostring(k));
-							if tocc ~= nil then
-								tocc:StopUpdateScript("EXTENDEDUI_ON_DRAGGING");
-								tocc:ShowWindow(0);
-								if v.hasChild then
-									for ch,_ in pairs(v.child) do
-										 local chf = ui.GetFrame("extuidragframe"..k..ch);
-										 chf:StopUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
-										 chf:ShowWindow(0);
-									end
+				if v.isMovable and v.show then
+					if k ~= exclude then
+						local tocc = ui.GetFrame("extuidragframe"..tostring(k));
+						if tocc ~= nil then
+							tocc:StopUpdateScript("EXTENDEDUI_ON_DRAGGING");
+							tocc:ShowWindow(0);
+							if v.hasChild then
+								for ch,_ in pairs(v.child) do
+									 local chf = ui.GetFrame("extuidragframe"..k..ch);
+									 chf:StopUpdateScript("EXTENDEDUI_ON_DRAGGING_CHILD");
+									 chf:ShowWindow(0);
 								end
 							end
-							v.show = false;
 						end
+						v.show = false;
 					end
-				end);
+				end
+			end);
 			extui.showAll = false;
 		end
 	else
@@ -980,22 +977,22 @@ function EXTENDEDUI_ON_RESTORE_R()
 
 
 	extui.ForEachFrame(function(k,v,toc)
-							extui.framepos[tostring(k)].x = extui.defaultFrames[tostring(k)].x;
-							extui.framepos[tostring(k)].y = extui.defaultFrames[tostring(k)].y;
-							toc:MoveFrame(extui.framepos[tostring(k)].x, extui.framepos[tostring(k)].y);
-							if not(v.noResize) then
-								extui.framepos[tostring(k)].w = extui.defaultFrames[tostring(k)].w;
-								extui.framepos[tostring(k)].h = extui.defaultFrames[tostring(k)].h;
-								toc:Resize(extui.framepos[tostring(k)].w, extui.framepos[tostring(k)].h);
-							end
-						end,
-						nil, nil, nil,
-						function(k, v, ck, cv, toc, tcc)
-							extui.framepos[tostring(k)]["child"][tostring(ck)].x = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].x;
-							extui.framepos[tostring(k)]["child"][tostring(ck)].y = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].y;
-							tcc:SetOffset(extui.framepos[tostring(k)]["child"][tostring(ck)].x, extui.framepos[tostring(k)]["child"][tostring(ck)].y);
-						end,
-						nil);
+		extui.framepos[tostring(k)].x = extui.defaultFrames[tostring(k)].x;
+		extui.framepos[tostring(k)].y = extui.defaultFrames[tostring(k)].y;
+		toc:MoveFrame(extui.framepos[tostring(k)].x, extui.framepos[tostring(k)].y);
+		if not(v.noResize) then
+			extui.framepos[tostring(k)].w = extui.defaultFrames[tostring(k)].w;
+			extui.framepos[tostring(k)].h = extui.defaultFrames[tostring(k)].h;
+			toc:Resize(extui.framepos[tostring(k)].w, extui.framepos[tostring(k)].h);
+		end
+	end,
+	nil, nil, nil,
+	function(k, v, ck, cv, toc, tcc)
+		extui.framepos[tostring(k)]["child"][tostring(ck)].x = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].x;
+		extui.framepos[tostring(k)]["child"][tostring(ck)].y = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].y;
+		tcc:SetOffset(extui.framepos[tostring(k)]["child"][tostring(ck)].x, extui.framepos[tostring(k)]["child"][tostring(ck)].y);
+	end,
+	nil);
 
 	extui.SavePositions();
 	extui.UpdateSliders();

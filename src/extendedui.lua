@@ -130,16 +130,8 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	local uieffect_frame = ui.GetFrame("uieffect");
 	uieffect_frame:RunUpdateScript("EXTUI_MINIMAP_VISIBILITY_CHECK");
 
-
-	local _frame = ui.GetFrame("systemoption");
-	local _box = GET_CHILD_RECURSIVELY(_frame, "gameBox", "ui::CGroupBox");
-	local ctrls = _box:CreateOrGetControl("button", "extuiopenbutton", 20, 315, 208, 35);
-	ctrls = tolua.cast(ctrls, "ui::CButton");
-	ctrls:SetText("{@st66b}ExtendedUI{/}");
-	ctrls:SetClickSound("button_click_big");
-	ctrls:SetOverSound("button_over");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPEN_UI", false);
-	ctrls:SetSkinName("test_pvp_btn");
+	local acutil = require("acutil");
+	acutil.addSysIcon("extui", "addonmenu_extui", "ExtendedUI", "EXTENDEDUI_ON_OPEN_UI");
 
 	--only runs on first startup because *_ON_INIT gets called on map change
 	if _G["EXTUI_LOADED"] == nil then

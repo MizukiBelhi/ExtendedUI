@@ -240,6 +240,8 @@ function extui.LoadSettings()
 								end
 							end
 
+							extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+							INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
 						end,
 			["oncall"] = ui.LBUTTONUP,
 			["max"] = 100,
