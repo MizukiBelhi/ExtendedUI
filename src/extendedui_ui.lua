@@ -1044,8 +1044,8 @@ function EXTENDEDUI_ON_DRAGGING(frame)
 			mFrame:MoveFrame(x,y);
 			extui.framepos[tostring(isFrame)]["x"] = x;
 			extui.framepos[tostring(isFrame)]["y"] = y;
-			extui.framepos[tostring(isFrame)]["w"] = frame:GetWidth();
-			extui.framepos[tostring(isFrame)]["h"] = frame:GetHeight();
+			extui.framepos[tostring(isFrame)]["w"] = mFrame:GetWidth();
+			extui.framepos[tostring(isFrame)]["h"] = mFrame:GetHeight();
 
 			--move the childs
 			local eframe = extui.GetFrame(isFrame);
@@ -1109,8 +1109,6 @@ function EXTENDEDUI_ON_DRAGGING_CHILD(frame)
 				if isFrame == "buff" then
 					extui.MoveBuffCaption(isFrame, isChild);
 				end
-
-
 			end
 		end
 	end
