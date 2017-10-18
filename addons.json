@@ -1,15 +1,18 @@
 [
 	{
-		"name" : "ExtendedUI",
+		"name" : "ExtendedUI-2",
 		"file" : "extendedui",
 		"extension" : "ipf",
-		"fileVersion" : "v1.3.1",
-		"releaseTag" : "1.3.1",
+		"fileVersion" : "v2.0.0",
+		"releaseTag" : "2.0.0",
 		"unicode" : "⚗",
-		"description" : "ExtendedUI allows you to move most UI elements on your screen to wherever you want them.",
+		"description" : "ExtendedUI allows you to move most UI elements on your screen to wherever you want them. Please see github for instructions. Supported Languages: English, German, Chinese, Portugese",
 		"tags" : [
 			"ui",
-			"extension"
+			"extension",
+			"setting",
+			"frames",
+			"info"
 		]
 	}
 ]
