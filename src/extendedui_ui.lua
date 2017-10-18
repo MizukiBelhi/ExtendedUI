@@ -76,9 +76,6 @@ function EXTENDEDUI_ON_MINI_CANCEL()
 	frm:StopUpdateScript("EXTENDEDUI_MINI_UPDATE");
 	frm:ShowWindow(0);
 
-	--local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
-	--mf:MoveFrame(extui.savedFramePosX, extui.savedFramePosY);
-
 	extui.showAll = true;
 	EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
 
@@ -457,9 +454,6 @@ function EXTENDEDUI_ON_MINI_SAVE()
 	frm:StopUpdateScript("EXTENDEDUI_MINI_UPDATE");
 	frm:ShowWindow(0);
 
-	--local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
-	--mf:MoveFrame(extui.savedFramePosX, extui.savedFramePosY);
-
 	extui.showAll = true;
 	EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
 
@@ -471,11 +465,6 @@ function extui.OpenMiniFrame()
 	extui.oldSelectedFrameParent = nil;
 	extui.selectedFrameParent = nil;
 	extui.selectedFrame = nil;
-
-	--local mf = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
-	--extui.savedFramePosX = mf:GetX();
-	--extui.savedFramePosY = mf:GetY();
-	--mf:MoveFrame(9999,9999);--move frame out of view
 
 	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_MINI_FRAME");
 	frm:Resize(350 , 120);
@@ -735,11 +724,6 @@ function EXTENDEDUI_CHOOSE_LANGUAGE(frm)
 
 	extui.PopulateSideFrame(ui.GetFrame("EXTENDEDUI_SIDE_FRAME"));
 	extui.isInDrop = false;
-
-	--EXTENDEDUI_ON_MINI_CANCEL();
-
-	--EXTENDEDUI_ON_OPEN_UI();
-	--extui.openside();
 end
 
 
@@ -1127,12 +1111,7 @@ function extui.InitSideFrame()
 	end
 
 	if ui.GetFrame("EXTENDEDUI_SIDE_FRAME") ~= nil then
-		local t,p = pcall(EXTENDEDUI_ON_CLOSE_UI);
-		if not(t) then
-			extui.print(tostring(p));
-		end
-		--EXTENDEDUI_ON_CLOSE_UI();
-		--extui.close();
+		EXTENDEDUI_ON_CLOSE_UI();
 		return;
 	end
 
@@ -1171,21 +1150,8 @@ function extui.PopulateSideFrame(frm)
 	--ctab:SetOverSound("button_over");
 	--ctab:SetSkinName("tab2");
 
-	--settings box
-	--local cbox = ctrl:CreateOrGetControl("groupbox", "extuiboxs", 30, 120, 740, 430);
-	--cbox = tolua.cast(cbox, "ui::CGroupBox");
-	--cbox:SetSkinName("chat_window");
-	
+
 	extui.UIAddSettings(frm);
-	
-	--buttons
-	--local ctrls = ctrl:CreateOrGetControl("button", "extuibuttonreload", 50, 600-45, 150, 30);
-	--ctrls = tolua.cast(ctrls, "ui::CButton");
-	--ctrls:SetText("{@st66b}"..extui.TLang("reloadUI").."{/}");
-	--ctrls:SetClickSound("button_click_big");
-	--ctrls:SetOverSound("button_over");
-	--ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_RELOADUI");
-	--ctrls:SetSkinName("test_pvp_btn");
 
 	local ctrls = frm:CreateOrGetControl("button", "extuibuttonrestore", 20, 600-45, 150, 30);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
@@ -1195,13 +1161,5 @@ function extui.PopulateSideFrame(frm)
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_RESTORE", false);
 	ctrls:SetSkinName("test_pvp_btn");
 	
-	--local ctrls = ctrl:CreateOrGetControl("button", "extuibuttonclose", 750-150, 600-45, 150, 30);
-	--ctrls = tolua.cast(ctrls, "ui::CButton");
-	--ctrls:SetText("{@st66b}"..extui.TLang("close").."{/}");
-	--ctrls:SetClickSound("button_click_big");
-	--ctrls:SetOverSound("button_over");
-	--ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CLOSE_UI");
-	--ctrls:SetSkinName("test_pvp_btn");
-
 	extui.sIsPopulated = true;
 end

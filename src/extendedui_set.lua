@@ -367,12 +367,8 @@ end
 
 
 function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
-	--local tabObj		    = extui.sideFrame:GetChild("extuitabs");
-	--local itembox_tab		= tolua.cast(tabObj, "ui::CTabControl");
-	--local curtabIndex	    = itembox_tab:GetSelectItemIndex();
-	
 	local _settings = extui.GetSettings();
-	local uibox = extui.sideFrame; --GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
+	local uibox = extui.sideFrame;
 	ctrl = tolua.cast(ctrl, "ui::CSlideBar");
 	local n = ctrl:GetName();
 	local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);

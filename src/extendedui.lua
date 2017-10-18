@@ -141,7 +141,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPEN_UI", false);
 	ctrls:SetSkinName("test_pvp_btn");
 
-	--only runs on first startup since *_ON_INIT gets called on map change etc
+	--only runs on first startup because *_ON_INIT gets called on map change
 	if _G["EXTUI_LOADED"] == nil then
 		if not(extui.GetSetting("remload")) then
 			extui.print("ExtendedUI Loaded");
