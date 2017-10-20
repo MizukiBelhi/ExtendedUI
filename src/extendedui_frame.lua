@@ -381,6 +381,7 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			end
 
 			if v.saveHidden then
+				extui.framepos[tostring(k)].hidden = (extui.framepos[tostring(k)].hidden==1 or extui.framepos[tostring(k)].hidden == true) and 1 or 0
 				toc:ShowWindow(extui.framepos[tostring(k)].hidden, true);
 			end
 

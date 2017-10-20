@@ -1045,6 +1045,8 @@ function EXTENDEDUI_ON_DRAGGING(frame)
 					end
 				end
 			end
+			extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+			INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
 		end
 	end
 	return 1;
@@ -1090,6 +1092,8 @@ function EXTENDEDUI_ON_DRAGGING_CHILD(frame)
 				if isFrame == "buff" then
 					extui.MoveBuffCaption(isFrame, isChild);
 				end
+				extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+				INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
 			end
 		end
 	end
