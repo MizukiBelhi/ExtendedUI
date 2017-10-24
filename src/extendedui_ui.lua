@@ -220,7 +220,7 @@ function EXTENDEDUI_ON_MINI_ADVANCED()
 	button_close:SetOffset(175, 400-35);
 	button_save:SetOffset(50, 400-35);
 
-	button_adv:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_LESS", false);
+	button_adv:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_LESS");
 	button_adv:SetText("{@st66b}"..extui.TLang("less").."{/}");
 
 	local settingbox = frm:GetChild("extuiminigrpsetbox");
@@ -261,7 +261,7 @@ function EXTENDEDUI_ON_MINI_LESS()
 	button_close:SetOffset(175, 85);
 	button_save:SetOffset(50, 85);
 
-	button_adv:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_ADVANCED", false);
+	button_adv:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_ADVANCED");
 	button_adv:SetText("{@st66b}"..extui.TLang("advanced").."{/}");
 
 	local settingbox = frm:GetChild("extuiminigrpsetbox");
@@ -486,7 +486,7 @@ function extui.PopulateMiniFrame(frm)
 	ctrls:SetText("{@st66b}"..extui.TLang("savenclose").."{/}");
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_SAVE", false);
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_SAVE");
 	ctrls:SetSkinName("test_pvp_btn");
 
 	ctrls = frm:CreateOrGetControl("button", "extuiminiopt", 10, 10, 30, 30);
@@ -494,7 +494,7 @@ function extui.PopulateMiniFrame(frm)
 	ctrls:SetTextTooltip("{@st42b}"..extui.TLang("options").."{/}");
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPTIONS", false);
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPTIONS");
 	ctrls:SetImage("chat_option2_btn")
 
 	ctrls = frm:CreateOrGetControl("button", "extuiminiclose", 175, 85, 125, 30);
@@ -502,7 +502,7 @@ function extui.PopulateMiniFrame(frm)
 	ctrls:SetText("{@st66b}"..extui.TLang("cancel").."{/}");
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_CANCEL", false);
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_CANCEL");
 	ctrls:SetSkinName("test_pvp_btn");
 
 	ctrls = frm:CreateOrGetControl("button", "extuiminiadv", (350/2)-(125/2), 85-30, 125, 30);
@@ -510,13 +510,13 @@ function extui.PopulateMiniFrame(frm)
 	ctrls:SetText("{@st66b}"..extui.TLang("advanced").."{/}");
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_ADVANCED", false);
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_ADVANCED");
 	ctrls:SetSkinName("test_pvp_btn");
 
 	ctrls = frm:CreateOrGetControl("checkbox", "extuicheckfram", (350/2)+110, 15, 150, 30);
 	ctrls = tolua.cast(ctrls, "ui::CCheckBox");
 	--ctrls:SetText(" ");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_ON_CHECK", false);
+	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_ON_CHECK");
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
 	ctrls:SetTextTooltip("{@st42b}"..extui.TLang("onlySelect").."{/}");
@@ -536,7 +536,7 @@ function extui.PopulateMiniFrame(frm)
 	ctrlss = tolua.cast(ctrlss, "ui::CButton");
 	ctrlss:EnableImageStretch(false);
 	ctrlss:SetImage("count_down_btn");
-	ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_CREATE_DROPLIST", false);
+	ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_CREATE_DROPLIST");
 
 	local gbox = frm:CreateOrGetControl("groupbox", "extuiminigrpsetbox", 0, 0, 350, 400);
 	gbox = tolua.cast(gbox, "ui::CGroupBox");
@@ -659,7 +659,7 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 		ctrls:SetText("{@st66b}"..extui.TLang("setSkin").."{/}");
 		ctrls:SetClickSound("button_click_big");
 		ctrls:SetOverSound("button_over");
-		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_OPEN_CONTEXT", false);
+		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_OPEN_CONTEXT");
 		ctrls:SetSkinName("test_pvp_btn");
 
 		iny = iny+35;
@@ -669,7 +669,7 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 		ctrls:SetText("{@st42b}"..extui.TLang("showFrame").."{/}");
 		ctrls:SetClickSound("button_click_big");
 		ctrls:SetOverSound("button_over");
-		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CHECK_HIDE", false);
+		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CHECK_HIDE");
 		ctrls:SetEventScriptArgString(ui.LBUTTONUP, frame:GetName());
 		ctrls:SetCheck(frame:IsVisible());
 		if v.saveHidden then

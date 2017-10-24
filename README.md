@@ -1,33 +1,55 @@
 
-## What Sorcery Is This?
+## ExtendedUI-2
 
-ExtendedUI allows you to move most UI elements on your screen to wherever you want them.  
+ExtendedUI-2 allows you to move UI elements on your screen to wherever you want them.  
 It also comes with a few nice options to customize your UI even further, including:
 - Showing exact experience numbers when hovering over your experience bars
 - Disabling recipe item popups
-- Some elements save their hidden status, like FPS
-- And many more
+- Removing the Set1/Set2 Buttons from the Joystick Quickslot
+- Extended Buff Display
+
+ExtendedUI-2 comes in multiple languages selectable through the Settings Cog.
+- English
+- German
+- BR Portugese
+- Traditional Chinese
+- Polish
+
+If you would like to add additional languages, please edit the languages.json file and open a [Pull Request](https://github.com/MizukiBelhi/ExtendedUI/pulls).
 
 ## Issues
 
-Please send me a private message in-game (Server: Klaipeda, Family Name: Belhi) or join our [Discord](https://discord.gg/0yyOKTr8o3OdJTxa) and message me `privately` on there. Alternatively, please open up a [issue](https://github.com/MizukiBelhi/ExtendedUI/issues).
+Please send me a private message on the TOS Dev Community [Discord](https://discord.gg/hgxRFwy). Alternatively, please open up an [issue](https://github.com/MizukiBelhi/ExtendedUI/issues).
+
 
 ## Installation
 
 ___DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK___
 
-1. Go to [Releases](https://github.com/MizukiBelhi/ExtendedUI/releases/latest) and download the latest version.
-2. Extract the package into your '\Steam\SteamApps\common\TreeOfSavior\' folder.
-3. After extracting make sure 'extendedui.ipf' in your data folder has a '⚗' in front of it.  
-  If it does not, don't forget to add it so it looks like '⚗extendedui.ipf' otherwise it will not work!
+___ONLY INSTALL EXTENDEDUI WITH THE ADDON MANAGER___
 
-It is not recommended to download the ipf file manually.
+1. Download the [jAddon Manager](https://github.com/JTosAddon/Tree-of-Savior-Addon-Manager/releases).
+2. Find ExtendedUI-2 in the list and install it.
+3. Start your game.
 
-Alternatively, use the fancy new [Addon Manager](https://github.com/Excrulon/Tree-of-Savior-Addon-Manager/releases)!
 
 ## Usage
 
-After installing ExtendedUI you're ready to use it!
-Go into your **Game Settings** and press the big friendly ExtendedUI button!
-![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
+After installing ExtendedUI-2 you're ready to use it!
+If your installation was successful you should see an addon button on the bottom of your screen, if you click it, one or multiple new icons should appear, in this list find ExtendedUI, this should open the UI-Edit window where you can customize your UI.
 
+1. Frame List
+![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
+You are able to select which frame to edit from this list.
+
+2. Only Edit Selected Frames Checkbox
+![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
+This checkbox shows all frames that can be edited on the screen, as if you would have selected every frame in the list.
+
+3. Advanced
+![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
+Shows advanced settings for editing a selected frame.
+
+4. Settings Cog
+![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
+Features and settings for ExtendedUI-2.

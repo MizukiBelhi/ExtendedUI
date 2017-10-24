@@ -117,7 +117,7 @@ extui.language.defaultFile = [[{
 	},
 	"ch": {
         "name": "Chinese - 華文",
-        "author": "ersakoz",
+        "author": "~Hoi",
         "data": {
 			"euiSettings": "設定",
 			"noSelect": "未選",
