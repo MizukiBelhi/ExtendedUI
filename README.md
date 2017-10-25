@@ -106,7 +106,7 @@ This should create a new list, if it doesn't already exist, with "UI" and "YOUR_
 
 ##### extuiAddon:AddFrame()
 - Parameters: [String]frameName, [Multiple][frameTable](#--frametable)
-- Returns: [extuiFrame](#--extuiframe)
+- Returns: [Object][extuiFrame](#--extuiframe)
 
 ##### extuiAddon:RemoveFrame()
 - Parameters: [String]frameName
