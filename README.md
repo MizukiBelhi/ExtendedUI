@@ -56,18 +56,18 @@ Features and settings for ExtendedUI-2.
 
 
 ## For Developers
-1. [Example](#Example)
-2. [Object and Function Reference](#Object-and-Function-Reference)
+1. [Example](#example)
+2. [Object and Function Reference](#object-and-function-reference)
 	1. [extui](#--extui)
-		1. [CreateNewAddon](#extui.CreateNewAddon(addonName))
-	2. [extuiAddon](#--extuiAddon)
-		1. [IsInUse](#extuiAddon:IsInUse())
-		2. [AddFrame](#extuiAddon:AddFrame())
-		3. [RemoveFrame](#extuiAddon:RemoveFrame())
+		1. [CreateNewAddon](#extuicreatenewaddonaddonname)
+	2. [extuiAddon](#--extuiaddon)
+		1. [IsInUse](#extuiaddonisinuse)
+		2. [AddFrame](#extuiaddonaddframe)
+		3. [RemoveFrame](#extuiaddonremoveframe)
 	3. [extuiFrame](#--extuiFrame)
-		1. [frameObject](#frame-Object)
-		2. [AddChild](#extuiFrame:AddChild())
-	4. [frameTable](#--frameTable)
+		1. [frameObject](#frame-object)
+		2. [AddChild](#extuiframeaddchild)
+	4. [frameTable](#--frametable)
 
 
 ### Example
