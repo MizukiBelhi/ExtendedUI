@@ -59,7 +59,7 @@ Features and settings for ExtendedUI-2.
 1. [Example](#example)
 2. [Object and Function Reference](#object-and-function-reference)
 	1. [extui](#--extui)
-		1. [CreateNewAddon](#extuicreatenewaddonaddonname)
+		1. [CreateNewAddon](#extuicreatenewaddon)
 	2. [extuiAddon](#--extuiaddon)
 		1. [IsInUse](#extuiaddonisinuse)
 		2. [AddFrame](#extuiaddonaddframe)
@@ -92,7 +92,7 @@ This should create a new list, if it doesn't already exist, with "UI" and "YOUR_
 
 #### - extui
 
-###### extui.CreateNewAddon(addonName)
+###### extui.CreateNewAddon()
 - Parameters: [String]addonName
 - Returns:  [Object][extuiAddon](#--extuiAddon).
   
