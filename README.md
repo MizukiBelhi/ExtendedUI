@@ -64,7 +64,7 @@ Features and settings for ExtendedUI-2.
 		1. [IsInUse](#extuiaddonisinuse)
 		2. [AddFrame](#extuiaddonaddframe)
 		3. [RemoveFrame](#extuiaddonremoveframe)
-	3. [extuiFrame](#--extuiFrame)
+	3. [extuiFrame](#--extuiframe)
 		1. [frameObject](#frame-object)
 		2. [AddChild](#extuiframeaddchild)
 	4. [frameTable](#--frametable)
@@ -94,7 +94,7 @@ This should create a new list, if it doesn't already exist, with "UI" and "YOUR_
 
 ###### extui.CreateNewAddon()
 - Parameters: [String]addonName
-- Returns:  [Object][extuiAddon](#--extuiAddon).
+- Returns:  [Object][extuiAddon](#--extuiaddon).
   
 
 #### - extuiAddon
@@ -105,8 +105,8 @@ This should create a new list, if it doesn't already exist, with "UI" and "YOUR_
 - Comments: Returns if addon is in use.
 
 ##### extuiAddon:AddFrame()
-- Parameters: [String]frameName, [Multiple][frameTable](#--frameTable)
-- Returns: [extuiFrame](#--extuiFrame)
+- Parameters: [String]frameName, [Multiple][frameTable](#--frametable)
+- Returns: [extuiFrame](#--extuiframe)
 
 ##### extuiAddon:RemoveFrame()
 - Parameters: [String]frameName
