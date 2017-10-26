@@ -61,6 +61,7 @@ extui.language.defaultFile = [[{
 			"confirmReset": "Are you sure you want to reset{nl}all frames to their default positions?",
 			"options": "Options",
 			"lang": "Language",
+			"resetFrame": "Reset Frame",
 			"author": "Author"
 		}
 	},
@@ -112,6 +113,7 @@ extui.language.defaultFile = [[{
 			"confirmReset": "Sind Sie sicher, dass Sie{nl}alle frames auf ihre Standardposition zurücksetzen möchten?",
 			"options": "Optionen",
 			"lang": "Sprache",
+			"resetFrame": "Frame zurücksetzen",
 			"author": "Autor"
 		}
 	},
@@ -163,6 +165,7 @@ extui.language.defaultFile = [[{
 			"confirmReset": "你確定你想重置{nl}所有視窗到他們的預設位置嗎?",
 			"options": "選項",
 			"lang": "語言",
+			"resetFrame": "復位框架",
 			"author": "作者"
 		}
 	},
@@ -214,6 +217,7 @@ extui.language.defaultFile = [[{
 			"confirmReset": "Tem certeza de que deseja restaurar{nl}todos os frames para suas posições padrões?",
 			"options": "Opções",
 			"lang": "Idioma",
+			"resetFrame": "redefinir o frame",
 			"author": "Autor"
 		}
 	},
@@ -265,6 +269,7 @@ extui.language.defaultFile = [[{
 			"confirmReset": "Jestes pewny/a, ze chcesz zresetowac{nl}wszystkie ramki do domyslnych pozycji?",
 			"options": "Opcje",
 			"lang": "Jezyk",
+			"resetFrame": "zresetuj ramke",
 			"author": "Autor"
 		}
 	}

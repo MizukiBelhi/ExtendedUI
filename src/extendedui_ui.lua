@@ -721,6 +721,15 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 			ctrls:SetTextTooltip("{@st42b}"..extui.TLang("visfalse").."{/}");
 		end
 
+		ctrls = gbox:CreateOrGetControl("checkbox", "extuiframereset", inx+125, iny, 150, 30);
+		ctrls = tolua.cast(ctrls, "ui::CButton");
+		ctrls:SetText("{@st66b}"..extui.TLang("resetFrame").."{/}");
+		ctrls:SetClickSound("button_click_big");
+		ctrls:SetOverSound("button_over");
+		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_FRAME_RESET");
+		ctrls:SetEventScriptArgString(ui.LBUTTONUP, frame:GetName());
+		ctrls:SetSkinName("test_pvp_btn");
+
 	end
 end
 
