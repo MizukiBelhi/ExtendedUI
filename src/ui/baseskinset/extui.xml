@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skinset name="Base">
+    <imagelist category="extui_buttons">
+		<image name="addonmenu_extui" file="\skin\extui.tga" imgrect="76 0 38 44" CMM_Caption="ExtendedUI"/>
+		<image name="addonmenu_extui_cursoron" file="\skin\extui.tga" imgrect="76 44 38 44"/>
+		<image name="addonmenu_extui_clicked" file="\skin\extui.tga" imgrect="76 88 38 44"/>
+	</imagelist>
+</skinset>

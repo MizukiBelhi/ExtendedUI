@@ -25,14 +25,50 @@ function extui.GetSettings()
 end
 
 function extui.AddSetting(name, tbl)
-	extui.lSettingsUI[name] = tbl;
-	extui.lSettingsUI[name].order = extui.tablelength(extui.lSettingsUI);
+	if extui.lSettingsUI[name] ~= nil then
+		if tbl.name ~= nil then
+			extui.lSettingsUI[name].name = tbl.name;
+		end
+		if tbl.tool ~= nil then
+			extui.lSettingsUI[name].tool = tbl.tool;
+		end
+	else
+		extui.lSettingsUI[name] = tbl;
+		extui.lSettingsUI[name].order = extui.tablelength(extui.lSettingsUI);
+	end
+end
 
+function extui.AddNewLine(n)
+	if n == nil then
+		n = tostring(math.random(999999)).."_"..tostring(math.random(999999));
+	end
+	extui.AddSetting("newline_"..tostring(n), {
+			["typedata"] = {
+				["a"] = "newline",
+			}
+		}
+	);
+end
+
+function extui.AddLabelLine(n)
+	if n == nil then
+		n = tostring(math.random(999999)).."_"..tostring(math.random(999999));
+	end
+	extui.AddSetting("line_"..tostring(n), {
+			["typedata"] = {
+				["a"] = "labelline",
+			}
+		}
+	);
 end
 
 function extui.AddDefaults(tbl, adef)
 	if extui.ldSettingsUI == nil then
 		extui.ldSettingsUI = {};
+	end
+
+	if #extui.ldSettingsUI > 0 then
+		return;
 	end
 
 	for k,v in pairs(tbl) do
@@ -61,12 +97,15 @@ function extui.LoadSettings()
 		["remload"]		=	false,
 		["rowamt"]		=	15,
 		["buffsec"]		=	false,
+		["lang"]		=	"eng",
 	}, true);
 
 	extui.lSettingsUI = {};
 
+	extui.AddNewLine();
+
 	extui.AddSetting("label1", {
-			["name"] = "{@st43}General{/}",
+			["name"] = "{@st43}"..extui.TLang("general").."{/}",
 			["typedata"] = {
 				["t"] = "ui::CRichText",
 				["a"] = "richtext",
@@ -74,17 +113,9 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddSetting("newline", {
-			["typedata"] = {
-				["a"] = "newline",
-			}
-		}
-	);
-
-
 	extui.AddSetting("remload", {
-			["name"] = "Remove Loaded Message",
-			["tool"] = "Removes the \"ExtendedUI Loaded\" message on startup",
+			["name"] = extui.TLang("loadMessage"),
+			["tool"] = extui.TLang("loadMessageDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -96,8 +127,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("remjoy", {
-			["name"] = "Hide buttons from Joystick Quickslot",
-			["tool"] = "Removes the \"Set 1\"/\"Set 2\" buttons from the Joystick Quickslot",
+			["name"] = extui.TLang("hideJoy"),
+			["tool"] = extui.TLang("hideJoyDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -113,8 +144,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("showexp", {
-			["name"] = "Show EXP Numbers",
-			["tool"] = "Shows exact exp numbers when hovering over the exp bars. (Updates after map change)",
+			["name"] = extui.TLang("showExp"),
+			["tool"] = extui.TLang("showExpDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -126,8 +157,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("discraft", {
-			["name"] = "Disable Recipe Item Popup",
-			["tool"] = "Disables the popup when getting an item for crafting.",
+			["name"] = extui.TLang("disablePop"),
+			["tool"] = extui.TLang("disablePopDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -139,8 +170,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("lockquest", {
-			["name"] = "Lock Quest Log Position",
-			["tool"] = "Locks the Quest Log so it no longer moves in both directions when new quests are added or removed.",
+			["name"] = extui.TLang("lockQuest"),
+			["tool"] = extui.TLang("lockQuestDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -151,16 +182,22 @@ function extui.LoadSettings()
 		}
 	);
 
-
-	extui.AddSetting("line4", {
+	extui.AddSetting("lang", {
+			["name"] = extui.TLang("lang"),
+			["tool"] = extui.language.GetAuthor(),
 			["typedata"] = {
-				["a"] = "labelline",
+				["a"] = "dropdown",
 			},
+			["val"] = extui.ldSettingsUI["lang"],
+			["dropcall"] = EXTENDEDUI_ON_LANGUAGE_SELECT,
+			["callback"] = "EXTENDEDUI_CHOOSE_LANGUAGE",
 		}
 	);
 
+	extui.AddLabelLine(1);
+
 	extui.AddSetting("label3", {
-			["name"] = "{@st43}Buffs{/}",
+			["name"] = "{@st43}"..extui.TLang("buffs").."{/}",
 			["typedata"] = {
 				["t"] = "ui::CRichText",
 				["a"] = "richtext",
@@ -168,16 +205,10 @@ function extui.LoadSettings()
 		}
 	);
 
-	extui.AddSetting("newline3", {
-			["typedata"] = {
-				["a"] = "newline",
-			}
-		}
-	);
-
+	--extui.AddNewLine();
 
 	extui.AddSetting("iconsize", {
-			["name"] = "Buff Icon Size",
+			["name"] = extui.TLang("bIconSize"),
 			["typedata"] = {
 				["t"] = "ui::CSlideBar",
 				["a"] = "slidebar",
@@ -186,36 +217,41 @@ function extui.LoadSettings()
 			["callback"] = function(frame, ctrl)
 							extui.SetSetting("iconsize",ctrl:GetLevel());
 
-							for k,v in pairs(extui.frames) do
-								if v.isMovable and k=="buff" then
-									if extui.frames[k].hasChild then
-										for ch,v in pairs(extui.frames[k]["child"]) do
-											if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+							local eframe = extui.GetFrame("buff");
+							if eframe ~= nil then
+								for ch,_ in pairs(eframe.child) do
+									if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
-												extui.MoveBuffCaption(k, ch);
+										extui.MoveBuffCaption("buff", ch);
 
-												local frm = ui.GetFrame(k);
-												local fch = frm:GetChild(ch);
+										local frm = ui.GetFrame("buff");
+										local fch = frm:GetChild(ch);
 
-												local slotc = extui.GetSetting("rowamt");
-												local rowc = extui.round(30/slotc);
+										local slotc = extui.GetSetting("rowamt");
+										local rowc = extui.round(30/slotc);
 
-												fch:Resize(slotc*ctrl:GetLevel(),rowc*ctrl:GetLevel());
-											end
+										fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
+
+										local chfrm = ui.GetFrame("extuidragframebuff"..ch);
+										if chfrm ~= nil then
+											chfrm:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel()));
 										end
 									end
 								end
 							end
 
+							extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+							INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
 						end,
 			["oncall"] = ui.LBUTTONUP,
 			["max"] = 100,
+			["min"] = 16,
 		}
 	);
 
 	extui.AddSetting("extbuff", {
-			["name"] = "Extend Buff Display",
-			["tool"] = "Extends the buff display to show a maximum of 30 buffs.",
+			["name"] = extui.TLang("extBuff"),
+			["tool"] = extui.TLang("extBuffDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -229,8 +265,8 @@ function extui.LoadSettings()
 	);
 
 	extui.AddSetting("rowamt", {
-			["name"] = "Amount In Row",
-			["tool"] = "Creates new rows with this amount of buffs. (Only works with extended buff display on)",
+			["name"] = extui.TLang("buffAmt"),
+			["tool"] = extui.TLang("buffAmtDesc"),
 			["typedata"] = {
 				["t"] = "ui::CSlideBar",
 				["a"] = "slidebar",
@@ -240,23 +276,20 @@ function extui.LoadSettings()
 							if ctrl:GetLevel() ~= extui.GetSetting("rowamt") then
 								extui.SetSetting("rowamt",ctrl:GetLevel());
 
-								for k,v in pairs(extui.frames) do
-									if v.isMovable and k=="buff" then
-										if extui.frames[k].hasChild then
-											for ch,v in pairs(extui.frames[k]["child"]) do
-												if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+								local eframe = extui.GetFrame("buff");
+								if eframe ~= nil then
+									for ch,_ in pairs(eframe.child) do
+										if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
-													extui.MoveBuffCaption(k, ch);
+											extui.MoveBuffCaption("buff", ch);
 
-													local frm = ui.GetFrame(k);
-													local fch = frm:GetChild(ch);
+											local frm = ui.GetFrame("buff");
+											local fch = frm:GetChild(ch);
 
-													local slotc = extui.GetSetting("rowamt");
-													local rowc = extui.round(30/slotc);
+											local slotc = extui.GetSetting("rowamt");
+											local rowc = extui.round(30/slotc);
 
-													fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
-												end
-											end
+											fch:Resize(slotc*extui.GetSetting("iconsize"),(rowc*extui.GetSetting("iconsize"))+(rowc*15));
 										end
 									end
 								end
@@ -269,12 +302,13 @@ function extui.LoadSettings()
 			["oncall"] = ui.LBUTTONUP,
 			["min"] = 1,
 			["max"] = 30,
+			["disabled"] = function() return not(extui.GetSetting("extbuff")); end,
 		}
 	);
 
 	extui.AddSetting("buffsec", {
-			["name"] = "Always Show Seconds",
-			["tool"] = "Shows (x)s instead of (x)m.",
+			["name"] = extui.TLang("buffSec"),
+			["tool"] = extui.TLang("buffSecDesc"),
 			["typedata"] = {
 				["t"] = "ui::CCheckBox",
 				["a"] = "checkbox",
@@ -300,37 +334,60 @@ function EXTENDEDUI_ON_SETTINGS_PRESS(frame, ctrl, argStr)
 			extui.print(tostring(p));
 		end
 	end
+
+	--also update all disabled
+	for k,v in extui.spairs(_settings, function(t,a,b) return t[b].order > t[a].order end) do
+		local typedata = v.typedata;
+		local ctrla = typedata.a;
+		local isDisabled = v.disabled;
+
+		if type(isDisabled) == "function" then
+			isDisabled = isDisabled();
+		end
+
+		local cbox = extui.sideFrame; --extui.sideFrame:GetChild("extuiboxs");
+		local ctrls = cbox:GetChild("extuisetctrl"..tostring(k));
+
+		if isDisabled then
+			ctrls:SetColorTone("FF444444");
+			ctrls:SetClickSound("");
+			ctrls:SetOverSound("");
+			ctrls:CreateOrGetControl("picture", "extuitctrlpd"..tostring(k), 400, 30, ui.LEFT, ui.TOP, 0, 0, 0, 0)
+		else
+			ctrls:SetColorTone("FFFFFFFF");
+
+			if ctrla == "checkbox" then
+				ctrls:SetClickSound("button_click_big");
+				ctrls:SetOverSound("button_over");
+			end
+
+			ctrls:RemoveChild("extuitctrlpd"..tostring(k));
+		end
+	end
 	
 end
 
 
 function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
-	local tabObj		    = extui.sideFrame:GetChild("extuitabs");
-	local itembox_tab		= tolua.cast(tabObj, "ui::CTabControl");
-	local curtabIndex	    = itembox_tab:GetSelectItemIndex();
-	
-	-- make sure it only happens when actually on that tab
-	if curtabIndex == 0 then
-		local _settings = extui.GetSettings();
-		local uibox = GET_CHILD(extui.sideFrame, "extuiboxs", "ui::CGroupBox");
-		ctrl = tolua.cast(ctrl, "ui::CSlideBar");
-		local n = ctrl:GetName();
-		local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);
+	local _settings = extui.GetSettings();
+	local uibox = extui.sideFrame;
+	ctrl = tolua.cast(ctrl, "ui::CSlideBar");
+	local n = ctrl:GetName();
+	local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);
 
-		if _settings[argStr] ~= nil then
-			if ctrl:GetLevel() ~= _settings[argStr].val then
-				local labelval = GET_CHILD(uibox,"extuisetlabelval"..argStr,"ui::CRichText");
-				labelval:SetText("{@st42b}"..tostring(ctrl:GetLevel()).."{/}");
-			end
-
-			if _settings[argStr].callback ~= nil then
-
-				_settings[argStr].callback(uibox, ctrl);
-
-			end
+	if _settings[argStr] ~= nil then
+		if ctrl:GetLevel() ~= _settings[argStr].val then
+			local labelval = GET_CHILD(uibox,"extuisetlabelval"..argStr,"ui::CRichText");
+			labelval:SetText("{@st42b}"..tostring(ctrl:GetLevel()).."{/}");
 		end
 
+		if _settings[argStr].callback ~= nil then
+
+			_settings[argStr].callback(uibox, ctrl);
+
+		end
 	end
+
 	return 1;
 end
 
@@ -351,16 +408,20 @@ function extui.UIAddSettings(cbox)
 		local oncall = v.oncall;
 		local oncreate = v.oncreate;
 		local isDisabled = v.disabled;
+
+		if type(isDisabled) == "function" then
+			isDisabled = isDisabled();
+		end
+
 		
-		
-		if ctrla ~= "newline" then
+		if ctrla ~= "newline" and ctrla ~= "dropdown" then
 			ctrls = cbox:CreateOrGetControl(ctrla, "extuisetctrl"..tostring(k), inx, iny, 150, 30);
 		end
 		if ctrltype then
 			ctrls = tolua.cast(ctrls, ctrltype);
 		end
 
-		if tool ~= nil and tool ~= "" then
+		if tool ~= nil and tool ~= "" and ctrla ~= "dropdown" then
 			ctrls:SetTextTooltip(string.format("{@st42b}"..tool.."{/}"));
 		end
 
@@ -403,22 +464,29 @@ function extui.UIAddSettings(cbox)
 		elseif ctrla == "richtext" then
 			ctrls:SetText(name);
 		elseif ctrla == "labelline" then
-			inx=20;
-			iny = iny+40;
-
-			if iii%2 ~= 0 then
-				iny = iny-40;
-			end
-
 			ctrls:SetOffset(inx,iny);
-			ctrls:Resize(700,1);
+			ctrls:Resize(300,4);
 
-			if iii%2 == 0 then
-				iny = iny-30;
-			else
-				iny = iny-30;
-				iii=iii+1;
+			iny = iny-30;
+		elseif ctrla == "dropdown" then
+			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetdroplabel"..tostring(k), inx+5, iny, 150, 30);
+			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+			ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+
+			ctrlst = cbox:CreateOrGetControl("richtext", "extuisetauthorlabel"..tostring(k), inx+100, iny+20, 150, 30);
+			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+			ctrlst:SetText("{@st62}"..extui.TLang("author")..": "..tostring(tool).."{/}");
+
+			if extui.isInDrop == false then
+				cbox:CreateOrGetControl("richtext", "extuisetctrl"..tostring(k), inx, iny, 0, 0); --needed
+				ctrlss = cbox:CreateOrGetControl("droplist", "extuiminidropdown"..tostring(k), inx+100, iny, 200, 40);
+				ctrlss = tolua.cast(ctrlss, "ui::CDropList");
+				ctrlss:SetSkinName("droplist_normal");
+				ctrlss:SetTextAlign("left","left");
+				ctrlss:SetSelectedScp(v.callback);
+				v.dropcall();
 			end
+
 		end
 
 		if isDisabled then
@@ -431,15 +499,10 @@ function extui.UIAddSettings(cbox)
 		if oncreate ~= nil then
 			oncreate(ctrls, inx, iny);
 		end
-		
-		inx = inx+400;
-		
-		if iii%2 == 0 then
-			iny = iny+40;
-			inx = 20;
-		end
-		
-		iii = iii+1;
+
+		iny = iny+40;
+		inx = 20;
+
 	end
 
 end

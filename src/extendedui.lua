@@ -73,6 +73,7 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	addon:RegisterMsg("JOB_EXP_ADD", "EXTENDEDUI_ON_JOB_EXP");
 	addon:RegisterMsg("CHANGE_COUNTRY", "EXTENDEDUI_ON_CHAR_EXP");
 	addon:RegisterMsg("ESCAPE_PRESSED", "EXTENDEDUI_ON_CLOSE_UI");
+	addon:RegisterMsg("EXTENDEDUI_ON_FRAME_LOAD", "EXTENDEDUI_ON_FRAME_LOADS");
 
 	extui.UpdateCheck();
 
@@ -129,31 +130,25 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	local uieffect_frame = ui.GetFrame("uieffect");
 	uieffect_frame:RunUpdateScript("EXTUI_MINIMAP_VISIBILITY_CHECK");
 
+	local acutil = require("acutil");
+	acutil.addSysIcon("extui", "addonmenu_extui", "ExtendedUI", "EXTENDEDUI_ON_OPEN_UI");
 
-	local _frame = ui.GetFrame("systemoption")
-	local ctrls = _frame:CreateOrGetControl("button", "extuiopenbutton", 332, 320, 208, 35);
-	ctrls = tolua.cast(ctrls, "ui::CButton");
-	ctrls:SetText("{@st66b}ExtendedUI{/}");
-	ctrls:SetClickSound("button_click_big");
-	ctrls:SetOverSound("button_over");
-	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPEN_UI");
-	ctrls:SetSkinName("test_pvp_btn");
-
-	--only runs on first startup since *_ON_INIT gets called on map change etc
+	--only runs on first startup because *_ON_INIT gets called on map change
 	if _G["EXTUI_LOADED"] == nil then
 		if not(extui.GetSetting("remload")) then
 			extui.print("ExtendedUI Loaded");
 		end
 
+
 		extui.OldToggleFrame = ui.ToggleFrame;
 		ui.ToggleFrame = function(frm) 
-							if extui.frames[frm] == nil then
+							if extui.GetFrame(frm) == nil then
 								extui.OldToggleFrame(frm);
 							end
 						end;
 		extui.OldGetFrame = ui.GetFrame;
 		ui.GetFrame = function(frm)
-							if extui.frames[frm] ~= nil then
+							if extui.GetFrame(frm) ~= nil then
 								local nframe = extui.OldGetFrame(frm);
 
 								if nframe.OldShowWindow ~= nil then return nframe; end
@@ -161,8 +156,9 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 								nframe.OldShowWindow = nframe.ShowWindow;
 
 								function nframe:ShowWindow(b,ex)
-									if extui.frames[self:GetName()] ~= nil then
-										if extui.frames[self:GetName()].saveHidden ~= nil then
+									local eframe = extui.GetFrame(self:GetName());
+									if eframe ~= nil then
+										if eframe.saveHidden ~= nil then
 											if ex then
 												self:OldShowWindow(b);
 											end
