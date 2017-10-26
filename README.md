@@ -124,6 +124,7 @@ Please do not write to internal variables, it might break EUI.
 - *internal* [Bool]show
 - *internal* [List]child
 - [Function]onUpdate(x, y, w, h)
+- [Bool]saveHidden (default: nil)
 
 ##### extuiFrame:AddChild()
 - Parameters: [String]childFrameName, [String]displayName
@@ -138,6 +139,7 @@ Can be [String]displayName or table:
 		["name"] = "displayName",
 		["isMovable"] = true,
 		["noResize"] = true,
+		["saveHidden"] = true,
 		["onUpdate"] = function(x, y, w, h) ... end,
 	};
 ```
