@@ -15,7 +15,7 @@ ExtendedUI-2 comes in multiple languages selectable through the Settings Cog.
 - Traditional Chinese
 - Polish
 
-If you would like to add additional languages, please edit the [language.json](https://github.com/MizukiBelhi/ExtendedUI/blob/src/language/language.json) file and open a [Pull Request](https://github.com/MizukiBelhi/ExtendedUI/pulls).
+If you would like to add additional languages, please edit the [language.json](https://github.com/MizukiBelhi/ExtendedUI/blob/master/src/language/language.json) file and open a [Pull Request](https://github.com/MizukiBelhi/ExtendedUI/pulls).
 
 ## Issues
 
