@@ -733,6 +733,54 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 	end
 end
 
+
+function EXTENDEDUI_ON_FRAME_RESET(frame, argStr)
+	local frm = ui.GetFrame(argStr);
+	if frm == nil then return; end
+
+	local k = argStr;
+	local v = extui.GetFrame(argStr);
+	local toc = frm;
+
+	extui.framepos[tostring(k)].x = extui.defaultFrames[tostring(k)].x;
+	extui.framepos[tostring(k)].y = extui.defaultFrames[tostring(k)].y;
+	toc:MoveFrame(extui.framepos[tostring(k)].x, extui.framepos[tostring(k)].y);
+	if not(v.noResize) then
+		extui.framepos[tostring(k)].w = extui.defaultFrames[tostring(k)].w;
+		extui.framepos[tostring(k)].h = extui.defaultFrames[tostring(k)].h;
+		toc:Resize(extui.framepos[tostring(k)].w, extui.framepos[tostring(k)].h);
+	end
+
+	local x = frm:GetX();
+	local y = frm:GetY();
+	local drfrm = ui.CreateNewFrame("extendedui", "extuidragframe"..argStr);
+	if drfrm ~= nil then
+		drfrm:Resize(extui.framepos[tostring(k)].w , extui.framepos[tostring(k)].h);
+		drfrm:MoveFrame(x, y);
+	end
+
+	if v.hasChild then
+		for ck,_ in pairs(v.child) do
+			local tcc = ui.GetFrame(ck);
+			if tcc ~= nil then
+				extui.framepos[tostring(k)]["child"][tostring(ck)].x = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].x;
+				extui.framepos[tostring(k)]["child"][tostring(ck)].y = extui.defaultFrames[tostring(k)]["child"][tostring(ck)].y;
+				tcc:SetOffset(extui.framepos[tostring(k)]["child"][tostring(ck)].x, extui.framepos[tostring(k)]["child"][tostring(ck)].y);
+
+				local chfrm = ui.GetFrame("extuidragframe"..k..ck);
+				if chfrm ~= nil then
+					local ssc = toc:GetChild(ck);
+					local xc = ssc:GetX();
+					local yc = ssc:GetY();
+
+					chfrm:MoveFrame(x+xc, y+yc);
+				end
+			end
+		end
+	end
+
+end
+
 extui.dropListOptionsLang = {};
 function EXTENDEDUI_ON_LANGUAGE_SELECT()
 	local frm = ui.GetFrame("EXTENDEDUI_SIDE_FRAME");
