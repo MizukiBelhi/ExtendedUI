@@ -22,7 +22,7 @@
 		"fileVersion" : "v2.0.0-pre",
 		"releaseTag" : "2.0.0-pre",
 		"unicode" : "⚗",
-		"description" : "ExtendedUI-2 Pre Release. Do not install v1.3.1 together with this. Please see github for instructions. Supported Languages: English, German, Chinese, Portugese, Polish",
+		"description" : "ExtendedUI-2 Pre Release. Please see github for instructions. Supported Languages: English, German, Chinese, Portugese, Polish",
 		"tags" : [
 			"ui",
 			"extension",
