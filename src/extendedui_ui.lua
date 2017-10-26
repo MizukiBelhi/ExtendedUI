@@ -84,7 +84,7 @@ function EXTENDEDUI_ON_MINI_CANCEL()
 end
 
 
-function EXTENDEDUI_MINI_ON_SELECT(index, channelID)
+function EXTENDEDUI_MINI_ON_SELECT(index)
 	local droplist = ui.GetDropListFrame("EXTENDEDUI_MINI_ON_SELECT");
 	
 	local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
@@ -190,6 +190,35 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST()
 	end);
 end
 
+function EXTENDEDUI_MINI_ON_ADDON_SELECT(index)
+	extui.print(tostring(index));
+	local t,p = pcall(EXTENDEDUI_MINI_ON_SELECT, 0);
+	if not(t) then
+		extui.print("ERRRRR func(): "..tostring(p));
+	end
+
+	extui.selectedAddon = extui.dropListAddonOptions[index+1];
+
+end
+
+extui.dropListAddonOptions = {};
+function EXTENDEDUI_MINI_CREATE_ADDONLIST()
+	local frm = ui.GetFrame("EXTENDEDUI_MINI_FRAME");
+	local ctrls = ui.MakeDropListFrame(frm, (350/2)+130, 15, 200, 30, 10, ui.LEFT, "EXTENDEDUI_MINI_ON_ADDON_SELECT");
+
+	extui.dropListAddonOptions[1] = "UI";
+	ui.AddDropListItem("UI", "", 1);
+	local iii = 1;
+
+	for k,v in pairs(extui.Addons) do
+		if v.name ~= "UI" then
+			ui.AddDropListItem(v.name, "", iii);
+			extui.dropListAddonOptions[iii+1] = v.name
+			iii = iii+1;
+		end
+	end
+end
+
 function EXTENDEDUI_MINI_ON_CHECK(frame, ctrl)
 	local isChecked = (ctrl:IsChecked() == 1);
 
@@ -237,7 +266,11 @@ function extui.UpdateMiniBox()
 
 	local frame = extui.selectedFrameParent;
 	local cframe = extui.selectedFrame;
-	local v = extui.GetFrame(frame:GetName());
+	local v = nil;
+
+	if frame ~= nil then
+		v = extui.GetFrame(frame:GetName());
+	end
 
 	if cframe ~= nil then
 		v = extui.GetFrame(frame:GetName()).child[cframe:GetName()];
@@ -513,7 +546,7 @@ function extui.PopulateMiniFrame(frm)
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_MINI_ADVANCED");
 	ctrls:SetSkinName("test_pvp_btn");
 
-	ctrls = frm:CreateOrGetControl("checkbox", "extuicheckfram", (350/2)+110, 15, 150, 30);
+	ctrls = frm:CreateOrGetControl("checkbox", "extuicheckfram", (350/2)+110, 15, 30, 30);
 	ctrls = tolua.cast(ctrls, "ui::CCheckBox");
 	--ctrls:SetText(" ");
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_ON_CHECK");
@@ -537,6 +570,14 @@ function extui.PopulateMiniFrame(frm)
 	ctrlss:EnableImageStretch(false);
 	ctrlss:SetImage("count_down_btn");
 	ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_CREATE_DROPLIST");
+
+	if extui.tablelength(extui.Addons) > 1 then
+		ctrlss = frm:CreateOrGetControl("button", "extuiminiaddonbut", (350/2)+140, 5, 30, 30);
+		ctrlss = tolua.cast(ctrlss, "ui::CButton");
+		ctrlss:EnableImageStretch(false);
+		ctrlss:SetImage("count_down_btn");
+		ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_CREATE_ADDONLIST");
+	end
 
 	local gbox = frm:CreateOrGetControl("groupbox", "extuiminigrpsetbox", 0, 0, 350, 400);
 	gbox = tolua.cast(gbox, "ui::CGroupBox");
