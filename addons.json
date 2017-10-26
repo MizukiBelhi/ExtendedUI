@@ -9,7 +9,26 @@
 		"description" : "ExtendedUI allows you to move most UI elements on your screen to wherever you want them.",
 		"tags" : [
 			"ui",
-			"extension"
+			"extension",
+			"setting",
+			"frames",
+			"info"
+		]
+	},
+	{
+		"name" : "ExtendedUI-2 Pre Release",
+		"file" : "extendedui",
+		"extension" : "ipf",
+		"fileVersion" : "v2.0.0-pre",
+		"releaseTag" : "2.0.0-pre",
+		"unicode" : "⚗",
+		"description" : "ExtendedUI-2 Pre Release.\r\nDo not install v1.3.1 together with this.\r\nPlease see github for instructions.\r\nSupported Languages: English, German, Chinese, Portugese, Polish",
+		"tags" : [
+			"ui",
+			"extension",
+			"setting",
+			"frames",
+			"info"
 		]
 	}
 ]
