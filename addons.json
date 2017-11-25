@@ -1,5 +1,6 @@
 [
 	{
+		"tosversion" : "20161124",
 		"name" : "ExtendedUI",
 		"file" : "extendedui",
 		"extension" : "ipf",
@@ -16,6 +17,7 @@
 		]
 	},
 	{
+		"tosversion" : "20171124",
 		"name" : "ExtendedUI-2 Pre Release",
 		"file" : "extendedui",
 		"extension" : "ipf",
