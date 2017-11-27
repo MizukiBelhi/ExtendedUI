@@ -186,9 +186,27 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("minimizedalarm", "Mini Guild Mission");
 	euiAddon:AddFrame("fevorcombo", "Fever Combo");
 	euiAddon:AddFrame("joystick rest quickslot");
-	euiAddon:AddFrame("joystick quickslot");
+	euiFrame = euiAddon:AddFrame("joystick quickslot");
+	euiFrame.onUpdate = function(x,y,w,h)
+						if IsJoyStickMode() == 1 then
+							local quickframe = ui.GetFrame("quickslotnexpbar");
+							quickframe:ShowWindow(0,true)
+
+							local joyframe = ui.GetFrame('joystickquickslot')
+							joyframe:ShowWindow(1,true)
+						end
+					end;
 	euiAddon:AddFrame("rest quickslot");
-	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
+	euiFrame = euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
+	euiFrame.onUpdate = function(x,y,w,h)
+						if IsJoyStickMode() == 0 then
+							local quickframe = ui.GetFrame("quickslotnexpbar");
+							quickframe:ShowWindow(1,true)
+
+							local joyframe = ui.GetFrame('joystickquickslot')
+							joyframe:ShowWindow(0,true)
+						end
+					end;
 	euiAddon:AddFrame("durnotify", "Durability");
 	euiFrame = euiAddon:AddFrame("chatframe", "Chat Window");
 	euiFrame.onUpdate = function(x,y,w,h)
