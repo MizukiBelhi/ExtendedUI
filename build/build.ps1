@@ -6,7 +6,8 @@ $uiBaseDir = "$outputDir\temp\ui.ipf\baseskinset";
 $uiSkinDir = "$outputDir\temp\ui.ipf\skin";
 Write-Output "Creating $ipfDir directory"
 New-Item -ItemType Directory -Force $ipfDir | Out-Null
-New-Item -ItemType Directory -Force $uiDir | Out-Null
+New-Item -ItemType Directory -Force $uiBaseDir | Out-Null
+New-Item -ItemType Directory -Force $uiSkinDir | Out-Null
 
 Write-Output "Copying .lua and .xml files"
 Get-ChildItem -Filter . .\src\addon_d\*.lua | Copy-Item -Destination $ipfDir
