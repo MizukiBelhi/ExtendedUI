@@ -16,7 +16,7 @@ skip_commits:
 
 install:
   - ps: Write-Output "Starting build"
-	
+
 
 #---------------------------#
 #    Build configuration    #
