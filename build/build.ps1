@@ -16,5 +16,5 @@ Write-Output "-done"
 Write-Output "Encrypting IPF file"
 & $PSScriptRoot\buildtools\IPFUnpacker\ipf_unpack.exe "$outputDir\$name.ipf" encrypt
 
-Move-Item "$outputDir\$name.ipf" "..\..\extendedui.ipf"
+Move-Item "$outputDir\$name.ipf" "$PSScriptRoot\..\extendedui.ipf"
 Write-Output "Done"
