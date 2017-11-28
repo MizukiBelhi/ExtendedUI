@@ -29,7 +29,7 @@ build: off
 test_script:
   - ps: . .\build\build.ps1
 after_test:
-  - ps: Move-Item "build\release\extendedui.ipf" "extendedui.ipf"
+  - ps: Move-Item "C:\Python36-x64\release\extendedui.ipf" "extendedui.ipf"
 
 #-------------------------------#
 #    Artifacts configuration    #
