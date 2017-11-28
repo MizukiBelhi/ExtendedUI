@@ -6,8 +6,8 @@ Write-Output "Creating $ipfDir directory"
 New-Item -ItemType Directory -Force $ipfDir | Out-Null
 
 Write-Output "Copying .lua and .xml files"
-Get-ChildItem -Filter ..\src\*.lua | Copy-Item -Destination $ipfDir
-Get-ChildItem -Filter ..\src\*.xml | Copy-Item -Destination $ipfDir
+Get-ChildItem -Filter . .\src\*.lua | Copy-Item -Destination $ipfDir
+Get-ChildItem -Filter . .\src\*.xml | Copy-Item -Destination $ipfDir
 
 Write-Output "Creating IPF file"
 py -3 buildtools\ipf.py -c -f "$outputDir\$name.ipf" "$outputDir\temp"
