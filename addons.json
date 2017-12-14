@@ -1,5 +1,6 @@
 [
 	{
+		"tosversion" : "20161124",
 		"name" : "ExtendedUI",
 		"file" : "extendedui",
 		"extension" : "ipf",
@@ -16,13 +17,14 @@
 		]
 	},
 	{
-		"name" : "ExtendedUI-2 Pre Release",
+		"tosversion" : "20171213",
+		"name" : "ExtendedUI-2 Final",
 		"file" : "extendedui",
 		"extension" : "ipf",
-		"fileVersion" : "v2.0.0-pre",
-		"releaseTag" : "2.0.0-pre",
+		"fileVersion" : "v2.0.0",
+		"releaseTag" : "2.0.0",
 		"unicode" : "⚗",
-		"description" : "ExtendedUI-2 Pre Release. Please see github for instructions. Supported Languages: English, German, Chinese, Portugese, Polish",
+		"description" : "Please see github for instructions.<br>Supported Languages: English, German, Chinese, Portugese, Polish",
 		"tags" : [
 			"ui",
 			"extension",

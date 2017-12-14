@@ -188,7 +188,17 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("joystick rest quickslot");
 	euiAddon:AddFrame("joystick quickslot");
 	euiAddon:AddFrame("rest quickslot");
-	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
+	euiFrame = euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
+	euiFrame.onUpdate = function(x,y,w,h)
+						--if IsJoyStickMode() == 0 then
+							local quickframe = ui.GetFrame("quickslotnexpbar");
+						--	quickframe:ShowWindow(1,true)
+
+						--	local joyframe = ui.GetFrame('joystickquickslot')
+						--	joyframe:ShowWindow(0,true)
+							QUICKSLOTNEXPBAR_UPDATE_HOTKEYNAME(quickframe)
+						--end
+					end;
 	euiAddon:AddFrame("durnotify", "Durability");
 	euiFrame = euiAddon:AddFrame("chatframe", "Chat Window");
 	euiFrame.onUpdate = function(x,y,w,h)

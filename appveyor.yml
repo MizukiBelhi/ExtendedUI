@@ -1,0 +1,38 @@
+#-----------------------------#
+#    General configuration    #
+#-----------------------------#
+version: '{build}'
+max_jobs: 1
+
+#---------------------------------#
+#    Environment configuration    #
+#---------------------------------#
+shallow_clone: true
+clone_depth: 2
+
+skip_commits:
+  files:
+    - README.md
+
+install:
+  - ps: Write-Output "Starting build"
+
+
+#---------------------------#
+#    Build configuration    #
+#---------------------------#
+build: off
+
+#---------------------------#
+#    Tests configuration    #
+#---------------------------#
+test_script:
+  - ps: . .\build\build.ps1
+after_test:
+  - ps: Write-Output "Done"
+
+#-------------------------------#
+#    Artifacts configuration    #
+#-------------------------------#
+artifacts:
+  - path: extendedui.ipf
