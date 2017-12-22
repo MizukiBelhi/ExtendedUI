@@ -11,7 +11,7 @@ It also comes with a few nice options to customize your UI even further, includi
 ExtendedUI-2 comes in multiple languages selectable through the Settings Cog.
 - English
 - German
-- BR Portugese
+- BR Portuguese
 - Traditional Chinese
 - Polish
 
