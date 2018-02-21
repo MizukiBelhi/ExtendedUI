@@ -82,6 +82,11 @@ end
 function extui_Addon:AddFrame(name, frameTbl)
 	local fName = string.gsub(name , "%s", "");
 
+	--if ui.GetFrame(fName) == nil then
+	--	print("EUI Internal Error: Frame `%s` doesn't exist, cannot add.", name);
+	--	return {};
+	--end
+
 	self.frames[fName] = setmetatable({}, { __index = extui_Frame });
 
 	if type(frameTbl) == "table" then
@@ -105,7 +110,7 @@ function extui_Addon:AddFrame(name, frameTbl)
 	elseif frameTbl == nil then
 		self.frames[fName].name = string.gsub(name, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end);
 	else
-		extui.print(string.format("Error: Cannot Add Frame, frameTbl of type \"%s\" is invalid.", type(frameTbl)));
+		extui.print(string.format("EUI Internal Error: Cannot Add Frame, frameTbl of type \"%s\" is invalid.", type(frameTbl)));
 		return nil;
 	end
 
@@ -188,17 +193,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("joystick rest quickslot");
 	euiAddon:AddFrame("joystick quickslot");
 	euiAddon:AddFrame("rest quickslot");
-	euiFrame = euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
-	euiFrame.onUpdate = function(x,y,w,h)
-						--if IsJoyStickMode() == 0 then
-							local quickframe = ui.GetFrame("quickslotnexpbar");
-						--	quickframe:ShowWindow(1,true)
-
-						--	local joyframe = ui.GetFrame('joystickquickslot')
-						--	joyframe:ShowWindow(0,true)
-							QUICKSLOTNEXPBAR_UPDATE_HOTKEYNAME(quickframe)
-						--end
-					end;
+	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
 	euiAddon:AddFrame("durnotify", "Durability");
 	euiFrame = euiAddon:AddFrame("chatframe", "Chat Window");
 	euiFrame.onUpdate = function(x,y,w,h)
@@ -353,7 +348,7 @@ end
 
 
 function EXTENDEDUI_LOAD_POSITIONS()
-	local hasNew = false;
+	local hasNew = false;	
 
 	imcAddOn.BroadMsg("EXTENDEDUI_ON_FRAME_LOAD");
 
