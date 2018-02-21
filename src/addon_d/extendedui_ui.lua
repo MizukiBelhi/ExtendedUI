@@ -60,7 +60,7 @@ function EXTUI_ON_TAB_CHANGE(frame, ctrl, argStr, argNum)
 
 	if ui.GetFrame("EXTENDEDUI_MINI_FRAME") == nil then
 		curtabName = string.gsub(curtabName, "%s", "");
-		extui.selectedAddon = string.gsub(curtabName, "({@[%w_']*})([%a%d_]*)({/})", function(_,d) return d; end);
+		extui.selectedAddon = string.gsub(curtabName, "({@[%w_']*})([%w_']*)({/})", function(_,d) return d; end);
 		extui.showAll = false;
 		EXTENDEDUI_ON_BUTTON_FRAME_PRESS(nil,nil,"*all");
 		extui.OpenMiniFrame();
@@ -170,7 +170,8 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST()
 		y = y-280;
 	end
 
-	local ctrls = ui.MakeDropListFrame(frm, 75, y, 200, 30, 10, ui.LEFT, "EXTENDEDUI_MINI_ON_SELECT");
+	local ctrls = ui.MakeDropListFrame(frm, 75, y, 200, 30, 10, ui.LEFT, "EXTENDEDUI_MINI_ON_SELECT", nil, nil);
+
 	ui.AddDropListItem(extui.TLang("noSelect"), "", 1);
 	local iii = 1;
 
