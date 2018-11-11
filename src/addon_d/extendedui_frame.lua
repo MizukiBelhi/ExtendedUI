@@ -243,7 +243,10 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("castingbar", "Castbar");
 	euiFrame.noResize = false;
-	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Shop Button");
+	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Item Button");
+	euiFrame.noResize = false;
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("minimized_tp_button", "TP Shop Button");
 	euiFrame.noResize = false;
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("mini map");
