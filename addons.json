@@ -17,12 +17,12 @@
 		]
 	},
 	{
-		"tosversion" : "20171213",
+		"tosversion" : "20180730",
 		"name" : "ExtendedUI-2 Final",
 		"file" : "extendedui",
 		"extension" : "ipf",
-		"fileVersion" : "v2.0.0",
-		"releaseTag" : "2.0.0",
+		"fileVersion" : "v2.0.1",
+		"releaseTag" : "2.0.1",
 		"unicode" : "⚗",
 		"description" : "Please see github for instructions.<br>Supported Languages: English, German, Chinese, Portugese, Polish",
 		"tags" : [
