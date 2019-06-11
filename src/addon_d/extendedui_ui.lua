@@ -20,7 +20,10 @@ function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	end
 end
 
+function extui.islargedisplay()
 
+	return option.GetClientWidth() >= 3000
+end
 function extui.openside()
 	extui.oldSlider = {};
 
@@ -499,10 +502,15 @@ function extui.OpenMiniFrame()
 	extui.oldSelectedFrameParent = nil;
 	extui.selectedFrameParent = nil;
 	extui.selectedFrame = nil;
-
+	local div = 1
+	
+	if (extui.islargedisplay()) then
+		--Supported 4k Resolution
+		div =2
+	end
 	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_MINI_FRAME");
 	frm:Resize(350 , 120);
-	frm:MoveFrame((ui.GetSceneWidth()/2)-175, (ui.GetSceneHeight()/2)-50);
+	frm:MoveFrame((ui.GetSceneWidth()/div/2)-175, (ui.GetSceneHeight()/div/2)-50);
 	frm:SetSkinName("pip_simple_frame");
 	frm:RunUpdateScript("EXTENDEDUI_MINI_UPDATE");
 
@@ -903,6 +911,7 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 					local frm = ui.CreateNewFrame("extendedui", "extuidragframe"..k);
 					frm:Resize(w , h);
 					frm:MoveFrame(x, y);
+
 					frm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING");
 					frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 					frm:SetEventScriptArgString(ui.LBUTTONDOWN, "start");
@@ -1206,10 +1215,14 @@ function extui.InitSideFrame()
 		EXTENDEDUI_ON_CLOSE_UI();
 		return;
 	end
-
+	local div = 1
+	if (extui.islargedisplay()) then
+		--Supported 4k Resolution
+		div =2
+	end
 	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_SIDE_FRAME");
 	frm:Resize(365 , 600);
-	frm:MoveFrame((ui.GetSceneWidth()/2)-400, (ui.GetSceneHeight()/2)-300);
+	frm:MoveFrame((ui.GetSceneWidth()/div/2)-400, (ui.GetSceneHeight()/div/2)-300);
 	frm:SetSkinName("test_frame_low");
 
 	local ctrl = frm
