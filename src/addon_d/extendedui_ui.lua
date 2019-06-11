@@ -20,7 +20,6 @@ function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	end
 end
 
-
 function extui.openside()
 	extui.oldSlider = {};
 
@@ -505,7 +504,8 @@ function extui.OpenMiniFrame()
 	frm:MoveFrame((ui.GetSceneWidth()/2)-175, (ui.GetSceneHeight()/2)-50);
 	frm:SetSkinName("pip_simple_frame");
 	frm:RunUpdateScript("EXTENDEDUI_MINI_UPDATE");
-
+	frm:EnableMove(1)
+	frm:EnableHittestFrame(1)
 	extui.PopulateMiniFrame(frm);
 end
 
@@ -903,6 +903,7 @@ function EXTENDEDUI_ON_BUTTON_FRAME_PRESS(frame, ctrl, argStr, exclude)
 					local frm = ui.CreateNewFrame("extendedui", "extuidragframe"..k);
 					frm:Resize(w , h);
 					frm:MoveFrame(x, y);
+
 					frm:RunUpdateScript("EXTENDEDUI_ON_DRAGGING");
 					frm:SetEventScript(ui.LBUTTONDOWN, "EXTENDEDUI_ON_DRAG_START_END");
 					frm:SetEventScriptArgString(ui.LBUTTONDOWN, "start");
@@ -1206,12 +1207,12 @@ function extui.InitSideFrame()
 		EXTENDEDUI_ON_CLOSE_UI();
 		return;
 	end
-
 	local frm = ui.CreateNewFrame("extendedui", "EXTENDEDUI_SIDE_FRAME");
 	frm:Resize(365 , 600);
 	frm:MoveFrame((ui.GetSceneWidth()/2)-400, (ui.GetSceneHeight()/2)-300);
 	frm:SetSkinName("test_frame_low");
-
+	frm:EnableMove(1)
+	frm:EnableHittestFrame(1)
 	local ctrl = frm
 	ctrl = tolua.cast(ctrl, "ui::CFrame");
 	extui.sideFrame = ctrl;
