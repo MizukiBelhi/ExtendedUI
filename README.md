@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/x8pcmdnepqahl5iy/branch/master?svg=true)](https://ci.appveyor.com/project/MizukiBelhi/extendedui/branch/master)
 
 ## ExtendedUI-2
 
