@@ -211,8 +211,10 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 
 							local slotc = extui.GetSetting("rowamt");
 							local rowc = extui.round(30/slotc);
+							
+							local iconsize = extui.GetSetting("iconsize");
 
-							fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
+							fch:Resize(slotc*iconsize,(rowc*iconsize)+(rowc*15));
 
 						end
 					end
@@ -736,6 +738,11 @@ end
 
 function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 	if extui.isSetting then return 1; end
+	
+	local isHovering = frame:GetUserIValue("EUI_IS_HOVERING");
+	if isHovering ~= nil and isHovering == 1 then
+		return 1;
+	end
 	
 	
 	local k = frame:GetName();

@@ -396,26 +396,6 @@ function EXTENDEDUI_MINI_UPDATE()
 					y = extui.framepos[frameName].y;
 
 					local eframe = extui.GetFrame(frameName);
-					if eframe.hasChild then
-						for ch,v in pairs(eframe.child) do
-							local chfrm = ui.GetFrame("extuidragframe"..frameName..ch);
-
-							local ssc = frame:GetChild(ch);
-							local xc = ssc:GetX();
-							local yc = ssc:GetY();
-
-							chfrm:MoveFrame(x+xc, y+yc);
-
-							if frameName == "buff" then
-								extui.MoveBuffCaption(frameName, chfrm:GetName());
-
-								local slotc = extui.GetSetting("rowamt");
-								local rowc = extui.round(30/slotc);
-
-								chfrm:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
-							end
-						end
-					end
 
 					if frameName == "targetinfo" then
 						extui.TargetInfoUpdate(x,y);
