@@ -262,10 +262,6 @@ function extui.LoadSettings()
 
 										fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
 
-										local chfrm = ui.GetFrame("extuidragframebuff"..ch);
-										if chfrm ~= nil then
-											chfrm:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel()));
-										end
 									end
 								end
 							end

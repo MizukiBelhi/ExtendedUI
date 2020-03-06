@@ -69,6 +69,7 @@ extui_Frame.show = false;
 extui_Frame.child = {};
 extui_Frame.onUpdate = function(x,y,w,h) end;
 extui_Frame.onBeforeUpdate = function(x,y,w,h) end;
+extui_Frame.onFrameUpdate = function(frame,x,y,w,h) end;
 
 
 function extui_Frame:AddChild(child, displayName)
@@ -198,6 +199,28 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	local euiAddon = extui.CreateNewAddon("UI");
 	local euiFrame = euiAddon:AddFrame("buff", "Buffs");
 	euiFrame.noResize = false;
+	euiFrame.onFrameUpdate = function(frame,x,y,w,h)
+
+					for ch,_ in pairs(extui.defaultFrames[frame:GetName()].child) do
+						if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+
+							extui.MoveBuffCaption("buff", ch);
+
+							--local frm = ui.GetFrame("buff");
+							local fch = frame:GetChild(ch);
+
+							local slotc = extui.GetSetting("rowamt");
+							local rowc = extui.round(30/slotc);
+
+							fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
+
+						end
+					end
+
+
+					extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+					INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+				end;
 	euiFrame:AddChild("buffcountslot", "Temp Buffs");
 	euiFrame:AddChild("buffslot", "Perm Buffs");
 	euiFrame:AddChild("debuffslot", "Debuffs");
@@ -378,44 +401,7 @@ extui.debug = {};
 extui.doFirstPositionLoad = true;
 
 function EXTENDEDUI_LOAD_POSITIONS()
-	if extui.doFirstPositionLoad == true then
-		extui.cloktime = os.clock();
-		
-		local frame = ui.GetFrame("extendedui");
-		frame:SetSkinName("None");
-		frame:ShowWindow(1);
-		local timer = frame:CreateOrGetControl("timer", "delaytimer", 0, 0, 0, 0);
-		
-		table.insert(extui.debug, "Delaying");
 
-		frame:RunUpdateScript("EXTENDEDUI_LOAD_POSITIONS_DELAYED");
-		--timer:Start(1, 2);
-		
-	else
-		EXTENDEDUI_LOAD_POSITIONS_DELAYED();
-		table.insert(extui.debug, "NotDelaying");
-	end
-end
-
-function EXTENDEDUI_LOAD_POSITIONS_DELAYED()
-	local frame = ui.GetFrame("extendedui");
-	local timer = frame:GetChild("delaytimer");
-	if timer ~= nil then
-
-		local curdelay = os.clock() - extui.cloktime;
-
-		table.insert(extui.debug, string.format("HasDelayed: Elapsed Time: %.2f", curdelay) );
-		if curdelay >= 0.5 then
-			--timer:Stop();
-			frame:RemoveChild("delaytimer");
-			frame:StopUpdateScript("EXTENDEDUI_LOAD_POSITIONS_DELAYED");
-			extui.print("stoppedDelay");
-			frame:ShowWindow(0);
-			table.insert(extui.debug, "DelayEnd");
-			extui.doFirstPositionLoad = false;
-		end
-		return 1;
-	end
 	
 	local hasNew = false;
 
@@ -490,6 +476,8 @@ function EXTENDEDUI_LOAD_POSITIONS_DELAYED()
 			if not extui.intable(extui.skins, skin) then
 				table.insert(extui.skins, skin);
 			end
+			
+			toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
 
 			v.onUpdate(x,y,w,h);
 			--if k=="targetinfo" then
@@ -528,6 +516,8 @@ function EXTENDEDUI_LOAD_POSITIONS_DELAYED()
 			if v.hasChild then
 				extui.framepos[tostring(k)]["child"] = {};
 			end
+			
+			toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
 
 			v.onUpdate(x,y,w,h);
 		end,
@@ -739,6 +729,56 @@ function EXTUI_MINIMAP_VISIBILITY_CHECK()
 		end
 	end
 
+	return 1;
+end
+
+
+
+function EXTENDEDUI_FULLFRAME_UPDATE(frame)
+	if extui.isSetting then return 1; end
+	
+	
+	local k = frame:GetName();
+	local v = extui.GetFrame(k);
+	
+	
+	local x = extui.framepos[tostring(k)].x;
+	local y = extui.framepos[tostring(k)].y;
+	local w = extui.framepos[tostring(k)].w;
+	local h = extui.framepos[tostring(k)].h;
+	local nskin = extui.framepos[tostring(k)].skin or "@default";
+	local nscale = extui.framepos[tostring(k)].scale or 100;
+	local hover = extui.framepos[tostring(k)].hover or 0;
+
+	local xs = frame:GetX() or 0;
+	local ys = frame:GetY() or 0;
+	local ws = frame:GetWidth() or 0;
+	local hs = frame:GetHeight() or 0;
+	local scale = 100;
+
+	v.onBeforeUpdate(x, y, w, h);
+	
+	frame:MoveFrame(x, y);
+	if not(v.noResize) then
+		frame:Resize(w, h);
+	end
+
+	if scale ~= nscale then
+		frame:SetScale(nscale, nscale);
+	end	
+
+	if v.saveHidden and hover == 0 then
+		frame:ShowWindow(extui.framepos[tostring(k)].hidden, true);
+	end
+	
+	if hover == 1 then
+		frame:ShowWindow(0, true);
+	end
+
+	v.onUpdate(x,y,w,h);
+	
+	v.onFrameUpdate(frame, x,y,w,h);
+	
 	return 1;
 end
 
