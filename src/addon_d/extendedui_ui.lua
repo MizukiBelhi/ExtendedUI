@@ -1256,8 +1256,10 @@ function extui.CheckForHovers()
 			if toc:GetUserValue("EUI_IS_DRAGGING") ~= 1 then
 				if mx >= xs and my >= ys and mx <= xs+ws and my <= ys+hs then
 					toc:ShowWindow(1, true);
+					toc:SetUserValue("EUI_IS_HOVERING", 1);
 				else
 					toc:ShowWindow(0, true);
+					toc:SetUserValue("EUI_IS_HOVERING", 0);
 				end
 			end
 			
