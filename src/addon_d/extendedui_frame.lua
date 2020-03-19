@@ -239,18 +239,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("rest quickslot");
 	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
 	euiAddon:AddFrame("durnotify", "Durability");
-	euiFrame = euiAddon:AddFrame("chatframe", "Chat Window");
-	euiFrame.onUpdate = function(x,y,w,h)
-						local cheight = config.GetXMLConfig("ChatFrameSizeHeight")-230;
-						local sheight = h-230;
-						local chatFrame = ui.GetFrame("chatframe");
 
-						if cheight ~= sheight then
-							chatFrame:Resize(config.GetXMLConfig("ChatFrameSizeWidth"),h);
-							chatFrame:MoveFrame(x,y);
-							chatFrame:Resize(config.GetXMLConfig("ChatFrameSizeWidth"),config.GetXMLConfig("ChatFrameSizeHeight"));
-						end
-					end;
 	euiAddon:AddFrame("chat", "Chat Input");
 	euiAddon:AddFrame("notice");
 	--euiAddon:AddFrame("indunautomatch", "Queue Window");
@@ -783,6 +772,32 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 	end
 
 	v.onUpdate(x,y,w,h);
+	
+	if v.hasChild then
+		for ck,cv in pairs(v.child) do
+			local tcc = frame:GetChild(tostring(ck));
+						
+			if cv.isMovable and tcc ~= nil then
+				if extui.framepos[tostring(k)]["child"][tostring(ck)] ~= nil then
+					local cx = extui.framepos[tostring(k)]["child"][tostring(ck)].x;
+					local cy = extui.framepos[tostring(k)]["child"][tostring(ck)].y;
+
+					tcc:SetOffset(cx, cy);
+
+					if k == "buff" then
+						extui.MoveBuffCaption(k, ck);
+						local frm = ui.GetFrame(k);
+						local fch = frm:GetChild(ck);
+
+						local slotc = extui.GetSetting("rowamt");
+						local rowc = extui.round(30/slotc);
+
+						fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+					end
+				end
+			end
+		end
+	end
 	
 	v.onFrameUpdate(frame, x,y,w,h);
 	
