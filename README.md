@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/x8pcmdnepqahl5iy/branch/master?svg=true)](https://ci.appveyor.com/project/MizukiBelhi/extendedui/branch/master)
 
 ## ExtendedUI-2
 
@@ -30,7 +31,7 @@ Alternatively, please open up an [issue](https://github.com/MizukiBelhi/Extended
 ___DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK___  
 ___ONLY INSTALL EXTENDEDUI WITH THE ADDON MANAGER___
 
-1. Download the [jAddon Manager](https://github.com/JTosAddon/Tree-of-Savior-Addon-Manager/releases).
+1. Download the [Addon Manager](https://github.com/MizukiBelhi/Addon-Manager/releases/latest).
 2. Find ExtendedUI-2 in the list and install it.
 3. Start your game.
 
