@@ -668,7 +668,7 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 			ctrls = gbox:CreateOrGetControl("slidebar", "extuislidew", inx+12, iny, 300, 30);
 			ctrls = tolua.cast(ctrls, "ui::CSlideBar");
 			ctrls:SetMaxSlideLevel(ui.GetClientInitialWidth());
-			ctrls:SetMinSlideLevel(0);
+			ctrls:SetMinSlideLevel(5);
 			ctrls:SetLevel(w);
 			ctrls:SetTextTooltip("{@st42b}"..extui.TLang("width").."{/}");
 			
@@ -685,7 +685,7 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 			ctrls = gbox:CreateOrGetControl("slidebar", "extuislideh", inx+12, iny, 300, 30);
 			ctrls = tolua.cast(ctrls, "ui::CSlideBar");
 			ctrls:SetMaxSlideLevel(ui.GetClientInitialHeight());
-			ctrls:SetMinSlideLevel(0);
+			ctrls:SetMinSlideLevel(5);
 			ctrls:SetLevel(h);
 			ctrls:SetTextTooltip("{@st42b}"..extui.TLang("height").."{/}");
 			
@@ -947,6 +947,14 @@ function EXTENDEDUI_FRAMEBORDER_UPDATE_S(border)
 			local h = borderFrame:GetHeight();
 			local x = borderFrame:GetX();
 			local y = borderFrame:GetY();
+			
+			if w < 5 then
+				w = 5;
+			end
+			
+			if h < 5 then
+				h = 5;
+			end
 
 			local borderFrm = ui.GetFrame("extui_borderParent");
 

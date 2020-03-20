@@ -356,26 +356,15 @@ function extui.language.GetAuthor()
 end
 
 function extui.language.LoadFile()
-	local acutil = require("acutil");
-
-	local tload, error = acutil.loadJSON("../addons/extendedui/language.json");
-	if not error then
-		for k,v in pairs(tload) do
-			extui.language.data[k] = v.data;
-			extui.language.names[k] = v.name;
-			extui.language.authors[k] = v.author;
-		end
-	else
-		--Create default
-		file, error = io.open("../addons/extendedui/language.json", "w");
-		if file ~= nil then
-			file:write(extui.language.defaultFile);
-			io.close(file);
-
-			--Load it again
-			extui.language.LoadFile();
-		end
+	local json = require("json");
+	
+	local tload = json.decode(extui.language.defaultFile);
+	for k,v in pairs(tload) do
+		extui.language.data[k] = v.data;
+		extui.language.names[k] = v.name;
+		extui.language.authors[k] = v.author;
 	end
+
 end
 
 --For easy access
