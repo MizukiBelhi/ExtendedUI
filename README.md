@@ -19,8 +19,10 @@ ExtendedUI-2 comes in multiple languages selectable through the Settings Cog.
 If you would like to add additional languages, please edit the [language.json](https://github.com/MizukiBelhi/ExtendedUI/blob/master/src/language/language.json) file and open a [Pull Request](https://github.com/MizukiBelhi/ExtendedUI/pulls).
 
 ## Issues
+Find me in Game on Klaipeda if you have any issues or feedback!  
+![Screenshot](https://i.gyazo.com/916326ff19724beb825a08f7a7c85d80.png)
 
-Please send me a private message on the TOS Dev Community [Discord](https://discord.gg/hgxRFwy).  
+Or send me a private message on the TOS Dev Community [Discord](https://discord.gg/hgxRFwy).  
 Alternatively, please open up an [issue](https://github.com/MizukiBelhi/ExtendedUI/issues).
 
 
@@ -29,7 +31,7 @@ Alternatively, please open up an [issue](https://github.com/MizukiBelhi/Extended
 ___DO NOT DOWNLOAD THE SOURCE DIRECTLY OFF THE REPOSITORY IT WILL NOT WORK___  
 ___ONLY INSTALL EXTENDEDUI WITH THE ADDON MANAGER___
 
-1. Download the [jAddon Manager](https://github.com/JTosAddon/Tree-of-Savior-Addon-Manager/releases).
+1. Download the [Addon Manager](https://github.com/MizukiBelhi/Addon-Manager/releases/latest).
 2. Find ExtendedUI-2 in the list and install it.
 3. Start your game.
 
@@ -39,116 +41,21 @@ ___ONLY INSTALL EXTENDEDUI WITH THE ADDON MANAGER___
 After installing ExtendedUI-2 you're ready to use it!  
 If your installation was successful you should see an addon button on the bottom of your screen, if you click it, one or multiple new icons should appear, in this list find ExtendedUI, this should open the UI-Edit window where you can customize your UI.
 
-1. Frame List
-![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
+1. Frame List  
+![Screenshot](https://i.gyazo.com/154807065931c9f65523076243151f7c.png)  
 You are able to select which frame to edit from this list.
 
-2. Only Edit Selected Frames Checkbox
-![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
-This checkbox shows all frames that can be edited on the screen, as if you would have selected every frame in the list.
+2. Snap To Grid Checkbox  
+![Screenshot](https://i.gyazo.com/29ffe227862b74e65a98d6d9450263c5.png)  
+Disables or enables snapping to the grid for fine adjustment.
 
-3. Advanced
-![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
+3. Advanced  
+![Screenshot](https://i.gyazo.com/91f908de6c817dc5c5aef1dfeb436256.png)  
 Shows advanced settings for editing a selected frame.
 
-4. Settings Cog
-![Screenshot](http://pandadesigns.web44.net/extendedui/options.png)
-Features and settings for ExtendedUI-2.
-
-
-## For Developers
-1. [Example](#example)
-2. [Object and Function Reference](#object-and-function-reference)
-	1. [extui](#--extui)
-		1. [CreateNewAddon](#extuicreatenewaddon)
-	2. [extuiAddon](#--extuiaddon)
-		1. [IsInUse](#extuiaddonisinuse)
-		2. [AddFrame](#extuiaddonaddframe)
-		3. [RemoveFrame](#extuiaddonremoveframe)
-	3. [extuiFrame](#--extuiframe)
-		1. [frameObject](#frame-object)
-		2. [AddChild](#extuiframeaddchild)
-	4. [frameTable](#--frametable)
-
-
-### Example
-ExtendedUI-2 allows developers to add their own or already existing frames through the use of ``addon:RegisterMsg``.  
-Example:
-
-```Lua
-function MY_ADDON_ON_INIT(addon, frame)
-	addon:RegisterMsg("EXTENDEDUI_ON_FRAME_LOAD", "MY_FUNCTION");
-	...
-end
-
-function MY_FUNCTION()
-	local euiAddon = extui.CreateNewAddon("YOUR_ADDON");
-	local euiFrame = euiAddon:AddFrame("buff", "Buffs");
-end
-```
-This should create a new list, if it doesn't already exist, with "UI" and "YOUR_ADDON" as selections, if selected, the frame list will contain the frames you have added.
-
-
-### Object and Function Reference
-
-#### - extui
-
-###### extui.CreateNewAddon()
-- Parameters: [String]addonName
-- Returns:  [Object][extuiAddon](#--extuiaddon).
-  
-
-#### - extuiAddon
-
-###### extuiAddon:IsInUse()
-- Parameters: -
-- Returns:  [Bool]inUse.
-- Comments: Returns if addon is in use.
-
-##### extuiAddon:AddFrame()
-- Parameters: [String]frameName, [Multiple][frameTable](#--frametable)
-- Returns: [Object][extuiFrame](#--extuiframe)
-
-##### extuiAddon:RemoveFrame()
-- Parameters: [String]frameName
-- Returns: -
-
-#### - extuiFrame
-
-##### frame Object
-
-Please do not write to internal variables, it might break EUI.
-- *internal* [String]name
-- [Bool]isMovable (default: true)
-- *internal* [Bool]hasChild
-- [Bool]noResize (default: true)
-- *internal* [Bool]show
-- *internal* [List]child
-- [Function]onUpdate(x, y, w, h)
-- [Bool]saveHidden (default: nil)
-
-##### extuiFrame:AddChild()
-- Parameters: [String]childFrameName, [String]displayName
-- Returns: -
-
-
-#### - frameTable
-
-Can be [String]displayName or table:
-```Lua
-	local frameTable = {
-		["name"] = "displayName",
-		["isMovable"] = true,
-		["noResize"] = true,
-		["saveHidden"] = true,
-		["onUpdate"] = function(x, y, w, h) ... end,
-	};
-```
-
-
-
-
-
+4. Settings Cog  
+![Screenshot](https://i.gyazo.com/a9f697cf4993838b43c112c978e73ec0.png)  
+Features and settings for ExtendedUI-2.  
 
 
 

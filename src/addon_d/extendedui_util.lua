@@ -36,6 +36,7 @@ function extui.GetPercent(anum,maxn,amaxn)
 end
 
 function extui.print(t)
+	print(t);
 	CHAT_SYSTEM(tostring(t));
 end
 
@@ -249,4 +250,23 @@ function EXTENDEDUI_ON_SAVE()
 	if not(s) then
 		extui.print("ERROR: "..bl);
 	end
+end
+
+function extui.DrawBorder(pic, xPos, yPos, width, height, color)
+	width = width - 1;
+	height = height - 1;
+	--Limit width and height to a minimum of 1
+	if width < 1 then
+		width = 1;
+	end
+	if height < 1 then
+		height = 1;
+	end
+	pic:DrawBrush(xPos, yPos, xPos+width, yPos, "spray_1", color);
+	
+	pic:DrawBrush(xPos, yPos+height, xPos+width, yPos+height, "spray_1", color);
+
+	pic:DrawBrush(xPos+width, yPos+height, xPos+width, yPos, "spray_1", color);
+	
+	pic:DrawBrush(xPos, yPos+height, xPos, yPos, "spray_1", color);
 end

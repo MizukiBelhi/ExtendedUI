@@ -9,10 +9,17 @@ extui.lSettingsUI = {};
 extui.defaultSettings = {};
 
 function extui.GetSetting(name)
+	if extui.lSettingsUI[name] == nil then
+		extui.print("[EUI] GettingSetting: ''"..name.."'' not found.");
+	end
 	return extui.lSettingsUI[name].val;
 end
 
 function extui.GetSavedSetting(name)
+	if extui.ldSettingsUI[name] == nil then
+		extui.ldSettingsUI[name] = extui.defaultSettings[name];
+	end
+	
 	return extui.ldSettingsUI[name];
 end
 
@@ -89,15 +96,16 @@ function extui.LoadSettings()
 
 	extui.AddDefaults( {
 		["showexp"]		=	true,
-		["lockquest"]	=	true,
-		["discraft"]	=	false,
-		["iconsize"]	=	32,
-		["extbuff"]		=	true,
-		["remjoy"]		=	false,
+		["lockquest"]		=	true,
+		["discraft"]			=	false,
+		["iconsize"]		=	32,
+		["extbuff"]			=	true,
+		["remjoy"]			=	false,
 		["remload"]		=	false,
-		["rowamt"]		=	15,
-		["buffsec"]		=	false,
-		["lang"]		=	"eng",
+		["rowamt"]			=	15,
+		["buffsec"]			=	false,
+		["lang"]				=	"eng",
+		["gridSize"]			= 16,
 	}, true);
 
 	extui.lSettingsUI = {};
@@ -191,10 +199,32 @@ function extui.LoadSettings()
 			["val"] = extui.ldSettingsUI["lang"],
 			["dropcall"] = EXTENDEDUI_ON_LANGUAGE_SELECT,
 			["callback"] = "EXTENDEDUI_CHOOSE_LANGUAGE",
+			["isLanguage"] = true,
+		}
+	);
+	
+	extui.AddSetting("gridSize", {
+			["name"] = "Grid Size",
+			["typedata"] = {
+				["t"] = "ui::CSlideBar",
+				["a"] = "slidebar",
+			},
+			["val"] = extui.ldSettingsUI["gridSize"],
+			["callback"] = function(frame, ctrl)
+							local oldGridSize = extui.GetSetting("gridSize");
+							extui.SetSetting("gridSize",ctrl:GetLevel());
+							
+							if ui.GetFrame("EXTENDEDUI_GRIDFRAME") ~= nil and oldGridSize ~= ctrl:GetLevel() then
+								extui.DrawGrid();
+							end
+						end,
+			["oncall"] = ui.LBUTTONUP,
+			["max"] = 100,
+			["min"] = 5,
 		}
 	);
 
-	extui.AddLabelLine(1);
+	extui.AddLabelLine();
 
 	extui.AddSetting("label3", {
 			["name"] = "{@st43}"..extui.TLang("buffs").."{/}",
@@ -232,10 +262,6 @@ function extui.LoadSettings()
 
 										fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
 
-										local chfrm = ui.GetFrame("extuidragframebuff"..ch);
-										if chfrm ~= nil then
-											chfrm:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel()));
-										end
 									end
 								end
 							end
@@ -320,7 +346,9 @@ function extui.LoadSettings()
 			["oncall"] = ui.LBUTTONUP,
 		}
 	);
-
+	
+	
+	extui.AddNewLine();
 end
 
 
@@ -369,8 +397,18 @@ end
 
 
 function EXTENDEDUI_ON_SETTINGS_SLIDE(ctrl)
+	local t,p = pcall(EXTENDEDUI_ON_SETTINGS_SLIDES, ctrl);
+	if not(t) then
+		extui.print("[EUI] Settings Error: "..tostring(p));
+	end
+	
+	return 1;
+end
+
+function EXTENDEDUI_ON_SETTINGS_SLIDES(ctrl)
 	local _settings = extui.GetSettings();
 	local uibox = extui.sideFrame;
+	uibox = uibox:GetChild("extuisetgrpbox");
 	ctrl = tolua.cast(ctrl, "ui::CSlideBar");
 	local n = ctrl:GetName();
 	local argStr = string.sub(tostring(n), string.len("extuisetctrl")+1);
@@ -393,119 +431,186 @@ end
 
 
 function extui.UIAddSettings(cbox)
+	local t,p = pcall(extui.UIAddSettingsS, cbox);
+	if not(t) then
+		extui.print("ERRRRR func(): "..tostring(p));
+	end
+
+end
+
+
+function EXTENDEDUI_ON_OPENCOLORWHEEL(frm, ctrl)
+	local t,p = pcall(EXTENDEDUI_ON_OPENCOLORWHEELS, ctrl);
+	if not(t) then
+		extui.print("ERRRRR func(): "..tostring(p));
+	end
+
+end
+function EXTENDEDUI_ON_OPENCOLORWHEELS(ctrl)
+	extui.CreateColorWheel(ctrl:GetUserValue("settingName"));
+end
+
+function extui.UIAddSettingsS(cbox)
 	local ctrls = nil;
 	local inx = 20;
-	local iny = 20;
+	local iny = 0;
 	local _settings = extui.GetSettings();
 	local iii = 1;
 	for k,v in extui.spairs(_settings, function(t,a,b) return t[b].order > t[a].order end) do
-		local typedata = v.typedata;
-		local ctrltype = typedata.t;
-		local ctrla = typedata.a;
-		local name = v.name;
-		local value = extui.GetSavedSetting(tostring(k));
-		local tool = v.tool;
-		local oncall = v.oncall;
-		local oncreate = v.oncreate;
-		local isDisabled = v.disabled;
-
-		if type(isDisabled) == "function" then
-			isDisabled = isDisabled();
-		end
-
+		local isHidden = v.hidden or false;
 		
-		if ctrla ~= "newline" and ctrla ~= "dropdown" then
-			ctrls = cbox:CreateOrGetControl(ctrla, "extuisetctrl"..tostring(k), inx, iny, 150, 30);
-		end
-		if ctrltype then
-			ctrls = tolua.cast(ctrls, ctrltype);
-		end
+		if isHidden == false then
+			local typedata = v.typedata;
+			local ctrltype = typedata.t;
+			local ctrla = typedata.a;
+			local name = v.name;
+			local value = extui.GetSavedSetting(tostring(k));
+			local tool = v.tool;
+			local oncall = v.oncall;
+			local oncreate = v.oncreate;
+			local isDisabled = v.disabled;
 
-		if tool ~= nil and tool ~= "" and ctrla ~= "dropdown" then
-			ctrls:SetTextTooltip(string.format("{@st42b}"..tool.."{/}"));
-		end
-
-		if ctrla == "checkbox" then
-			ctrls:SetText("{@st42b}"..tostring(name).."{/}");
-			ctrls:SetEventScriptArgString(oncall, tostring(k));
-			ctrls:SetCheck(value==true and 1 or 0);
-			ctrls:SetClickSound("button_click_big");
-			ctrls:SetOverSound("button_over");
-
-			if isDisabled == nil then
-				ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS");
+			if type(isDisabled) == "function" then
+				isDisabled = isDisabled();
 			end
 
-		elseif ctrla == "slidebar" then
-			ctrls:SetMaxSlideLevel(v.max);
-			ctrls:SetMinSlideLevel(v.min or 0);
-			ctrls:SetLevel(value);
-			ctrls:Resize(260,30);
-			iny = iny+5;
-			ctrls:SetOffset(inx,iny);
-
-			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetlabelval"..tostring(k), inx+255, iny+5, 150, 30);
-			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
-			ctrlst:SetText("{@st42b}"..tostring(value).."{/}");
-
-			local ctrlsst = cbox:CreateOrGetControl("richtext", "extuisetctrlsl"..tostring(k), inx, iny-12, 150, 30);
-			ctrlsst = tolua.cast(ctrlsst, "ui::CRichText");
-			ctrlsst:SetText("{@st42b}"..tostring(name).."{/}");
-
-			if isDisabled then
-				ctrlst:SetColorTone("FF444444");
-				ctrlsst:SetColorTone("FF444444");
-			else
-				ctrls:RunUpdateScript("EXTENDEDUI_ON_SETTINGS_SLIDE");
+			
+			if ctrla ~= "newline" and ctrla ~= "dropdown" and ctrla ~= "rgbaselect" and ctrla ~= "advdropdown" then
+				ctrls = cbox:CreateOrGetControl(ctrla, "extuisetctrl"..tostring(k), inx, iny, 150, 30);
+			end
+			if ctrltype then
+				ctrls = tolua.cast(ctrls, ctrltype);
 			end
 
-			iny = iny-5;
+			if tool ~= nil and tool ~= "" and ctrla ~= "dropdown" and ctrla ~= "rgbaselect" and ctrla ~= "advdropdown" then
+				ctrls:SetTextTooltip(string.format("{@st42b}"..tool.."{/}"));
+			end
 
-		elseif ctrla == "richtext" then
-			ctrls:SetText(name);
-		elseif ctrla == "labelline" then
-			ctrls:SetOffset(inx,iny);
-			ctrls:Resize(300,4);
+			if ctrla == "checkbox" then
+				ctrls:SetText("{@st42b}"..tostring(name).."{/}");
+				ctrls:SetEventScriptArgString(oncall, tostring(k));
+				ctrls:SetCheck(value==true and 1 or 0);
+				ctrls:SetClickSound("button_click_big");
+				ctrls:SetOverSound("button_over");
 
-			iny = iny-30;
-		elseif ctrla == "dropdown" then
-			local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetdroplabel"..tostring(k), inx+5, iny, 150, 30);
-			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
-			ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+				if isDisabled == nil then
+					ctrls:SetEventScript(oncall, "EXTENDEDUI_ON_SETTINGS_PRESS");
+				end
 
-			ctrlst = cbox:CreateOrGetControl("richtext", "extuisetauthorlabel"..tostring(k), inx+100, iny+20, 150, 30);
-			ctrlst = tolua.cast(ctrlst, "ui::CRichText");
-			ctrlst:SetText("{@st62}"..extui.TLang("author")..": "..tostring(tool).."{/}");
+			elseif ctrla == "slidebar" then
+				ctrls:SetMaxSlideLevel(v.max);
+				ctrls:SetMinSlideLevel(v.min or 0);
+				ctrls:SetLevel(value);
+				ctrls:Resize(260,30);
+				iny = iny+5;
+				ctrls:SetOffset(inx,iny);
 
-			if extui.isInDrop == false then
-				cbox:CreateOrGetControl("richtext", "extuisetctrl"..tostring(k), inx, iny, 0, 0); --needed
-				ctrlss = cbox:CreateOrGetControl("droplist", "extuiminidropdown"..tostring(k), inx+100, iny, 200, 40);
-				ctrlss = tolua.cast(ctrlss, "ui::CDropList");
+				local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetlabelval"..tostring(k), inx+255, iny+5, 150, 30);
+				ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+				ctrlst:SetText("{@st42b}"..tostring(value).."{/}");
+
+				local ctrlsst = cbox:CreateOrGetControl("richtext", "extuisetctrlsl"..tostring(k), inx, iny-12, 150, 30);
+				ctrlsst = tolua.cast(ctrlsst, "ui::CRichText");
+				ctrlsst:SetText("{@st42b}"..tostring(name).."{/}");
+
+				if isDisabled then
+					ctrlst:SetColorTone("FF444444");
+					ctrlsst:SetColorTone("FF444444");
+				else
+					ctrls:RunUpdateScript("EXTENDEDUI_ON_SETTINGS_SLIDE");
+				end
+
+				iny = iny-5;
+
+			elseif ctrla == "richtext" then
+				ctrls:SetText(name);
+			elseif ctrla == "labelline" then
+				ctrls:SetOffset(inx,iny);
+				ctrls:Resize(300,4);
+
+				iny = iny-30;
+			elseif ctrla == "dropdown" then
+				local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetdroplabel"..tostring(k), inx+5, iny, 150, 30);
+				ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+				ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+				
+				if v.isLanguage ~= nil then
+					ctrlst = cbox:CreateOrGetControl("richtext", "extuisetauthorlabel"..tostring(k), inx+100, iny+20, 150, 30);
+					ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+					ctrlst:SetText("{@st62}"..extui.TLang("author")..": "..tostring(tool).."{/}");
+				end
+
+				if extui.isInDrop == false then
+					cbox:CreateOrGetControl("richtext", "extuisetctrl"..tostring(k), inx, iny, 0, 0); --needed
+					ctrlss = cbox:CreateOrGetControl("droplist", "extuiminidropdown"..tostring(k), inx+100, iny, 200, 40);
+					ctrlss = tolua.cast(ctrlss, "ui::CDropList");
+					ctrlss:SetSkinName("droplist_normal");
+					ctrlss:SetTextAlign("left","left");
+					if v.callback ~= nil then
+						ctrlss:SetSelectedScp(v.callback);
+					end
+					
+					if v.dropcall ~= nil then
+						v.dropcall();
+					end
+				end
+			elseif ctrla == "rgbaselect" then
+				local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetdroplabel"..tostring(k), inx+5, iny+15, 150, 30);
+				ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+				ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+				
+				local ctrlss = cbox:CreateOrGetControl("button","setcolPreview"..tostring(k),inx+60, iny, 30, 30);
+				AUTO_CAST(ctrlss);
+				ctrlss:SetImage("euiwhite");
+				ctrlss:SetColorTone("FF"..extui.GetSetting(tostring(k)));
+				ctrlss:SetTextTooltip("{@st42b}Open Color Wheel{/}");
+				ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPENCOLORWHEEL");
+				ctrlss:SetClickSound("button_click_big");
+				ctrlss:SetOverSound("button_over");
+				ctrlss:SetUserValue("settingName", tostring(k));
+				
+				iny=iny+15;
+
+			elseif ctrla == "advdropdown" then
+				local ctrlst = cbox:CreateOrGetControl("richtext", "extuisetdroplabel"..tostring(k), inx+5, iny, 150, 30);
+				ctrlst = tolua.cast(ctrlst, "ui::CRichText");
+				ctrlst:SetText("{@st42b}"..tostring(name).."{/}");
+				
+				ctrlss = cbox:CreateOrGetControl("droplist", "extuisetdropdown"..tostring(k), inx+100, iny, 200, 40);
+				AUTO_CAST(ctrlss);
 				ctrlss:SetSkinName("droplist_normal");
 				ctrlss:SetTextAlign("left","left");
-				ctrlss:SetSelectedScp(v.callback);
-				v.dropcall();
+				ctrlss:SetUserValue("SETTING", tostring(k));
+				
+				if v.callback ~= nil then
+					ctrlss:SetSelectedScp(v.callback);
+				end
+				
+				if v.dropcall ~= nil then
+					v.dropcall(ctrlss, tostring(k));
+				end
+				
 			end
 
-		end
+			if isDisabled then
+				ctrls:SetColorTone("FF444444");
+				ctrls:SetClickSound("");
+				ctrls:SetOverSound("");
+				ctrls:CreateOrGetControl("picture", "extuitctrlpd"..tostring(k), 400, 30, ui.LEFT, ui.TOP, 0, 0, 0, 0)
+			end
 
-		if isDisabled then
-			ctrls:SetColorTone("FF444444");
-			ctrls:SetClickSound("");
-			ctrls:SetOverSound("");
-			ctrls:CreateOrGetControl("picture", "extuitctrlpd"..tostring(k), 400, 30, ui.LEFT, ui.TOP, 0, 0, 0, 0)
-		end
+			if oncreate ~= nil then
+				oncreate(ctrls, inx, iny);
+			end
 
-		if oncreate ~= nil then
-			oncreate(ctrls, inx, iny);
+			iny = iny+40;
+			inx = 20;
 		end
-
-		iny = iny+40;
-		inx = 20;
 
 	end
 
 end
+
 
 
 function extui.RemoveJoySetting()
@@ -517,6 +622,8 @@ function extui.RemoveJoySetting()
 	ch = frm:GetChild("L2R2_Set2");
 	ch:ShowWindow( not(set) and 1 or 0 );
 	ch = frm:GetChild("L2R2");
+	ch:ShowWindow( not(set) and 1 or 0 );
+	ch = frm:GetChild("refreshBtn");
 	ch:ShowWindow( not(set) and 1 or 0 );
 	frm = ui.GetFrame("joystickrestquickslot");
 	ch = frm:GetChild("restmode");

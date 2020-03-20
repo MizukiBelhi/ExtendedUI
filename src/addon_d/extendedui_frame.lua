@@ -61,12 +61,15 @@ extui_Addon.inUse = false;
 
 local extui_Frame = {};
 extui_Frame.name = "Undefined";
+extui_Frame.frameName = "Undefined";
 extui_Frame.isMovable = true;
 extui_Frame.hasChild = false;
 extui_Frame.noResize = true;
 extui_Frame.show = false;
 extui_Frame.child = {};
 extui_Frame.onUpdate = function(x,y,w,h) end;
+extui_Frame.onBeforeUpdate = function(x,y,w,h) end;
+extui_Frame.onFrameUpdate = function(frame,x,y,w,h) end;
 
 
 function extui_Frame:AddChild(child, displayName)
@@ -75,17 +78,13 @@ function extui_Frame:AddChild(child, displayName)
 	self.child[string.gsub(child , "%s", "")] = {
 			["name"] = string.gsub(displayName or child, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end),
 			["isMovable"] = true,
+			["frameName"] = child,
 		};
 end
 
 
 function extui_Addon:AddFrame(name, frameTbl)
 	local fName = string.gsub(name , "%s", "");
-
-	--if ui.GetFrame(fName) == nil then
-	--	print("EUI Internal Error: Frame `%s` doesn't exist, cannot add.", name);
-	--	return {};
-	--end
 
 	self.frames[fName] = setmetatable({}, { __index = extui_Frame });
 
@@ -113,6 +112,8 @@ function extui_Addon:AddFrame(name, frameTbl)
 		extui.print(string.format("EUI Internal Error: Cannot Add Frame, frameTbl of type \"%s\" is invalid.", type(frameTbl)));
 		return nil;
 	end
+	
+	self.frames[fName].frameName = fName;
 
 	return self.frames[fName];
 end
@@ -148,10 +149,29 @@ function extui.FrameExists(frame)
 	return false;
 end
 
+function extui.GetFrameDirect(addon, frame)
+	return extui.Addons[addon].frames[frame];
+end
+
 function extui.GetFrame(frame)
 	for _,addon in pairs(extui.Addons) do
 		for k,v in pairs(addon.frames) do
 			if k == frame then return v; end
+		end
+	end
+	return nil;	
+end
+
+function extui.IsChild(frame)
+	for _,addon in pairs(extui.Addons) do
+		for k,v in pairs(addon.frames) do
+			if v.hasChild then
+				for _k,_v in pairs(v.child) do
+					if _k == frame then
+						return v;
+					end
+				end
+			end
 		end
 	end
 	return nil;	
@@ -179,6 +199,30 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	local euiAddon = extui.CreateNewAddon("UI");
 	local euiFrame = euiAddon:AddFrame("buff", "Buffs");
 	euiFrame.noResize = false;
+	euiFrame.onFrameUpdate = function(frame,x,y,w,h)
+
+					for ch,_ in pairs(extui.defaultFrames[frame:GetName()].child) do
+						if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+
+							extui.MoveBuffCaption("buff", ch);
+
+							--local frm = ui.GetFrame("buff");
+							local fch = frame:GetChild(ch);
+
+							local slotc = extui.GetSetting("rowamt");
+							local rowc = extui.round(30/slotc);
+							
+							local iconsize = extui.GetSetting("iconsize");
+
+							fch:Resize(slotc*iconsize,(rowc*iconsize)+(rowc*15));
+
+						end
+					end
+
+
+					extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+					INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+				end;
 	euiFrame:AddChild("buffcountslot", "Temp Buffs");
 	euiFrame:AddChild("buffslot", "Perm Buffs");
 	euiFrame:AddChild("debuffslot", "Debuffs");
@@ -195,18 +239,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiAddon:AddFrame("rest quickslot");
 	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
 	euiAddon:AddFrame("durnotify", "Durability");
-	euiFrame = euiAddon:AddFrame("chatframe", "Chat Window");
-	euiFrame.onUpdate = function(x,y,w,h)
-						local cheight = config.GetXMLConfig("ChatFrameSizeHeight")-230;
-						local sheight = h-230;
-						local chatFrame = ui.GetFrame("chatframe");
 
-						if cheight ~= sheight then
-							chatFrame:Resize(config.GetXMLConfig("ChatFrameSizeWidth"),h);
-							chatFrame:MoveFrame(x,y);
-							chatFrame:Resize(config.GetXMLConfig("ChatFrameSizeWidth"),config.GetXMLConfig("ChatFrameSizeHeight"));
-						end
-					end;
 	euiAddon:AddFrame("chat", "Chat Input");
 	euiAddon:AddFrame("notice");
 	--euiAddon:AddFrame("indunautomatch", "Queue Window");
@@ -235,6 +268,11 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame.noResize = false;
 	euiFrame = euiAddon:AddFrame("charbaseinfo", "EXP Bars");
+	euiFrame.onBeforeUpdate = function(x,y,w,h)
+						local expFrame = ui.GetFrame("charbaseinfo");
+						
+						expFrame:Resize(1920,30);
+					end;
 	--euiFrame.saveHidden = true;
 	--euiFrame.noResize = false;
 	euiFrame = euiAddon:AddFrame("playtime");
@@ -243,24 +281,25 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("castingbar", "Castbar");
 	euiFrame.noResize = false;
-	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Item Button");
-	euiFrame.noResize = false;
-	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("minimized_tp_button", "TP Shop Button");
-	euiFrame.noResize = false;
-	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("mini map");
     euiFrame.saveHidden = true;
     euiFrame = euiAddon:AddFrame("time");
     euiFrame.saveHidden = true;
     euiFrame = euiAddon:AddFrame("minimizedeventbanner", "Event Button");
     euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("minimized_tp_button", "TP Shop Button");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("minimized_godprotection_button", "God Protect Button");
+	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Item Button");
+	euiFrame.noResize = false;
+	euiFrame.saveHidden = true;
 end
 
 function extui.ForEachFrameN(func)
 	for _,addon in pairs(extui.Addons) do
 		for k,v in pairs(addon.frames) do
-			if func then
+			if func and extui.IsDisabledFrame(k) ~= true then
 				local t,p = pcall(func, k,v);
 				if not(t) then
 					extui.print("ForEachFrameN func(): "..tostring(p));
@@ -272,7 +311,7 @@ end
 
 function extui.ForEachFrameS(addon, func)
 	for k,v in pairs(extui.Addons[addon].frames) do
-		if func then
+		if func and extui.IsDisabledFrame(k) ~= true then
 			local t,p = pcall(func, k,v);
 			if not(t) then
 				extui.print("ForEachFrameS func(): "..tostring(p));
@@ -287,7 +326,7 @@ function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 	for _,addon in pairs(extui.Addons) do
 		for k,v in pairs(addon.frames) do
 			toc = ui.GetFrame(k);
-			if v.isMovable and toc ~= nil then
+			if v.isMovable and toc ~= nil and extui.IsDisabledFrame(k) ~= true then
 				if extui.framepos[tostring(k)] ~= nil then
 					if func then
 						local t,p = pcall(func, k,v,toc);
@@ -348,12 +387,19 @@ function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 	end
 end
 
-
+extui.cloktime = 0;
+extui.debug = {};
+extui.doFirstPositionLoad = true;
 
 function EXTENDEDUI_LOAD_POSITIONS()
-	local hasNew = false;	
+
+	
+	local hasNew = false;
 
 	imcAddOn.BroadMsg("EXTENDEDUI_ON_FRAME_LOAD");
+	
+	extui.IsDragging = false;
+	extui.isFrameOpen = false;
 
 	extui.ForEachFrame(
 		function(k,v,toc)
@@ -363,6 +409,7 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			local h = extui.framepos[tostring(k)].h;
 			local nskin = extui.framepos[tostring(k)].skin or "@default";
 			local nscale = extui.framepos[tostring(k)].scale or 100;
+			local hover = extui.framepos[tostring(k)].hover or 0;
 
 			local xs = toc:GetX() or 0;
 			local ys = toc:GetY() or 0;
@@ -370,6 +417,8 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			local hs = toc:GetHeight() or 0;
 			local scale = 100;
 			local skin = toc:GetSkinName();
+			
+			v.onBeforeUpdate(x, y, w, h);
 			
 			toc:MoveFrame(x, y);
 			if not(v.noResize) then
@@ -387,11 +436,18 @@ function EXTENDEDUI_LOAD_POSITIONS()
 				skin = dictionary.ReplaceDicIDInCompStr(skin);
 				extui.framepos[tostring(k)].skin = skin;
 			end
+			
 
-			if v.saveHidden then
+			if v.saveHidden and hover == 0 then
 				extui.framepos[tostring(k)].hidden = (extui.framepos[tostring(k)].hidden==1 or extui.framepos[tostring(k)].hidden == true) and 1 or 0
 				toc:ShowWindow(extui.framepos[tostring(k)].hidden, true);
 			end
+			
+			if hover == 1 then
+				extui.hoverFrames[tostring(k)] = true;
+				toc:ShowWindow(0, true);
+			end
+
 
 			if not(extui.firstStart) then
 				extui.defaultFrames[tostring(k)] = {};
@@ -401,6 +457,7 @@ function EXTENDEDUI_LOAD_POSITIONS()
 				extui.defaultFrames[tostring(k)]["h"] = hs;
 				extui.defaultFrames[tostring(k)]["scale"] = scale;
 				extui.defaultFrames[tostring(k)]["skin"] = skin;
+				extui.defaultFrames[tostring(k)]["hover"] = 0;
 				if v.hasChild then
 					extui.defaultFrames[tostring(k)]["child"] = {};
 				end
@@ -410,6 +467,8 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			if not extui.intable(extui.skins, skin) then
 				table.insert(extui.skins, skin);
 			end
+			
+			toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
 
 			v.onUpdate(x,y,w,h);
 			--if k=="targetinfo" then
@@ -448,6 +507,8 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			if v.hasChild then
 				extui.framepos[tostring(k)]["child"] = {};
 			end
+			
+			toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
 
 			v.onUpdate(x,y,w,h);
 		end,
@@ -647,6 +708,9 @@ end
 --minimap, sorry..
 --minimap is made visible/hidden by client so we have to do this
 function EXTUI_MINIMAP_VISIBILITY_CHECK()
+	--we might as well put that here instead of creating a new one
+	extui.CheckForHover();
+
 	if extui.isSetting then return 1; end
 
 	local minimap_frame = ui.GetFrame("minimap");
@@ -656,6 +720,87 @@ function EXTUI_MINIMAP_VISIBILITY_CHECK()
 		end
 	end
 
+	return 1;
+end
+
+
+
+function EXTENDEDUI_FULLFRAME_UPDATE(frame)
+	if extui.isSetting then return 1; end
+	
+	local isHovering = frame:GetUserIValue("EUI_IS_HOVERING");
+	if isHovering ~= nil and isHovering == 1 then
+		return 1;
+	end
+	
+	
+	local k = frame:GetName();
+	local v = extui.GetFrame(k);
+	
+	
+	local x = extui.framepos[tostring(k)].x;
+	local y = extui.framepos[tostring(k)].y;
+	local w = extui.framepos[tostring(k)].w;
+	local h = extui.framepos[tostring(k)].h;
+	local nskin = extui.framepos[tostring(k)].skin or "@default";
+	local nscale = extui.framepos[tostring(k)].scale or 100;
+	local hover = extui.framepos[tostring(k)].hover or 0;
+
+	local xs = frame:GetX() or 0;
+	local ys = frame:GetY() or 0;
+	local ws = frame:GetWidth() or 0;
+	local hs = frame:GetHeight() or 0;
+	local scale = 100;
+
+	v.onBeforeUpdate(x, y, w, h);
+	
+	frame:MoveFrame(x, y);
+	if not(v.noResize) then
+		frame:Resize(w, h);
+	end
+
+	if scale ~= nscale then
+		frame:SetScale(nscale, nscale);
+	end	
+
+	if v.saveHidden and hover == 0 then
+		frame:ShowWindow(extui.framepos[tostring(k)].hidden, true);
+	end
+	
+	if hover == 1 then
+		frame:ShowWindow(0, true);
+	end
+
+	v.onUpdate(x,y,w,h);
+	
+	if v.hasChild then
+		for ck,cv in pairs(v.child) do
+			local tcc = frame:GetChild(tostring(ck));
+						
+			if cv.isMovable and tcc ~= nil then
+				if extui.framepos[tostring(k)]["child"][tostring(ck)] ~= nil then
+					local cx = extui.framepos[tostring(k)]["child"][tostring(ck)].x;
+					local cy = extui.framepos[tostring(k)]["child"][tostring(ck)].y;
+
+					tcc:SetOffset(cx, cy);
+
+					if k == "buff" then
+						extui.MoveBuffCaption(k, ck);
+						local frm = ui.GetFrame(k);
+						local fch = frm:GetChild(ck);
+
+						local slotc = extui.GetSetting("rowamt");
+						local rowc = extui.round(30/slotc);
+
+						fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+					end
+				end
+			end
+		end
+	end
+	
+	v.onFrameUpdate(frame, x,y,w,h);
+	
 	return 1;
 end
 

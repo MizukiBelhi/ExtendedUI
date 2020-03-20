@@ -9,9 +9,6 @@ extui.sideFrame = nil;
 extui.isSetting = false;
 extui.isReload = false;
 extui.closingSettings = false;
-extui.IsDragging = false;
-
-
 
 
 function EXTENDEDUI_ON_JOB_EXP(frame, msg, str, exp, tableinfo)
@@ -31,7 +28,7 @@ function EXTENDEDUI_ON_JOB_EXP(frame, msg, str, exp, tableinfo)
 		percent = 100.0;
 	end
 
-	local expObject = GET_CHILD(frame, 'skillexp', "ui::CGauge");
+	local expObject = GET_CHILD(frame, "skillexp", "ui::CGauge");
 	expObject:SetTextTooltip(string.format("{@st42b}%.1f%% / %.1f%%{/} (%i / %i)", percent, 100.0, curExp , maxExp));
 
 end
@@ -74,12 +71,15 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	addon:RegisterMsg("CHANGE_COUNTRY", "EXTENDEDUI_ON_CHAR_EXP");
 	addon:RegisterMsg("ESCAPE_PRESSED", "EXTENDEDUI_ON_CLOSE_UI");
 	addon:RegisterMsg("EXTENDEDUI_ON_FRAME_LOAD", "EXTENDEDUI_ON_FRAME_LOADS");
+		
 
 	extui.UpdateCheck();
 
 	extui.isSetting = false;
 
 	extui.LoadSettings();
+	
+	extui.doFirstPositionLoad = false;
 
 	if _G["_PUMP_RECIPE_OPEN_EXTOLD"] == nil then
 		_G["_PUMP_RECIPE_OPEN_EXTOLD"] = _G["_PUMP_RECIPE_OPEN"];
