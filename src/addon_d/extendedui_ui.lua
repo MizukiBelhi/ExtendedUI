@@ -876,8 +876,12 @@ function extui.ShowFrameBorder(parentFrame, childFrame)
 	local borderParent = ui.GetFrame("extui_borderParent");
 	if borderParent ~= nil then
 		borderParent:StopUpdateScript("EXTENDEDUI_FRAMEBORDER_UPDATE");
+		borderParent:RemoveAllChild();
 		
-		pic = borderParent:GetChild("pic");
+		pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
+
+		AUTO_CAST(pic);
+		pic:CreateInstTexture();
 
 	else
 	
