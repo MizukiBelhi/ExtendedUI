@@ -745,6 +745,7 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 	local nskin = extui.framepos[tostring(k)].skin or "@default";
 	local nscale = extui.framepos[tostring(k)].scale or 100;
 	local hover = extui.framepos[tostring(k)].hover or 0;
+	local isHidden = (extui.framepos[tostring(k)].hidden==true or extui.framepos[tostring(k)].hidden==1) and 1 or 0;
 
 	local xs = frame:GetX() or 0;
 	local ys = frame:GetY() or 0;
@@ -764,7 +765,7 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 	end	
 
 	if v.saveHidden and hover == 0 then
-		frame:ShowWindow(extui.framepos[tostring(k)].hidden, true);
+		frame:ShowWindow(isHidden, true);
 	end
 	
 	if hover == 1 then
