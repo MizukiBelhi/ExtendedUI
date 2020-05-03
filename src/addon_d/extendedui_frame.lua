@@ -291,6 +291,8 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("minimized_godprotection_button", "God Protect Button");
 	euiFrame.saveHidden = true;
+	euiFrame = euiAddon:AddFrame("minimized_event_new_season_server_coin_check_button", "God Roulette");
+	euiFrame.saveHidden = true;
 	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Item Button");
 	euiFrame.noResize = false;
 	euiFrame.saveHidden = true;
