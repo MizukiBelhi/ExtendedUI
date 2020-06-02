@@ -197,9 +197,9 @@ end
 function EXTENDEDUI_ON_FRAME_LOADS()
 
 	local euiAddon = extui.CreateNewAddon("UI");
-	local euiFrame = euiAddon:AddFrame("buff", "Buffs");
-	euiFrame.noResize = false;
-	euiFrame.onFrameUpdate = function(frame,x,y,w,h)
+	--local euiFrame = euiAddon:AddFrame("buff", "Buffs");
+	--euiFrame.noResize = false;
+	--[[euiFrame.onFrameUpdate = function(frame,x,y,w,h)
 
 					for ch,_ in pairs(extui.defaultFrames[frame:GetName()].child) do
 						if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
@@ -223,9 +223,10 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 					extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
 					INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
 				end;
-	euiFrame:AddChild("buffcountslot", "Temp Buffs");
-	euiFrame:AddChild("buffslot", "Perm Buffs");
-	euiFrame:AddChild("debuffslot", "Debuffs");
+	--]]
+	--euiFrame:AddChild("buffcountslot", "Temp Buffs");
+	--euiFrame:AddChild("buffslot", "Perm Buffs");
+	--euiFrame:AddChild("debuffslot", "Debuffs");
 	euiFrame = euiAddon:AddFrame("targetbuff", "Target Buffs");
 	euiFrame.noResize = false;
 	euiFrame:AddChild("buffcountslot", "Temp Buffs");
