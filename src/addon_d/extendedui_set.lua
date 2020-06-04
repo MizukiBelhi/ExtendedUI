@@ -99,11 +99,14 @@ function extui.LoadSettings()
 		["lockquest"]		=	true,
 		["discraft"]			=	false,
 		["iconsize"]		=	32,
+		["buffcount"]		=	30,
 		["extbuff"]			=	true,
 		["remjoy"]			=	false,
 		["remload"]		=	false,
 		["rowamt"]			=	15,
 		["buffsec"]			=	false,
+		["buffdir"]			=	false,
+		["buffdirtb"]		=	false,
 		["lang"]				=	"eng",
 		["gridSize"]			= 16,
 	}, true);
@@ -252,15 +255,7 @@ function extui.LoadSettings()
 								for ch,_ in pairs(eframe.child) do
 									if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
-										extui.MoveBuffCaption("buff", ch);
-
-										local frm = ui.GetFrame("buff");
-										local fch = frm:GetChild(ch);
-
-										local slotc = extui.GetSetting("rowamt");
-										local rowc = extui.round(30/slotc);
-
-										fch:Resize(slotc*ctrl:GetLevel(),(rowc*ctrl:GetLevel())+(rowc*15));
+										extui.UpdateBuffSizes(ch);
 
 									end
 								end
@@ -289,6 +284,96 @@ function extui.LoadSettings()
 			["oncall"] = ui.LBUTTONUP,
 		}
 	);
+	
+	extui.AddSetting("buffdir", {
+			["name"] = extui.TLang("buffdir"),
+			["tool"] = extui.TLang("buffdirDesc"),
+			["typedata"] = {
+				["t"] = "ui::CCheckBox",
+				["a"] = "checkbox",
+			},
+			["val"] = extui.ldSettingsUI["buffdir"],
+			["callback"] = function(frame, ctrl)
+							extui.SetSetting("buffdir",ctrl:IsChecked() == 1);
+							
+							local eframe = extui.GetFrame("buff");
+							if eframe ~= nil then
+								for ch,_ in pairs(eframe.child) do
+									if (ch == "buffcountslot_sub" or ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+
+										extui.UpdateBuffSizes(ch);
+									end
+								end
+							end
+
+							extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+							INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+						end,
+			["oncall"] = ui.LBUTTONUP,
+		}
+	);
+	
+	extui.AddSetting("buffdirtb", {
+			["name"] = extui.TLang("buffdirtb"),
+			["tool"] = extui.TLang("buffdirtbDesc"),
+			["typedata"] = {
+				["t"] = "ui::CCheckBox",
+				["a"] = "checkbox",
+			},
+			["val"] = extui.ldSettingsUI["buffdirtb"],
+			["callback"] = function(frame, ctrl)
+							extui.SetSetting("buffdirtb",ctrl:IsChecked() == 1);
+							
+							local eframe = extui.GetFrame("buff");
+							if eframe ~= nil then
+								for ch,_ in pairs(eframe.child) do
+									if (ch == "buffcountslot_sub" or ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+
+										extui.UpdateBuffSizes(ch);
+									end
+								end
+							end
+
+							extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+							INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+						end,
+			["oncall"] = ui.LBUTTONUP,
+		}
+	);
+	
+	extui.AddSetting("buffcount", {
+			["name"] = extui.TLang("buffcount"),
+			["tool"] = extui.TLang("buffcountDesc"),
+			["typedata"] = {
+				["t"] = "ui::CSlideBar",
+				["a"] = "slidebar",
+			},
+			["val"] = extui.ldSettingsUI["buffcount"],
+			["callback"] = function(frame, ctrl)
+							if ctrl:GetLevel() ~= extui.GetSetting("buffcount") then
+								extui.SetSetting("buffcount",ctrl:GetLevel());
+
+								local eframe = extui.GetFrame("buff");
+								if eframe ~= nil then
+									for ch,_ in pairs(eframe.child) do
+										if (ch == "buffcountslot_sub" or ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+
+											extui.UpdateBuffSizes(ch);
+										end
+									end
+								end
+
+								extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
+								INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
+							end
+
+						end,
+			["oncall"] = ui.LBUTTONUP,
+			["min"] = 30,
+			["max"] = 200,
+			["disabled"] = function() return not(extui.GetSetting("extbuff")); end,
+		}
+	);
 
 	extui.AddSetting("rowamt", {
 			["name"] = extui.TLang("buffAmt"),
@@ -300,22 +385,19 @@ function extui.LoadSettings()
 			["val"] = extui.ldSettingsUI["rowamt"],
 			["callback"] = function(frame, ctrl)
 							if ctrl:GetLevel() ~= extui.GetSetting("rowamt") then
-								extui.SetSetting("rowamt",ctrl:GetLevel());
+							
+								--we limit it to whatever the max buffcount is
+								local nlvl = ctrl:GetLevel() > extui.ldSettingsUI["buffcount"] and extui.ldSettingsUI["buffcount"] or ctrl:GetLevel();
+								
+								extui.SetSetting("rowamt", nlvl);
+								ctrl:SetLevel(nlvl);
 
 								local eframe = extui.GetFrame("buff");
 								if eframe ~= nil then
 									for ch,_ in pairs(eframe.child) do
-										if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+										if (ch == "buffcountslot_sub" or ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
-											extui.MoveBuffCaption("buff", ch);
-
-											local frm = ui.GetFrame("buff");
-											local fch = frm:GetChild(ch);
-
-											local slotc = extui.GetSetting("rowamt");
-											local rowc = extui.round(30/slotc);
-
-											fch:Resize(slotc*extui.GetSetting("iconsize"),(rowc*extui.GetSetting("iconsize"))+(rowc*15));
+											extui.UpdateBuffSizes(ch);
 										end
 									end
 								end
@@ -327,7 +409,7 @@ function extui.LoadSettings()
 						end,
 			["oncall"] = ui.LBUTTONUP,
 			["min"] = 1,
-			["max"] = 30,
+			["max"] = 200,
 			["disabled"] = function() return not(extui.GetSetting("extbuff")); end,
 		}
 	);

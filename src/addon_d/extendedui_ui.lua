@@ -135,7 +135,7 @@ function EXTENDEDUI_MINI_ON_SELECTD(index)
 	end
 	
 	if string.len(childFrameName) ~= 0 then
-		local selFrame = extui.GetFrameDirect(extui.selectedAddon, parentFrameName);
+		local selFrame = extui.GetFrameDirect(parentFrameName);
 		local selChildFrame = selFrame.child[childFrameName];
 		
 		if selChildFrame ~= nil then
@@ -157,7 +157,7 @@ function EXTENDEDUI_MINI_ON_SELECTD(index)
 	else
 	
 		if string.len(parentFrameName) ~= 0 then
-			local selFrame = extui.GetFrameDirect(extui.selectedAddon, parentFrameName);
+			local selFrame = extui.GetFrameDirect(parentFrameName);
 			extui.oldSelectedFrameParent = extui.selectedFrameParent;
 			extui.selectedFrameParent = ui.GetFrame(selFrame.frameName);
 			
@@ -234,7 +234,7 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST_S()
 	ui.AddDropListItem(extui.TLang("noSelect"), "", 1);
 	local iii = 1;
 
-	extui.ForEachFrameS(extui.selectedAddon, function(k,v)
+	extui.ForEachFrameS(function(k,v)
 
 		if v.isMovable and extui.IsDisabledFrame(tostring(v.name)) ~= true then		
 			ui.AddDropListItem(tostring(v.name),"", iii);
@@ -251,15 +251,6 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST_S()
 	end);
 end
 
-function EXTENDEDUI_MINI_ON_ADDON_SELECT(index)
-	local t,p = pcall(EXTENDEDUI_MINI_ON_SELECT, 0);
-	if not(t) then
-		extui.print("ERRRRR func(): "..tostring(p));
-	end
-
-	extui.selectedAddon = extui.dropListAddonOptions[index+1];
-
-end
 
 extui.dropListAddonOptions = {};
 function EXTENDEDUI_MINI_CREATE_ADDONLIST()
@@ -410,11 +401,7 @@ function EXTENDEDUI_MINI_UPDATE()
 
 
 					if frame:GetName() == "buff" then
-						extui.MoveBuffCaption(frame:GetName(), frameName);
-						local slotc = extui.GetSetting("rowamt");
-						local rowc = extui.round(30/slotc);
-
-						cframe:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+						extui.UpdateBuffSizes(frameName);
 					end
 					
 					cframe:SetOffset(x, y);
@@ -577,14 +564,6 @@ function extui.PopulateMiniFrame(frm)
 	ctrlss:EnableImageStretch(false);
 	ctrlss:SetImage("count_down_btn");
 	ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_CREATE_DROPLIST");
-
-	if extui.tablelength(extui.Addons) > 1 then
-		ctrlss = frm:CreateOrGetControl("button", "extuiminiaddonbut", (350/2)+140, 5, 30, 30);
-		ctrlss = tolua.cast(ctrlss, "ui::CButton");
-		ctrlss:EnableImageStretch(false);
-		ctrlss:SetImage("count_down_btn");
-		ctrlss:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_MINI_CREATE_ADDONLIST");
-	end
 
 	local gbox = frm:CreateOrGetControl("groupbox", "extuiminigrpsetbox", 0, 0, 350, 400);
 	gbox = tolua.cast(gbox, "ui::CGroupBox");
@@ -832,7 +811,7 @@ function EXTENDEDUI_ON_OPEN_UI()
 	--extui.openside();
 	if ui.GetFrame("EXTENDEDUI_MINI_FRAME") == nil then
 		--curtabName = string.gsub(curtabName, "%s", "");
-		extui.selectedAddon = "UI";--string.gsub(curtabName, "({@[%w_']*})([%w_']*)({/})", function(_,d) return d; end);
+		--extui.selectedAddon = "UI";--string.gsub(curtabName, "({@[%w_']*})([%w_']*)({/})", function(_,d) return d; end);
 		extui.language.selectedLanguage = extui.GetSetting("lang");
 		extui.LoadSettings();
 		extui.OpenMiniFrame();
@@ -961,6 +940,9 @@ function EXTENDEDUI_FRAMEBORDER_UPDATE_S(border)
 			end
 
 			local borderFrm = ui.GetFrame("extui_borderParent");
+			if borderFrm == nil then
+				return 1;
+			end
 
 			borderFrm:Resize(w+1 , h+1);
 			borderFrm:MoveFrame(x-1, y-1);
@@ -1330,6 +1312,7 @@ function extui.CheckForHovers()
 
 		toc:StopUpdateScript("EUI_PROCESS_MOVE_FRAME");
 		
+		
 	end
 end
 
@@ -1358,11 +1341,13 @@ end
 function EUI_PROCESS_MOVE_FRAME(frame)
 
 	if mouse.IsLBtnPressed() == 0 or ui.GetFrame("extui_borderParent") == nil then
-		
+		if extui.selectedChild ~= true then
 			frame:ShowWindow(frame:GetUserValue("EUI_OLD_VISIBLE"), true);
-			extui.IsDragging = false;
-			frame:SetUserValue("EUI_IS_DRAGGING", 0);
-			frame:StopUpdateScript("EUI_PROCESS_MOVE_FRAME");
+		end
+		
+		extui.IsDragging = false;
+		frame:SetUserValue("EUI_IS_DRAGGING", 0);
+		frame:StopUpdateScript("EUI_PROCESS_MOVE_FRAME");
 
 		return 0;
 	end
@@ -1394,15 +1379,9 @@ function EUI_PROCESS_MOVE_FRAME(frame)
 		
 		extui.framepos[parentFrame:GetName()].child[frameName]["x"] = frame:GetX();
 		extui.framepos[parentFrame:GetName()].child[frameName]["y"] = frame:GetY();
-		--extui.framepos[parentFrame:GetName()].child[frameName]["w"] = frame:GetWidth();
-		--extui.framepos[parentFrame:GetName()].child[frameName]["h"] = frame:GetHeight();
-		
-		if parentFrame:GetName() == "buff" then
-			extui.MoveBuffCaption(parentFrame:GetName(), frameName);
-			local slotc = extui.GetSetting("rowamt");
-			local rowc = extui.round(30/slotc);
 
-			frame:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+		if parentFrame:GetName() == "buff" then
+			extui.UpdateBuffSizes(frameName);
 		end
 	else
 		

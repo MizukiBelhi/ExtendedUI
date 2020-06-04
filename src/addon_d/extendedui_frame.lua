@@ -54,10 +54,7 @@ function extui.ScaleFrame(frame, scale)
 --todo
 end
 
-extui.Addons = {};
-local extui_Addon = {};
-extui_Addon.name = "Undefined";
-extui_Addon.inUse = false;
+extui.frames = {};
 
 local extui_Frame = {};
 extui_Frame.name = "Undefined";
@@ -73,21 +70,32 @@ extui_Frame.onFrameUpdate = function(frame,x,y,w,h) end;
 
 
 function extui_Frame:AddChild(child, displayName)
-	self.hasChild = true;
+	local pfrm = ui.GetFrame(self.frameName);
+	
+	if pfrm == nil then return; end
+	
+	local cfrm = pfrm:GetChild(child);
+	
+	if cfrm ~= nil then
+	
+		self.hasChild = true;
 
-	self.child[string.gsub(child , "%s", "")] = {
-			["name"] = string.gsub(displayName or child, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end),
-			["isMovable"] = true,
-			["frameName"] = child,
-		};
+		self.child[string.gsub(child , "%s", "")] = {
+				["name"] = string.gsub(displayName or child, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end),
+				["isMovable"] = true,
+				["frameName"] = child,
+			};
+	end
 end
 
 
-function extui_Addon:AddFrame(name, frameTbl)
+function extui.AddFrame(name, frameTbl)
 	local fName = string.gsub(name , "%s", "");
+	
+	extui.frames[fName] = {};
 
-	self.frames[fName] = setmetatable({}, { __index = extui_Frame });
-
+	setmetatable(extui.frames[fName], {__index = extui_Frame});
+	
 	if type(frameTbl) == "table" then
 		local function _thething(_to,_tbl)
 			for k,v in pairs(_tbl) do
@@ -103,118 +111,91 @@ function extui_Addon:AddFrame(name, frameTbl)
 			return _to;
 		end
 
-		self.frames[fName] = _thething(self.frames[fName], frameTbl);
+		extui.frames[fName] = _thething(extui.frames[fName], frameTbl);
 	elseif type(frameTbl) == "string" then
-		self.frames[fName].name = frameTbl;
+		extui.frames[fName].name = frameTbl;
 	elseif frameTbl == nil then
-		self.frames[fName].name = string.gsub(name, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end);
+		extui.frames[fName].name = string.gsub(name, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end);
 	else
 		extui.print(string.format("EUI Internal Error: Cannot Add Frame, frameTbl of type \"%s\" is invalid.", type(frameTbl)));
 		return nil;
 	end
 	
-	self.frames[fName].frameName = fName;
+	extui.frames[fName].frameName = fName;
+	extui.frames[fName].child = {};
 
-	return self.frames[fName];
+	return extui.frames[fName];
 end
 
-function extui_Addon:RemoveFrame(name)
-	if self.frames[name] ~= nil then
-		self.frames[name] = nil;
+function extui.RemoveFrame(name)
+	if extui.frames[name] ~= nil then
+		extui.frames[name] = nil;
 	end
-end
-
-
-function extui_Addon:IsInUse()
-	return self.inUse;
-end
-
---does things
-function extui.CreateNewAddon(addon)
-	if extui.Addons[addon] ~= nil then return extui.Addons[addon]; end
-
-	extui.Addons[addon] = setmetatable({}, { __index = extui_Addon });
-	extui.Addons[addon].name = addon;
-	extui.Addons[addon].frames = {};
-
-	return extui.Addons[addon];
 end
 
 function extui.FrameExists(frame)
-	for _,addon in pairs(extui.Addons) do
-		for k,_ in pairs(addon.frames) do
-			if k == frame then return true; end
-		end
+
+	for k,_ in pairs(extui.frames) do
+		if k == frame then return true; end
 	end
+
 	return false;
 end
 
-function extui.GetFrameDirect(addon, frame)
-	return extui.Addons[addon].frames[frame];
+function extui.GetFrameDirect(frame)
+	return extui.frames[frame];
 end
 
 function extui.GetFrame(frame)
-	for _,addon in pairs(extui.Addons) do
-		for k,v in pairs(addon.frames) do
-			if k == frame then return v; end
-		end
+	for k,v in pairs(extui.frames) do
+		if k == frame then return v; end
 	end
 	return nil;	
 end
 
 function extui.IsChild(frame)
-	for _,addon in pairs(extui.Addons) do
-		for k,v in pairs(addon.frames) do
-			if v.hasChild then
-				for _k,_v in pairs(v.child) do
-					if _k == frame then
-						return v;
-					end
+
+	for k,v in pairs(extui.frames) do
+		if v.hasChild then
+			for k,v in pairs(v.child) do
+				if k == frame then
+					return v;
 				end
 			end
 		end
 	end
+
 	return nil;	
 end
 
 
 function extui.ForceFrameUpdate()
-	for _,addon in pairs(extui.Addons) do
-		for k,v in pairs(addon.frames) do
-			local toc = ui.GetFrame(k);
-			if toc ~= nil then
-				local x = toc:GetX() or 0;
-				local y = toc:GetY() or 0;
-				local w = toc:GetWidth() or 0;
-				local h = toc:GetHeight() or 0;
-				v.onUpdate(x,y,w,h);
-			end
+
+	for k,v in pairs(extui.frames) do
+		local toc = ui.GetFrame(k);
+		if toc ~= nil then
+			local x = toc:GetX() or 0;
+			local y = toc:GetY() or 0;
+			local w = toc:GetWidth() or 0;
+			local h = toc:GetHeight() or 0;
+			v.onUpdate(x,y,w,h);
 		end
 	end
+
 end
 
 
 function EXTENDEDUI_ON_FRAME_LOADS()
+	--local euiFrame = extui.AddFrame("buff", "Buffs");euiFrame:AddChild("buffcountslot", "Self Applied Buffs");
 
-	local euiAddon = extui.CreateNewAddon("UI");
-	local euiFrame = euiAddon:AddFrame("buff", "Buffs");
+	local euiFrame = extui.AddFrame("buff", "Buffs");
 	euiFrame.noResize = false;
 	euiFrame.onFrameUpdate = function(frame,x,y,w,h)
 
 					for ch,_ in pairs(extui.defaultFrames[frame:GetName()].child) do
-						if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
-
-							extui.MoveBuffCaption("buff", ch);
-
-							--local frm = ui.GetFrame("buff");
-							local fch = frame:GetChild(ch);
-
-							local slotc = extui.GetSetting("rowamt");
-							local rowc = extui.round(30/slotc);
+						if (ch == "buffcountslot_sub" or ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 							
-							local iconsize = extui.GetSetting("iconsize");
-
-							fch:Resize(slotc*iconsize,(rowc*iconsize)+(rowc*15));
+							extui.UpdateBuffSizes(ch, true);
 
 						end
 					end
@@ -223,94 +204,112 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 					extui.INIT_BUFF_UI(ui.GetFrame("buff"), s_buff_ui, "MY_BUFF_TIME_UPDATE");
 					INIT_PREMIUM_BUFF_UI(ui.GetFrame("buff"));
 				end;
-	euiFrame:AddChild("buffcountslot", "Temp Buffs");
-	euiFrame:AddChild("buffslot", "Perm Buffs");
+
+	euiFrame:AddChild("buffcountslot", "Self Applied Buffs");
+	euiFrame:AddChild("buffcountslot_sub", "Buffs From Others");
+	euiFrame:AddChild("buffslot", "Unaffected Buffs");
 	euiFrame:AddChild("debuffslot", "Debuffs");
-	euiFrame = euiAddon:AddFrame("targetbuff", "Target Buffs");
+	
+	extui.AddFrame("minimizedalarm", "Mini Guild Mission");
+	euiFrame = extui.AddFrame("targetbuff", "Target Buffs");
 	euiFrame.noResize = false;
 	euiFrame:AddChild("buffcountslot", "Temp Buffs");
 	euiFrame:AddChild("buffslot", "Perm Buffs");
 	euiFrame:AddChild("debuffslot", "Debuffs");
 
-	euiAddon:AddFrame("minimizedalarm", "Mini Guild Mission");
-	euiAddon:AddFrame("fevorcombo", "Fever Combo");
-	euiAddon:AddFrame("joystick rest quickslot");
-	euiAddon:AddFrame("joystick quickslot");
-	euiAddon:AddFrame("rest quickslot");
-	euiAddon:AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
-	euiAddon:AddFrame("durnotify", "Durability");
 
-	euiAddon:AddFrame("chat", "Chat Input");
-	euiAddon:AddFrame("notice");
+	extui.AddFrame("fevorcombo", "Fever Combo");
+	extui.AddFrame("joystick rest quickslot");
+	extui.AddFrame("joystick quickslot");
+	extui.AddFrame("rest quickslot");
+	extui.AddFrame("quickslotnexpbar", "Keyboard/Mouse Quickslot");
+	extui.AddFrame("durnotify", "Durability");
+
+	extui.AddFrame("chat", "Chat Input");
+	extui.AddFrame("notice");
 	--euiAddon:AddFrame("indunautomatch", "Queue Window");
 
-	euiFrame = euiAddon:AddFrame("target info");
+	euiFrame = extui.AddFrame("target info");
 	euiFrame.onUpdate = function(x,y,w,h)
 						extui.TargetInfoUpdate(x,y);
 					end;
 
-	euiFrame = euiAddon:AddFrame("questinfoset_2", "Quest Log");
+	euiFrame = extui.AddFrame("questinfoset_2", "Quest Log");
 	--euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("keypress", "Tapping Key");
+	euiFrame = extui.AddFrame("keypress", "Tapping Key");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("ctrltargetui", "CTRL Target Lock");
+	euiFrame = extui.AddFrame("ctrltargetui", "CTRL Target Lock");
 	euiFrame.saveHidden = true;
 	--euiFrame = euiAddon:AddFrame("weaponswap");
 	--euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("partyinfo", "Party");
+	euiFrame = extui.AddFrame("partyinfo", "Party");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("channel");
+	euiFrame = extui.AddFrame("channel");
 	--euiFrame.saveHidden = true;
 	euiFrame.noResize = false;
-	euiFrame = euiAddon:AddFrame("sysmenu", "Menu");
+	euiFrame = extui.AddFrame("sysmenu", "Menu");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("headsupdisplay", "Character Status");
+	euiFrame = extui.AddFrame("headsupdisplay", "Character Status");
 	euiFrame.saveHidden = true;
 	euiFrame.noResize = false;
-	euiFrame = euiAddon:AddFrame("charbaseinfo", "EXP Bars");
+	euiFrame = extui.AddFrame("charbaseinfo", "EXP Bars");
 	euiFrame.onBeforeUpdate = function(x,y,w,h)
 						local expFrame = ui.GetFrame("charbaseinfo");
 						
 						expFrame:Resize(1920,30);
+						expFrame:MoveFrame(0, 1050);
 					end;
-	--euiFrame.saveHidden = true;
-	--euiFrame.noResize = false;
-	euiFrame = euiAddon:AddFrame("playtime");
+
+	euiFrame = extui.AddFrame("playtime");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("fps", "FPS");
+	euiFrame = extui.AddFrame("fps", "FPS");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("castingbar", "Castbar");
+	euiFrame = extui.AddFrame("castingbar", "Castbar");
 	euiFrame.noResize = false;
-	euiFrame = euiAddon:AddFrame("mini map");
+	euiFrame = extui.AddFrame("mini map");
     euiFrame.saveHidden = true;
-    euiFrame = euiAddon:AddFrame("time");
+	
+	euiFrame = extui.AddFrame("mapareatext", "Minimap Area Text");
+	euiFrame.noResize = false;
     euiFrame.saveHidden = true;
-    euiFrame = euiAddon:AddFrame("minimizedeventbanner", "Event Button");
+	euiFrame:AddChild("mapName", "Map Name");
+	euiFrame:AddChild("areaName", "Area Name");
+	
+	euiFrame = extui.AddFrame("minimap_outsidebutton", "Minimap Buttons");
     euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("minimized_tp_button", "TP Shop Button");
+    euiFrame = extui.AddFrame("time");
+    euiFrame.saveHidden = true;
+    euiFrame = extui.AddFrame("minimizedeventbanner", "Event Button");
+    euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("minimized_tp_button", "TP Shop Button");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("minimized_godprotection_button", "God Protect Button");
+	euiFrame = extui.AddFrame("minimized_godprotection_button", "God Protect Button");
+	euiFrame = extui.AddFrame("minimized_event_new_season_server_coin_check_button", "God Roulette");
 	euiFrame.saveHidden = true;
-	euiFrame = euiAddon:AddFrame("openingameshopbtn", "TP Item Button");
+	euiFrame = extui.AddFrame("minimized_pvpmine_shop_button", "Mercenary Shop Button");
+	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("openingameshopbtn", "TP Item Button");
 	euiFrame.noResize = false;
 	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("summonsinfo", "Summon Info");
+	euiFrame.noResize = false;
 end
 
 function extui.ForEachFrameN(func)
-	for _,addon in pairs(extui.Addons) do
-		for k,v in pairs(addon.frames) do
-			if func and extui.IsDisabledFrame(k) ~= true then
-				local t,p = pcall(func, k,v);
-				if not(t) then
-					extui.print("ForEachFrameN func(): "..tostring(p));
-				end
+
+	for k,v in pairs(extui.frames) do
+		if func and extui.IsDisabledFrame(k) ~= true then
+			local t,p = pcall(func, k,v);
+			if not(t) then
+				extui.print("ForEachFrameN func(): "..tostring(p));
 			end
 		end
 	end
+
 end
 
-function extui.ForEachFrameS(addon, func)
-	for k,v in pairs(extui.Addons[addon].frames) do
+function extui.ForEachFrameS(func)
+	for k,v in pairs(extui.frames) do
 		if func and extui.IsDisabledFrame(k) ~= true then
 			local t,p = pcall(func, k,v);
 			if not(t) then
@@ -323,68 +322,67 @@ end
 function extui.ForEachFrame(func, nfunc, nefunc, cfunc, cnfunc, cnefunc)
 	local toc = nil;
 
-	for _,addon in pairs(extui.Addons) do
-		for k,v in pairs(addon.frames) do
-			toc = ui.GetFrame(k);
-			if v.isMovable and toc ~= nil and extui.IsDisabledFrame(k) ~= true then
-				if extui.framepos[tostring(k)] ~= nil then
-					if func then
-						local t,p = pcall(func, k,v,toc);
-						if not(t) then
-							extui.print("ForEachFrame Err func(): "..tostring(p));
-						end
-					end
-				else
-					if nfunc then
-						local t,p = pcall(nfunc, k,v,toc);
-						if not(t) then
-							extui.print("ForEachFrame Err nfunc(): "..tostring(p));
-						end
+	for k,v in pairs(extui.frames) do
+		toc = ui.GetFrame(k);
+		if v.isMovable and toc ~= nil and extui.IsDisabledFrame(k) ~= true then
+			if extui.framepos[tostring(k)] ~= nil then
+				if func then
+					local t,p = pcall(func, k,v,toc);
+					if not(t) then
+						extui.print("ForEachFrame Err func(): "..tostring(p));
 					end
 				end
 			else
-				if nefunc then
-					local t,p = pcall(nefunc, k,v,toc);
+				if nfunc then
+					local t,p = pcall(nfunc, k,v,toc);
 					if not(t) then
-						extui.print("ForEachFrame Err nefunc(): "..tostring(p));
+						extui.print("ForEachFrame Err nfunc(): "..tostring(p));
 					end
 				end
 			end
-			
-			
-			if v.hasChild and toc ~= nil then
-				local tcc = nil;
-				for ck,cv in pairs(v.child) do
-					tcc = toc:GetChild(tostring(ck));
-					
-					if cv.isMovable and tcc ~= nil then
-						if extui.framepos[tostring(k)]["child"][tostring(ck)] == nil then
-							if cfunc then
-								local t,p = pcall(cfunc, k, v, ck, cv, toc, tcc);
-								if not(t) then
-									extui.print("ForEachFrame Err cfunc(): "..tostring(p));
-								end
-							end
-						else
-							if cnfunc then
-								local t,p = pcall(cnfunc, k, v, ck, cv, toc, tcc);
-								if not(t) then
-									extui.print("ForEachFrame Err cnfunc(): "..tostring(p));
-								end
+		else
+			if nefunc then
+				local t,p = pcall(nefunc, k,v,toc);
+				if not(t) then
+					extui.print("ForEachFrame Err nefunc(): "..tostring(p));
+				end
+			end
+		end
+		
+		
+		if v.hasChild and toc ~= nil then
+			local tcc = nil;
+			for ck,cv in pairs(v.child) do
+				tcc = toc:GetChild(tostring(ck));
+				
+				if cv.isMovable and tcc ~= nil then
+					if extui.framepos[tostring(k)]["child"][tostring(ck)] == nil then
+						if cfunc then
+							local t,p = pcall(cfunc, k, v, ck, cv, toc, tcc);
+							if not(t) then
+								extui.print("ForEachFrame Err cfunc(): "..tostring(p));
 							end
 						end
 					else
-						if cnefunc then
-							local t,p = pcall(cnefunc, k, v, ck, cv, toc, tcc);
+						if cnfunc then
+							local t,p = pcall(cnfunc, k, v, ck, cv, toc, tcc);
 							if not(t) then
-								extui.print("ForEachFrame Err cnefunc(): "..tostring(p));
+								extui.print("ForEachFrame Err cnfunc(): "..tostring(p));
 							end
+						end
+					end
+				else
+					if cnefunc then
+						local t,p = pcall(cnefunc, k, v, ck, cv, toc, tcc);
+						if not(t) then
+							extui.print("ForEachFrame Err cnefunc(): "..tostring(p));
 						end
 					end
 				end
 			end
 		end
 	end
+
 end
 
 extui.cloktime = 0;
@@ -544,14 +542,7 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			tcc:SetOffset(x, y);
 
 			if k == "buff" then
-				extui.MoveBuffCaption(k, ck);
-				local frm = ui.GetFrame(k);
-				local fch = frm:GetChild(ck);
-
-				local slotc = extui.GetSetting("rowamt");
-				local rowc = extui.round(30/slotc);
-
-				fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+				extui.UpdateBuffSizes(ck, true);
 			end
 
 		end,
@@ -580,8 +571,11 @@ end
 function extui.MoveBuffCaption(name, slotname)
     local typ = -1;
     local buff_ui = nil;
+	
     if slotname == "debuffslot" then
         typ = 2;
+	elseif snotname == "buffcountslot_sub" then
+		typ = 3;
     elseif slotname == "buffslot" then
         typ = 1;
     elseif slotname == "buffcountslot" then
@@ -600,11 +594,12 @@ function extui.MoveBuffCaption(name, slotname)
 
     local bslot = ui.GetFrame(name):GetChild(slotname);
     local aslotset = tolua.cast(bslot, 'ui::CSlotSet');
+	local buffc = extui.ldSettingsUI["buffcount"];
 
     if name == "buff" then
         if extui.GetSetting("extbuff") == true then
             local slotc = extui.GetSetting("rowamt");
-            local rowc = extui.round(30/slotc);
+            local rowc = extui.round(buffc/slotc);
 
             aslotset:SetColRow(slotc,rowc);
             aslotset:CreateSlots();
@@ -634,17 +629,56 @@ function extui.MoveBuffCaption(name, slotname)
                 onrow = onrow+1;
                 ncount = 0;
             end
+			
+			sy = (slotsize+(15))*onrow;
+			sx = slotsize*ncount;
 
-            sy = (slotsize+15)*onrow;
-            sx = slotsize*ncount;
         end
 
         if slot ~= nil then
-            slot:SetOffset(sx,sy);
+			local bdir = extui.GetSetting("buffdir");
+			local bdirtb = extui.GetSetting("buffdirtb");
+			
 
-            local x = buff_ui["slotsets"][typ]:GetX() + sx + buff_ui["txt_x_offset"];
-            local y = buff_ui["slotsets"][typ]:GetY() + sy + slot:GetHeight() + buff_ui["txt_y_offset"];
-            v:SetOffset(x, y);
+			slot:SetOffset(sx,sy);
+
+			local x = buff_ui["slotsets"][typ]:GetX() + sx + buff_ui["txt_x_offset"];
+			local y = buff_ui["slotsets"][typ]:GetY() + sy + slot:GetHeight() + buff_ui["txt_y_offset"];
+			v:SetOffset(x, y);
+		
+		
+			local buffc = extui.ldSettingsUI["buffcount"];
+			local slotc = extui.GetSetting("rowamt");
+			local rowc = extui.round(buffc/slotc);
+			
+			local ax = 0;
+			local ay = 0;
+			
+			ax = (slotc-1)*extui.GetSetting("iconsize")+5;
+			ay = ((rowc-1)*extui.GetSetting("iconsize"))+(rowc*15);
+			
+			if bdir == true then
+				slot:SetOffset(ax+ -sx, sy);
+
+				local x = buff_ui["slotsets"][typ]:GetX() + sx + buff_ui["txt_x_offset"];
+				local y = buff_ui["slotsets"][typ]:GetY() + sy + slot:GetHeight() + buff_ui["txt_y_offset"];
+				v:SetOffset(ax+ -x, y);
+			end
+			if bdirtb == true then
+				slot:SetOffset(sx,ay+ -sy);
+
+				local x = buff_ui["slotsets"][typ]:GetX() + sx + buff_ui["txt_x_offset"];
+				local y = buff_ui["slotsets"][typ]:GetY() + sy + slot:GetHeight() + buff_ui["txt_y_offset"];
+				v:SetOffset(x, ay+ -y);
+			end
+			if bdirtb == true and bdir == true then
+				slot:SetOffset(ax+ -sx,ay+ -sy);
+
+				local x = buff_ui["slotsets"][typ]:GetX() + sx + buff_ui["txt_x_offset"];
+				local y = buff_ui["slotsets"][typ]:GetY() + sy + slot:GetHeight() + buff_ui["txt_y_offset"];
+				v:SetOffset(ax+ -x, ay+ -y);
+			end
+
         end
 
         ncount = ncount+1;
@@ -654,13 +688,15 @@ end
 --directly taken from lib_uiscp with some minor modifications
 function extui.INIT_BUFF_UI(frame, buff_ui, updatescp)
 
-    local slotcountSetPt        = frame:GetChild('buffcountslot');
-    local slotSetPt             = frame:GetChild('buffslot');
-    local deslotSetPt           = frame:GetChild('debuffslot');
+    local slotcountSetPt = frame:GetChild('buffcountslot');
+    local slotSetPt = frame:GetChild('buffslot');
+    local deslotSetPt = frame:GetChild('debuffslot');
+    local slotcountsubSetPt = frame:GetChild("buffcountslot_sub");
 
-    buff_ui["slotsets"][0]          = tolua.cast(slotcountSetPt, 'ui::CSlotSet');
-    buff_ui["slotsets"][1]          = tolua.cast(slotSetPt, 'ui::CSlotSet');
-    buff_ui["slotsets"][2]          = tolua.cast(deslotSetPt, 'ui::CSlotSet');
+    buff_ui["slotsets"][0] = tolua.cast(slotcountSetPt, 'ui::CSlotSet');
+    buff_ui["slotsets"][1] = tolua.cast(slotSetPt, 'ui::CSlotSet');
+    buff_ui["slotsets"][2] = tolua.cast(deslotSetPt, 'ui::CSlotSet');
+    buff_ui["slotsets"][3] = tolua.cast(slotcountsubSetPt, "ui::CSlotSet");
 
     for i = 0 , buff_ui["buff_group_cnt"] do
 
@@ -786,14 +822,7 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 					tcc:SetOffset(cx, cy);
 
 					if k == "buff" then
-						extui.MoveBuffCaption(k, ck);
-						local frm = ui.GetFrame(k);
-						local fch = frm:GetChild(ck);
-
-						local slotc = extui.GetSetting("rowamt");
-						local rowc = extui.round(30/slotc);
-
-						fch:Resize(slotc*extui.GetSetting("iconsize"),rowc*extui.GetSetting("iconsize"));
+						extui.UpdateBuffSizes(ck, true);
 					end
 				end
 			end
@@ -806,3 +835,18 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 end
 
 
+
+function extui.UpdateBuffSizes(ck, req)
+	extui.MoveBuffCaption("buff", ck);
+	
+	if req ~= nil then
+		local frm = ui.GetFrame("buff");
+		local fch = frm:GetChild(ck);
+
+		local buffc = extui.ldSettingsUI["buffcount"];
+		local slotc = extui.GetSetting("rowamt");
+		local rowc = extui.round(buffc/slotc);
+
+		fch:Resize(slotc*extui.GetSetting("iconsize"),(rowc*extui.GetSetting("iconsize"))+(rowc*15));
+	end
+end
