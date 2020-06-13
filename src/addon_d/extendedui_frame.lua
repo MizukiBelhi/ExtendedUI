@@ -65,6 +65,7 @@ extui_Frame.noResize = true;
 extui_Frame.show = false;
 extui_Frame.child = {};
 extui_Frame.onUpdate = function(x,y,w,h) end;
+extui_Frame.onNewFrame = function() end;
 extui_Frame.onBeforeUpdate = function(x,y,w,h) end;
 extui_Frame.onFrameUpdate = function(frame,x,y,w,h) end;
 
@@ -239,7 +240,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame = extui.AddFrame("keypress", "Tapping Key");
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("ctrltargetui", "CTRL Target Lock");
-	euiFrame.saveHidden = true;
+	--euiFrame.saveHidden = true;
 	--euiFrame = euiAddon:AddFrame("weaponswap");
 	--euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("partyinfo", "Party");
@@ -257,8 +258,13 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 						local expFrame = ui.GetFrame("charbaseinfo");
 						
 						expFrame:Resize(1920,30);
-						expFrame:MoveFrame(0, 1050);
 					end;
+	euiFrame.onNewFrame = function()
+					local expFrame = ui.GetFrame("charbaseinfo");
+
+					expFrame:Resize(1920,30);
+					expFrame:MoveFrame(0, 1050);
+				end;
 
 	euiFrame = extui.AddFrame("playtime");
 	euiFrame.saveHidden = true;
@@ -475,6 +481,9 @@ function EXTENDEDUI_LOAD_POSITIONS()
 
 		end,
 		function(k,v,toc)
+			
+			v.onNewFrame();
+			
 			local x = toc:GetX() or 0;
 			local y = toc:GetY() or 0;
 			local w = toc:GetWidth() or 0;
