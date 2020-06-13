@@ -212,10 +212,12 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame:AddChild("debuffslot", "Debuffs");
 	
 	extui.AddFrame("minimizedalarm", "Mini Guild Mission");
+	
 	euiFrame = extui.AddFrame("targetbuff", "Target Buffs");
 	euiFrame.noResize = false;
-	euiFrame:AddChild("buffcountslot", "Temp Buffs");
-	euiFrame:AddChild("buffslot", "Perm Buffs");
+	euiFrame:AddChild("buffcountslot", "Self Applied Buffs");
+	euiFrame:AddChild("buffcountslot_sub", "Buffs From Others");
+	euiFrame:AddChild("buffslot", "Unaffected Buffs");
 	euiFrame:AddChild("debuffslot", "Debuffs");
 
 
