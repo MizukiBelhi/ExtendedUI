@@ -253,7 +253,7 @@ function extui.LoadSettings()
 							local eframe = extui.GetFrame("buff");
 							if eframe ~= nil then
 								for ch,_ in pairs(eframe.child) do
-									if (ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
+									if (ch == "buffcountslot_sub" or ch=="buffcountslot" or ch=="debuffslot" or ch=="buffslot") then
 
 										extui.UpdateBuffSizes(ch);
 
