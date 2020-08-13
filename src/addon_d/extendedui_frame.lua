@@ -68,12 +68,16 @@ extui_Frame.onUpdate = function(x,y,w,h) end;
 extui_Frame.onNewFrame = function() end;
 extui_Frame.onBeforeUpdate = function(x,y,w,h) end;
 extui_Frame.onFrameUpdate = function(frame,x,y,w,h) end;
-
+extui.currentNumFrames = 0;
 
 function extui_Frame:AddChild(child, displayName)
 	local pfrm = ui.GetFrame(self.frameName);
 	
-	if pfrm == nil then return; end
+	-- For yall who like to modify this gives you some more info now
+	if pfrm == nil then
+		print("Child Not Found "..tostring(child));
+		return;
+	end
 	
 	local cfrm = pfrm:GetChild(child);
 	
@@ -92,6 +96,19 @@ end
 
 function extui.AddFrame(name, frameTbl)
 	local fName = string.gsub(name , "%s", "");
+	
+	if ui.GetFrame(fName) == nil then
+		-- For yall who like to modify this gives you some more info now
+		print("Frame Not Found "..tostring(fName));
+		-- Create a fake object to return so everything doesn't break
+		local nonAddedFrame = {};
+		
+		setmetatable(nonAddedFrame, {__index = extui_Frame});
+		
+		nonAddedFrame.frameName = fName;
+		
+		return nonAddedFrame;
+	end
 	
 	extui.frames[fName] = {};
 
@@ -124,6 +141,9 @@ function extui.AddFrame(name, frameTbl)
 	
 	extui.frames[fName].frameName = fName;
 	extui.frames[fName].child = {};
+	-- Can be used to sort the array but i don't have enough time now to implement it everywhere
+	extui.frames[fName].id = extui.currentNumFrames;
+	extui.currentNumFrames = extui.currentNumFrames + 1;
 
 	return extui.frames[fName];
 end
@@ -187,8 +207,6 @@ end
 
 
 function EXTENDEDUI_ON_FRAME_LOADS()
-	--local euiFrame = extui.AddFrame("buff", "Buffs");euiFrame:AddChild("buffcountslot", "Self Applied Buffs");
-
 	local euiFrame = extui.AddFrame("buff", "Buffs");
 	euiFrame.noResize = false;
 	euiFrame.onFrameUpdate = function(frame,x,y,w,h)
@@ -292,7 +310,10 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame = extui.AddFrame("minimized_tp_button", "TP Shop Button");
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("minimized_godprotection_button", "God Protect Button");
-	euiFrame = extui.AddFrame("minimized_event_new_season_server_coin_check_button", "God Roulette");
+	
+	
+	-- Fix by Sadlion, modified into a ternary by me	
+    euiFrame = extui.AddFrame("minimized_event_progress_check_button", (IS_SEASON_SERVER() == "NO" and "Medina FLEX!" or "God Roulette"));
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("minimized_pvpmine_shop_button", "Mercenary Shop Button");
 	euiFrame.saveHidden = true;
