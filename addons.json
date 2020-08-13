@@ -1,11 +1,11 @@
 [
 	{
-		"tosversion" : "20180730",
+		"tosversion" : "20200812",
 		"name" : "ExtendedUI-2",
 		"file" : "extendedui",
 		"extension" : "ipf",
-		"fileVersion" : "v2.1.5",
-		"releaseTag" : "2.1.5",
+		"fileVersion" : "v2.1.6",
+		"releaseTag" : "2.1.6",
 		"unicode" : "⚗",
 		"description" : "Please see github for instructions.<br>Supported Languages: English, German, Chinese, Portuguese, Polish, Japanese",
 		"tags" : [
@@ -13,7 +13,9 @@
 			"extension",
 			"setting",
 			"frames",
-			"info"
+			"info",
+			"eui",
+			"extui"
 		]
 	}
 ]
