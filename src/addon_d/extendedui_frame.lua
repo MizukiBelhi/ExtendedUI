@@ -75,11 +75,16 @@ function extui_Frame:AddChild(child, displayName)
 	
 	-- For yall who like to modify this gives you some more info now
 	if pfrm == nil then
-		print("Child Not Found "..tostring(child));
+		print("Frame Not Found? "..tostring(self.frameName));
 		return;
 	end
 	
 	local cfrm = pfrm:GetChild(child);
+	
+	if cfrm == nil then
+		print("Child Not Found "..tostring(child));
+		return;
+	end
 	
 	if cfrm ~= nil then
 	
