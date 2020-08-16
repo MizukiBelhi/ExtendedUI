@@ -316,7 +316,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("minimized_godprotection_button", "God Protect Button");
 	euiFrame = extui.AddFrame("minimized_housing_promote_board", "Personal Housing");
-    euiFrame = extui.AddFrame("minimized_guild_housing", "Guild Housing");
+	euiFrame = extui.AddFrame("minimized_guild_housing", "Guild Housing");
 	
 	
 	-- Fix by Sadlion, modified into a ternary by me	
