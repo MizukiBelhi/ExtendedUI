@@ -860,7 +860,7 @@ function extui.ShowFrameBorder(parentFrame, childFrame)
 		pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
 
 		AUTO_CAST(pic);
-		pic:CreateInstTexture();
+		--pic:CreateInstTexture();
 
 	else
 	
@@ -869,13 +869,13 @@ function extui.ShowFrameBorder(parentFrame, childFrame)
 		pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
 
 		AUTO_CAST(pic);
-		pic:CreateInstTexture();
+		--pic:CreateInstTexture();
 	end
 	
 	borderParent:ShowWindow(1);
 	borderParent:Resize(w+1 , h+1);
 	borderParent:MoveFrame(x-1, y-1);
-	borderParent:SetSkinName("None");
+	borderParent:SetSkinName("pip_gridbox");
 	borderParent:EnableHitTest(1);
 	borderParent:SetUserValue("FRAME_NAME", parentFrame.frameName);
 	borderParent:SetUserValue("CHILD_NAME", "None");
@@ -885,12 +885,12 @@ function extui.ShowFrameBorder(parentFrame, childFrame)
 
 	AUTO_CAST(pic);
 	pic:EnableHitTest(1);
-	pic:FillClonePicture("88000000");
+	--pic:FillClonePicture("88000000");
 	
 	if childFrame ~= nil then
-		extui.DrawBorder(pic, 0, 0, w, h, "88FF0000");
+		--extui.DrawBorder(pic, 0, 0, w, h, "88FF0000");
 	else
-		extui.DrawBorder(pic, 0, 0, w, h, "8800FF00");
+		--extui.DrawBorder(pic, 0, 0, w, h, "8800FF00");
 	end
 	
 	if childFrame ~= nil then
@@ -901,7 +901,7 @@ function extui.ShowFrameBorder(parentFrame, childFrame)
 		local xc = masterChildFrame:GetX();
 		local yc = masterChildFrame:GetY();
 		
-		extui.DrawBorder(pic, xc, yc, wc, hc, "8800FF00");
+		--extui.DrawBorder(pic, xc, yc, wc, hc, "8800FF00");
 		
 		borderParent:SetUserValue("CHILD_NAME", childFrame.frameName);
 	end
@@ -956,12 +956,12 @@ function EXTENDEDUI_FRAMEBORDER_UPDATE_S(border)
 
 				AUTO_CAST(pic);
 
-				pic:CreateInstTexture();
+				--pic:CreateInstTexture();
 			
 			end
 			
 			AUTO_CAST(pic);
-			pic:FillClonePicture("88000000");
+			--pic:FillClonePicture("88000000");
 
 			
 			if borderChildFrameName ~= nil and borderChildFrameName ~= "None" then
@@ -974,12 +974,12 @@ function EXTENDEDUI_FRAMEBORDER_UPDATE_S(border)
 					local xc = masterChildFrame:GetX();
 					local yc = masterChildFrame:GetY();
 					
-					extui.DrawBorder(pic, 0, 0, w, h, "88FF0000");
-					extui.DrawBorder(pic, xc, yc, wc, hc, "8800FF00");
+					--extui.DrawBorder(pic, 0, 0, w, h, "88FF0000");
+					--extui.DrawBorder(pic, xc, yc, wc, hc, "8800FF00");
 				end
 				
 			else
-				extui.DrawBorder(pic, 0, 0, w, h, "8800FF00");
+				--extui.DrawBorder(pic, 0, 0, w, h, "8800FF00");
 			end
 			
 		end
@@ -1174,14 +1174,14 @@ function extui.InitGrid()
 		--tolua.cast(pic, "ui::CPicture")
 		AUTO_CAST(pic);
 		pic:EnableHitTest(1);
-		pic:CreateInstTexture();
+		--pic:CreateInstTexture();
 		
 	end
 	
 	
 	extui.GridFrame:ShowWindow(1);
 
-	extui.DrawGrid();
+	--extui.DrawGrid();
 end
 
 
