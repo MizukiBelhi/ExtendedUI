@@ -4,10 +4,10 @@
 		"name" : "ExtendedUI-2",
 		"file" : "extendedui",
 		"extension" : "ipf",
-		"fileVersion" : "v2.1.7",
-		"releaseTag" : "2.1.7",
+		"fileVersion" : "v2.1.8",
+		"releaseTag" : "2.1.8",
 		"unicode" : "⚗",
-		"description" : "Please see github for instructions.<br>Supported Languages: English, German, Chinese, Portuguese, Polish, Japanese",
+		"description" : "64bit Hotfix, see github for notes.<br>Supported Languages: English, German, Chinese, Portuguese, Polish, Japanese",
 		"tags" : [
 			"ui",
 			"extension",
