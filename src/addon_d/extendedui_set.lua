@@ -218,7 +218,7 @@ function extui.LoadSettings()
 							extui.SetSetting("gridSize",ctrl:GetLevel());
 							
 							if ui.GetFrame("EXTENDEDUI_GRIDFRAME") ~= nil and oldGridSize ~= ctrl:GetLevel() then
-								extui.DrawGrid();
+								--extui.DrawGrid();
 							end
 						end,
 			["oncall"] = ui.LBUTTONUP,
