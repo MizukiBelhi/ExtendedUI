@@ -73,7 +73,8 @@ function extui.SaveSettings()
 	for k,v in pairs(extui.lSettingsUI) do
 		extui.ldSettingsUI[k] = v.val;
 	end
-	acutil.saveJSON("../addons/extendedui/settings.json", extui.ldSettingsUI);
+	--acutil.saveJSON("../addons/extendedui/settings.json", extui.ldSettingsUI);
+	acutil.saveJSONX('extendedui/settings.json', extui.ldSettingsUI);
 end
 
 function extui.SavePositions()
@@ -89,157 +90,100 @@ function extui.SavePositions()
 			frmTbl[k] = v;
 			frmTbl[k].hidden = (frmTbl[k].hidden==1 or frmTbl[k].hidden == true) and true or false;
 			frmTbl[k].scale = frmTbl[k].scale or 100;
-			frmTbl[k].skin = frmTbl[k].skin or "@default";
-
-			frmTbl[k].skin = dictionary.ReplaceDicIDInCompStr(frmTbl[k].skin);
 		end
 	end
 
-	acutil.saveJSON("../addons/extendedui/frames.json", frmTbl);
+	--acutil.saveJSON("../addons/extendedui/frames.json", frmTbl);
+	acutil.saveJSONX('extendedui/frames.json', frmTbl);
+end
+
+
+function extui.LoadExternalFrameList()
+	local file, _err = io.open("../addons/extendedui/framelist.txt", "r");
+	if file ~= nil then
+		for line in file:lines() do
+			if line:sub(1, 2) ~= "//" then
+				local k,v = string.match(line,"(%w+),(%w+)");
+
+				extui.externalFrameList[k] = v;
+			end
+		end
+
+		io.close(file);
+	else
+		extui.SaveDefaultExternalFrameList();
+	end
+end
+
+--This also means EUI now supports translated names for frames
+--However, by default EUI will only come with english
+function extui.SaveDefaultExternalFrameList()
+	local file, _err = io.open("../addons/extendedui/framelist.txt", "w+");
+	if file ~= nil then
+		io.write("//frame name, readable name (No Child Frames)");
+		io.write("buff,Buffs");
+		io.write("targetbuff,Target Buffs");
+		io.write("minimizedalarm,Mini Guild Mission");
+		io.write("fevorcombo,Fever Combo");
+		io.write("joystickrestquickslot,Joystick Rest Quickslot");
+		io.write("joystickquickslot,Joystick Quickslot");
+		io.write("restquickslot,Rest Quickslot");
+		io.write("quickslotnexpbar,Mouse/Keyboard Quickslot");
+		io.write("durnotify,Durability");
+		io.write("chatframe,Chat Window");
+		io.write("chat,Chat Input");
+		io.write("notice,Notice");
+		io.write("targetinfo,Target Info");
+		io.write("questinfoset_2,Quest Log");
+		io.write("keypress,Tapping Key");
+		io.write("ctrltargetui,CTRL Target Lock");
+		io.write("partyinfo,Party");
+		io.write("channel,Channel");
+		io.write("sysmenu,Menu");
+		io.write("headsupdisplay,Character Status");
+		io.write("charbaseinfo,EXP Bars");
+		io.write("playtime,Playtime");
+		io.write("fps,FPS");
+		io.write("castingbar,Castbar");
+		io.write("minimap,Minimap");
+		io.write("mapareatext,Minimap Area Text");
+		io.write("minimap_outsidebutton,Minimap Buttons");
+		io.write("time,Time");
+		io.write("minimizedeventbanner,Event Banner");
+		io.write("minimized_tp_button,TP Shop Button");
+		io.write("minimized_godprotection_button,God Protect Button");
+		io.write("openingameshopbtn,TP Item Button");
+		io.write("minimized_event_progress_check_button,Seasonal Event Button");
+		io.write("minimized_pvpmine_shop_button,Mercenary Shop Button");
+		io.write("minimized_housing_promote_board,Personal Housing");
+		io.write("minimized_guild_housing,Guild Housing");
+		io.write("summonsinfo,Summon Info");
+
+		io.close(file);
+	end
 end
 
 
 function extui.UpdateCheck()
 	local acutil = require("acutil");
 
-	local file, _err = io.open("../addons/extendedui/settings.extui", "r");
-
-	if file == nil then
-
-		local tload, error = acutil.loadJSON("../addons/extendedui/settings.json");
-		if not error then
-			extui.ldSettingsUI = tload;
-		end
-
-		tload, error = acutil.loadJSON("../addons/extendedui/frames.json");
-		if not error then
-			for _,v in pairs(tload) do
-				v.hidden = (v.hidden==true) and 1 or 0;
-			end
-			extui.framepos = tload;
-		else
-			EXTENDEDUI_ON_SAVE();
-		end
-
-	else
-
-		if file ~= nil then
-			for line in file:lines() do
-		    	local k,v = string.match(line,"(%w+),(%w+)");
-				extui.ldSettingsUI[k] = extui.FromString(v);
-		    end
-
-			io.close(file);
-
-			os.remove("../addons/extendedui/settings.extui");
-		end
-
-		local file, _err = io.open("../addons/extendedui/frames.extui", "r");
-		if file ~= nil then
-			local _str = file:read("*all");
-
-			if string.len(_str) > 1 then
-
-				local version = 0;
-
-				local opFrames = StringSplit(_str, "\n");
-				for k,v in pairs(opFrames) do
-					if string.sub(v, 1, 2) == "//" then
-						version = 1;
-					else
-						if version == 0 then
-							local iFrames = StringSplit(v, ",");
-
-							local name = iFrames[1];
-							local x = extui.FromString(iFrames[2]);
-							local y = extui.FromString(iFrames[3]);
-							local w = extui.FromString(iFrames[4]);
-							local h = extui.FromString(iFrames[5]);
-							local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
-							local hasChild = extui.FromString(iFrames[7]);
-							local childs = {};
-							if hasChild then
-								local onL = 8;
-								while true do
-									local cname = iFrames[onL];
-
-									if cname == "0" then
-										break;
-									end
-
-									local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
-
-									childs[cname] = {
-											["x"] = cx,
-											["y"] = cy,
-										};
-
-									onL = onL+3;
-								end
-
-							end
-
-							extui.framepos[name] = {
-									["x"] = x,
-									["y"] = y,
-									["w"] = w,
-									["h"] = h,
-									["hidden"] = hidden,
-									["child"] = childs,
-								};
-						else
-							local iFrames = StringSplit(v, ",");
-
-							local name = iFrames[1];
-							local x = extui.FromString(iFrames[2]);
-							local y = extui.FromString(iFrames[3]);
-							local w = extui.FromString(iFrames[4]);
-							local h = extui.FromString(iFrames[5]);
-							local hidden = (extui.FromString(iFrames[6])==true) and 1 or 0;
-							local scale = extui.FromString(iFrames[7]);
-							local skin = iFrames[8];
-							local hasChild = extui.FromString(iFrames[9]);
-							local childs = {};
-							if hasChild then
-								local onL = 10;
-								while true do
-									local cname = iFrames[onL];
-
-									if cname == "0" then
-										break;
-									end
-
-									local cx,cy = extui.FromString(iFrames[onL+1]), extui.FromString(iFrames[onL+2]);
-
-									childs[cname] = {
-											["x"] = cx,
-											["y"] = cy,
-										};
-
-									onL = onL+3;
-								end
-
-							end
-
-							extui.framepos[name] = {
-									["x"] = x,
-									["y"] = y,
-									["w"] = w,
-									["h"] = h,
-									["hidden"] = hidden,
-									["skin"] = skin,
-									["scale"] = scale,
-									["child"] = childs,
-								};
-						end
-					end
-				end
-			end
-
-			io.close(file);
-			os.remove("../addons/extendedui/frames.extui");
-		end
+	--local tload, error = acutil.loadJSON("../addons/extendedui/settings.json");
+	local tload, error = acutil.loadJSONX("extendedui/settings.json");
+	if not error then
+		extui.ldSettingsUI = tload;
 	end
+
+	--tload, error = acutil.loadJSON("../addons/extendedui/frames.json");
+	tload, error = acutil.loadJSONX("extendedui/frames.json");
+	if not error then
+		for _,v in pairs(tload) do
+			v.hidden = (v.hidden==true) and 1 or 0;
+		end
+		extui.framepos = tload;
+	else
+		EXTENDEDUI_ON_SAVE();
+	end
+
 	extui.language.LoadFile();
 end
 
@@ -248,7 +192,7 @@ end
 function EXTENDEDUI_ON_SAVE()
 	local s, bl = pcall(extui.SavePositions);
 	if not(s) then
-		extui.print("ERROR: "..bl);
+		extui.print("[EUI] OnSave(): "..bl);
 	end
 end
 
@@ -262,11 +206,43 @@ function extui.DrawBorder(pic, xPos, yPos, width, height, color)
 	if height < 1 then
 		height = 1;
 	end
-	pic:DrawBrush(xPos, yPos, xPos+width, yPos, "spray_1", color);
 	
-	pic:DrawBrush(xPos, yPos+height, xPos+width, yPos+height, "spray_1", color);
+	--pic:SetColorTone("88000000");
+	
+	-- Top
+	local line = pic:CreateOrGetControl("picture", "aa"..tostring(color), xPos, yPos, width, 1);
+	AUTO_CAST(line);
+	line:SetImage("fullwhite");
+	line:SetEnableStretch(1);
+	line:SetColorTone(color);
+	
+	
+	-- Bottom
+	line = pic:CreateOrGetControl("picture", "ab"..tostring(color), xPos, yPos+height, width, 1);
+	AUTO_CAST(line);
+	line:SetImage("fullwhite");
+	line:SetEnableStretch(1);
+	line:SetColorTone(color);
+	
+	-- Left
+	line = pic:CreateOrGetControl("picture", "ac"..tostring(color), xPos, yPos, 1, height);
+	AUTO_CAST(line);
+	line:SetImage("fullwhite");
+	line:SetEnableStretch(1);
+	line:SetColorTone(color);
+	
+	-- Right
+	line = pic:CreateOrGetControl("picture", "ad"..tostring(color), xPos+width, yPos, 1, height);
+	AUTO_CAST(line);
+	line:SetImage("fullwhite");
+	line:SetEnableStretch(1);
+	line:SetColorTone(color);
+	
+	--pic:DrawBrush(xPos, yPos, xPos+width, yPos, "spray_1", color);
+	
+	--pic:DrawBrush(xPos, yPos+height, xPos+width, yPos+height, "spray_1", color);
 
-	pic:DrawBrush(xPos+width, yPos+height, xPos+width, yPos, "spray_1", color);
+	--pic:DrawBrush(xPos+width, yPos+height, xPos+width, yPos, "spray_1", color);
 	
-	pic:DrawBrush(xPos, yPos+height, xPos, yPos, "spray_1", color);
+	--pic:DrawBrush(xPos, yPos+height, xPos, yPos, "spray_1", color);
 end

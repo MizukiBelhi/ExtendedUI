@@ -444,6 +444,7 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			local nskin = extui.framepos[tostring(k)].skin or "@default";
 			local nscale = extui.framepos[tostring(k)].scale or 100;
 			local hover = extui.framepos[tostring(k)].hover or 0;
+			local doUpdate = extui.framepos[tostring(k)].alwaysupdate or false;
 
 			local xs = toc:GetX() or 0;
 			local ys = toc:GetY() or 0;
@@ -502,7 +503,9 @@ function EXTENDEDUI_LOAD_POSITIONS()
 				table.insert(extui.skins, skin);
 			end
 			
-			toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
+			if doUpdate then
+				toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
+			end
 
 			v.onUpdate(x,y,w,h);
 			--if k=="targetinfo" then
@@ -545,7 +548,7 @@ function EXTENDEDUI_LOAD_POSITIONS()
 				extui.framepos[tostring(k)]["child"] = {};
 			end
 			
-			toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
+			--toc:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
 
 			v.onUpdate(x,y,w,h);
 		end,

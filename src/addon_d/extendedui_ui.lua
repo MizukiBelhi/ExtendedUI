@@ -22,6 +22,22 @@ function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	end
 end
 
+function EXTENDEDUI_ON_CHECK_UPDATE(frame, ctrl, argStr)
+	local frm = ui.GetFrame(argStr);
+	local chk = ctrl:IsChecked();
+
+	local eframe = extui.GetFrame(argStr);
+	if eframe then
+		extui.framepos[argStr].alwaysupdate = chk == 1 and true or false;
+		
+		if chk == 1 then
+			frm:RunUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
+		else
+			frm:StopUpdateScript("EXTENDEDUI_FULLFRAME_UPDATE");
+		end
+	end
+end
+
 
 function EXTENDEDUI_ON_CHECK_HOVER(frame, ctrl, argStr)
 	local frm = ui.GetFrame(argStr);
@@ -92,7 +108,7 @@ end
 function EXTENDEDUI_MINI_ON_SELECT(index)
 	local s, bl = pcall(EXTENDEDUI_MINI_ON_SELECTD, index);
 	if not(s) then
-		extui.print("ERROR: "..bl);
+		extui.print("[EUI] MiniOnSelect(): "..bl);
 	end
 end
 
@@ -182,7 +198,7 @@ function EXTENDEDUI_MINI_CREATE_DROPLIST()
 
 	local t,p = pcall(EXTENDEDUI_MINI_CREATE_DROPLIST_S);
 	if not(t) then
-		extui.print("EUI Error: "..tostring(p));
+		extui.print("[EUI] CreateDroplist(): "..tostring(p));
 	end
 
 end
@@ -453,7 +469,7 @@ end
 function EXTENDEDUI_ON_MINI_SAVE()
 	local t,p = pcall(EXTENDEDUI_ON_MINI_SAVES);
 	if not(t) then
-		extui.print("[EUI] Error: "..tostring(p));
+		extui.print("[EUI] OnMiniSave(): "..tostring(p));
 	end
 	
 	return 1;
@@ -521,7 +537,7 @@ function extui.PopulateMiniFrame(frm)
 	ctrls:SetClickSound("button_click_big");
 	ctrls:SetOverSound("button_over");
 	ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_OPTIONS");
-	ctrls:SetImage("chat_option2_btn")
+	ctrls:SetImage("chat_option2_btn");
 
 	ctrls = frm:CreateOrGetControl("button", "extuiminiclose", 175, 85, 125, 30);
 	ctrls = tolua.cast(ctrls, "ui::CButton");
@@ -601,8 +617,8 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 	
 	ctrls = gbox:CreateOrGetControl("slidebar", "extuislidex", inx+12, iny, 300, 30);
 	ctrls = tolua.cast(ctrls, "ui::CSlideBar");
-	ctrls:SetMaxSlideLevel(ui.GetClientInitialWidth());
-	ctrls:SetMinSlideLevel(0);
+	ctrls:SetMaxSlideLevel(ui.GetClientInitialWidth()*2);
+	--ctrls:SetMinSlideLevel(0);
 	ctrls:SetLevel(x);
 	ctrls:SetTextTooltip("{@st42b}"..extui.TLang("posxDesc").."{/}");
 	
@@ -618,8 +634,8 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 
 	ctrls = gbox:CreateOrGetControl("slidebar", "extuislidey", inx+12, iny, 300, 30);
 	ctrls = tolua.cast(ctrls, "ui::CSlideBar");
-	ctrls:SetMaxSlideLevel(ui.GetClientInitialHeight());
-	ctrls:SetMinSlideLevel(0);
+	ctrls:SetMaxSlideLevel(ui.GetClientInitialHeight()*2);
+	--ctrls:SetMinSlideLevel(0);
 	ctrls:SetLevel(y);
 	ctrls:SetTextTooltip("{@st42b}"..extui.TLang("posyDesc").."{/}");
 	
@@ -704,11 +720,23 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CHECK_HOVER");
 		ctrls:SetEventScriptArgString(ui.LBUTTONUP, frame:GetName());
 		ctrls:SetCheck(extui.framepos[frame:GetName()].hover ~= nil and extui.framepos[frame:GetName()].hover or 0);
-
+		
 		iny = iny+25;
+		
 
 		-- if this returns false it's a child frame, and those aren't supported for reset
 		if extui.FrameExists(frame:GetName()) then
+			ctrls = gbox:CreateOrGetControl("checkbox", "extuicheckupdate", inx+10, iny, 150, 30);
+			ctrls = tolua.cast(ctrls, "ui::CCheckBox");
+			ctrls:SetText("{@st42b}Always Update (Use when position randomly resets){/}");
+			ctrls:SetClickSound("button_click_big");
+			ctrls:SetOverSound("button_over");
+			ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CHECK_UPDATE");
+			ctrls:SetEventScriptArgString(ui.LBUTTONUP, frame:GetName());
+			ctrls:SetCheck(extui.framepos[frame:GetName()].alwaysupdate ~= nil and extui.framepos[frame:GetName()].alwaysupdate or 0);
+
+			iny = iny+25;
+		
 			ctrls = gbox:CreateOrGetControl("button", "extuiframereset", inx+90, iny, 150, 30);
 			ctrls = tolua.cast(ctrls, "ui::CButton");
 			ctrls:SetText("{@st66b}"..extui.TLang("resetFrame").."{/}");
@@ -856,41 +884,43 @@ function extui.ShowFrameBorder(parentFrame, childFrame)
 	if borderParent ~= nil then
 		borderParent:StopUpdateScript("EXTENDEDUI_FRAMEBORDER_UPDATE");
 		borderParent:RemoveAllChild();
-		
-		pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
 
-		AUTO_CAST(pic);
+		--pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
+
+		--AUTO_CAST(pic);
 		--pic:CreateInstTexture();
 
 	else
 	
 		borderParent = ui.CreateNewFrame("extendedui", "extui_borderParent");
 		
-		pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
+		--pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
 
-		AUTO_CAST(pic);
+		--AUTO_CAST(pic);
 		--pic:CreateInstTexture();
 	end
 	
 	borderParent:ShowWindow(1);
 	borderParent:Resize(w+1 , h+1);
 	borderParent:MoveFrame(x-1, y-1);
-	borderParent:SetSkinName("pip_gridbox");
+	borderParent:SetSkinName("chat_window");
 	borderParent:EnableHitTest(1);
 	borderParent:SetUserValue("FRAME_NAME", parentFrame.frameName);
 	borderParent:SetUserValue("CHILD_NAME", "None");
 	borderParent:RunUpdateScript("EXTENDEDUI_FRAMEBORDER_UPDATE");
 	
-	pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
+	--pic = borderParent:CreateOrGetControl("picture", "pic", 0, 0, w, h);
 
-	AUTO_CAST(pic);
-	pic:EnableHitTest(1);
+	--AUTO_CAST(pic);
+	--pic:EnableHitTest(1);
+	
+	borderParent:SetColorTone("88000000");
 	--pic:FillClonePicture("88000000");
 	
 	if childFrame ~= nil then
-		--extui.DrawBorder(pic, 0, 0, w, h, "88FF0000");
+		extui.DrawBorder(borderParent, 0, 0, w, h, "88FF0000");
 	else
-		--extui.DrawBorder(pic, 0, 0, w, h, "8800FF00");
+		extui.DrawBorder(borderParent, 0, 0, w, h, "8800FF00");
 	end
 	
 	if childFrame ~= nil then
@@ -901,7 +931,7 @@ function extui.ShowFrameBorder(parentFrame, childFrame)
 		local xc = masterChildFrame:GetX();
 		local yc = masterChildFrame:GetY();
 		
-		--extui.DrawBorder(pic, xc, yc, wc, hc, "8800FF00");
+		extui.DrawBorder(borderParent, xc, yc, wc, hc, "8800FF00");
 		
 		borderParent:SetUserValue("CHILD_NAME", childFrame.frameName);
 	end
@@ -930,7 +960,7 @@ function EXTENDEDUI_FRAMEBORDER_UPDATE_S(border)
 			local h = borderFrame:GetHeight();
 			local x = borderFrame:GetX();
 			local y = borderFrame:GetY();
-			
+
 			if w < 5 then
 				w = 5;
 			end
@@ -947,20 +977,21 @@ function EXTENDEDUI_FRAMEBORDER_UPDATE_S(border)
 			borderFrm:Resize(w+1 , h+1);
 			borderFrm:MoveFrame(x-1, y-1);
 			
-			local pic = borderFrm:GetChild("pic");
-			if pic:GetWidth() ~= w or pic:GetHeight() ~= h then
+			--local pic = borderFrm:GetChild("pic");
+			--if pic:GetWidth() ~= w or pic:GetHeight() ~= h then
 			
-				borderFrm:RemoveChild("pic");
+			--	borderFrm:RemoveChild("pic");
 				
-				pic = borderFrm:CreateOrGetControl("picture", "pic", 0, 0, w, h);
+				--pic = borderFrm:CreateOrGetControl("picture", "pic", 0, 0, w, h);
 
-				AUTO_CAST(pic);
+				--AUTO_CAST(pic);
 
 				--pic:CreateInstTexture();
 			
-			end
+			--end
 			
-			AUTO_CAST(pic);
+			--AUTO_CAST(pic);
+			--borderFrm:SetColorTone("88000000");
 			--pic:FillClonePicture("88000000");
 
 			
@@ -974,12 +1005,12 @@ function EXTENDEDUI_FRAMEBORDER_UPDATE_S(border)
 					local xc = masterChildFrame:GetX();
 					local yc = masterChildFrame:GetY();
 					
-					--extui.DrawBorder(pic, 0, 0, w, h, "88FF0000");
-					--extui.DrawBorder(pic, xc, yc, wc, hc, "8800FF00");
+					extui.DrawBorder(borderFrm, 0, 0, w, h, "88FF0000");
+					extui.DrawBorder(borderFrm, xc, yc, wc, hc, "8800FF00");
 				end
 				
 			else
-				--extui.DrawBorder(pic, 0, 0, w, h, "8800FF00");
+				extui.DrawBorder(borderFrm, 0, 0, w, h, "8800FF00");
 			end
 			
 		end
@@ -1135,20 +1166,36 @@ function extui.DrawGrid()
 	local pic = extui.GridFrame:GetChild("pic");
 	
 	AUTO_CAST(pic);
-	pic:FillClonePicture("22000000");
+	pic:RemoveAllChild();
 	
-	local gridColCount = extui.GridFrame:GetWidth()/extui.GridSize;
-	local gridRowCount = extui.GridFrame:GetHeight()/extui.GridSize;
+	
+	local gridWidth = extui.GridFrame:GetWidth();
+	local gridHeight = extui.GridFrame:GetHeight();
+	
+	local gridColCount = gridWidth/extui.GridSize;
+	local gridRowCount = gridHeight/extui.GridSize;
 	
 	for _gy=0, gridRowCount, 1 do
 	
-		pic:DrawBrush(0, extui.GridSize*_gy , extui.GridFrame:GetWidth(), (extui.GridSize*_gy)+1, "spray_1", "88FFFFFF");
+		local line = extui.GridFrame:CreateOrGetControl("picture", "aa"..tostring(_gy), 0, extui.GridSize*_gy, gridWidth, 1);
+		AUTO_CAST(line);
+		line:SetImage("fullwhite");
+		line:SetEnableStretch(1);
+		line:SetColorTone("88FFFFFF");
+	
+		--pic:DrawBrush(0, extui.GridSize*_gy , extui.GridFrame:GetWidth(), (extui.GridSize*_gy)+1, "spray_1", "88FFFFFF");
 	
 	end
 	
 	for _gx=0, gridColCount, 1 do
 	
-		pic:DrawBrush(extui.GridSize*_gx, 0, (extui.GridSize*_gx)+1, extui.GridFrame:GetHeight(), "spray_1", "88FFFFFF");
+		local line = extui.GridFrame:CreateOrGetControl("picture", "ab"..tostring(_gx), extui.GridSize*_gx, 0, 1, gridHeight);
+		AUTO_CAST(line);
+		line:SetImage("fullwhite");
+		line:SetEnableStretch(1);
+		line:SetColorTone("88FFFFFF");
+		
+		--pic:DrawBrush(extui.GridSize*_gx, 0, (extui.GridSize*_gx)+1, extui.GridFrame:GetHeight(), "spray_1", "88FFFFFF");
 	
 	end
 end
@@ -1165,23 +1212,21 @@ function extui.InitGrid()
 		extui.GridFrame = ui.CreateNewFrame("extendedui", "EXTENDEDUI_GRIDFRAME");
 		extui.GridFrame:Resize(option.GetClientWidth()*2, option.GetClientHeight()*2);
 		extui.GridFrame:MoveFrame(-1, -1);
-		extui.GridFrame:SetSkinName("None");
+		extui.GridFrame:SetSkinName("chat_window");
 		
 		extui.GridFrame:SetLayerLevel(-10000);
 		
 		local pic = extui.GridFrame:CreateOrGetControl("picture", "pic", 0, 0, extui.GridFrame:GetWidth(), extui.GridFrame:GetHeight());
 
-		--tolua.cast(pic, "ui::CPicture")
 		AUTO_CAST(pic);
 		pic:EnableHitTest(1);
-		--pic:CreateInstTexture();
 		
 	end
 	
 	
 	extui.GridFrame:ShowWindow(1);
 
-	--extui.DrawGrid();
+	extui.DrawGrid();
 end
 
 
@@ -1204,10 +1249,16 @@ function extui.resizeFrame(frameName, scale)
 	for i = 0, cnt - 1 do
 		local ctrl = frame:GetChildByIndex(i);
 		
-		local ctrlScaleW = ctrl:GetOriginalWidth() * (scale/100);
-		local ctrlScaleH = ctrl:GetOriginalHeight() * (scale/100);
+		local oWidth = ctrl:GetOriginalWidth();
+		local oHeight = ctrl:GetOriginalHeight();
 		
-		--ctrl:SetOffset(ctrl:GetX(), y);
+		local ctrlScaleW = oWidth * (scale/100);
+		local ctrlScaleH = oHeight * (scale/100);
+		
+		local offsetX = oWidth - ctrlScaleW;
+		local offsetY = oHeight - ctrlScaleH;
+		
+		ctrl:SetOffset(ctrl:GetX()-offsetX, ctrl:GetY()-offsetY);
 		
 		ctrl:Resize(ctrlScaleW, ctrlScaleH);
 	end
@@ -1312,7 +1363,6 @@ function extui.CheckForHovers()
 
 		toc:StopUpdateScript("EUI_PROCESS_MOVE_FRAME");
 		
-		
 	end
 end
 
@@ -1344,10 +1394,10 @@ function EUI_PROCESS_MOVE_FRAME(frame)
 		if extui.selectedChild ~= true then
 			frame:ShowWindow(frame:GetUserValue("EUI_OLD_VISIBLE"), true);
 		end
-		
-		extui.IsDragging = false;
-		frame:SetUserValue("EUI_IS_DRAGGING", 0);
-		frame:StopUpdateScript("EUI_PROCESS_MOVE_FRAME");
+
+			extui.IsDragging = false;
+			frame:SetUserValue("EUI_IS_DRAGGING", 0);
+			frame:StopUpdateScript("EUI_PROCESS_MOVE_FRAME");
 
 		return 0;
 	end
