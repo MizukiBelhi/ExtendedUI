@@ -263,7 +263,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame = extui.AddFrame("questinfoset_2", "Quest Log");
 	--euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("keypress", "Tapping Key");
-	euiFrame.saveHidden = true;
+	--euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("ctrltargetui", "CTRL Target Lock");
 	--euiFrame.saveHidden = true;
 	--euiFrame = euiAddon:AddFrame("weaponswap");
