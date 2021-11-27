@@ -322,8 +322,8 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	-- Fix by Sadlion, modified into a ternary by me	
     euiFrame = extui.AddFrame("minimized_event_progress_check_button", (IS_SEASON_SERVER() == "NO" and "Medina FLEX!" or "God Roulette"));
 	euiFrame.saveHidden = true;
-	euiFrame = extui.AddFrame("minimized_pvpmine_shop_button", "Mercenary Shop Button");
-	euiFrame.saveHidden = true;
+	--euiFrame = extui.AddFrame("minimized_pvpmine_shop_button", "Mercenary Shop Button");
+	--euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("openingameshopbtn", "TP Item Button");
 	euiFrame.noResize = false;
 	euiFrame.saveHidden = true;
