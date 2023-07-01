@@ -290,7 +290,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 					expFrame:Resize(1920,30);
 					expFrame:MoveFrame(0, 1050);
 				end;
-
+				
 	euiFrame = extui.AddFrame("playtime");
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("fps", "FPS");
@@ -299,26 +299,23 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.noResize = false;
 	euiFrame = extui.AddFrame("mini map");
     euiFrame.saveHidden = true;
-	
+
 	euiFrame = extui.AddFrame("mapareatext", "Minimap Area Text");
 	euiFrame.noResize = false;
     euiFrame.saveHidden = true;
 	euiFrame:AddChild("mapName", "Map Name");
 	euiFrame:AddChild("areaName", "Area Name");
-	
+
 	euiFrame = extui.AddFrame("minimap_outsidebutton", "Minimap Buttons");
     euiFrame.saveHidden = true;
     euiFrame = extui.AddFrame("time");
     euiFrame.saveHidden = true;
-    euiFrame = extui.AddFrame("minimizedeventbanner", "Event Button");
-    euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("minimized_tp_button", "TP Shop Button");
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("minimized_godprotection_button", "God Protect Button");
-	euiFrame = extui.AddFrame("minimized_housing_promote_board", "Personal Housing");
 	euiFrame = extui.AddFrame("minimized_guild_housing", "Guild Housing");
-	
-	
+
+
 	-- Fix by Sadlion, modified into a ternary by me	
     euiFrame = extui.AddFrame("minimized_event_progress_check_button", (IS_SEASON_SERVER() == "NO" and "Medina FLEX!" or "God Roulette"));
 	euiFrame.saveHidden = true;
@@ -329,6 +326,38 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("summonsinfo", "Summon Info");
 	euiFrame.noResize = false;
+
+
+	-- Update by Elec, frames mostly mined by Sadlion
+	euiFrame = extui.AddFrame("indun_reward_hud", "Level Dungeon Rate");
+	euiFrame = extui.AddFrame("chaseinfo", "Quest List");
+	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("minimized_fullscreen_navigation_menu_button", "Fullscreen Menu");
+	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("minimized_guidequest_button", "Grow Up");
+	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("coin_get_gauge", "Merc Badge Acquisition");
+	euiFrame.saveHidden = true;
+	euiFrame.noResize = false;
+
+	euiFrame = extui.AddFrame("minimized_total_shop_button", "Open Shops Button");
+	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("minimized_folding_button", "Open Shops Menu");
+	euiFrame = extui.AddFrame("minimized_pvpmine_shop_button", "Mercenary Badge Shop");
+	euiFrame = extui.AddFrame("minimized_certificate_shop_button", "Goddess Token Shop");
+	euiFrame = extui.AddFrame("minimized_market_button", "Market");
+
+	euiFrame = extui.AddFrame("minimized_total_board_button", "Open Boards Button");
+	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("minimized_folding_board", "Open Boards Menu");
+	euiFrame = extui.AddFrame("minimized_housing_promote_board", "Personal Housing Board");
+	euiFrame = extui.AddFrame("minimizedeventbanner", "News");
+
+	euiFrame = extui.AddFrame("minimized_total_party_button", "Open Party Button");
+	euiFrame.saveHidden = true;
+	euiFrame = extui.AddFrame("minimized_folding_party", "Open Party Menu");
+	euiFrame = extui.AddFrame("minimized_party_board", "Search Party");
+	euiFrame = extui.AddFrame("minimized_pilgrim_mode", "Pilgrim Info");
 end
 
 function extui.ForEachFrameN(func)
