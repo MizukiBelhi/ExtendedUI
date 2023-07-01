@@ -36,4 +36,4 @@ after_test:
 #-------------------------------#
 artifacts:
   - path: extendedui.ipf
-    name: extendedui--2.0.'{build}'.ipf
+    name: 'extendedui--2.0.{build}.ipf'
