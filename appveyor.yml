@@ -35,4 +35,5 @@ after_test:
 #    Artifacts configuration    #
 #-------------------------------#
 artifacts:
-  - path: extendedui--2.1.{build}.ipf
+  - path: extendedui.ipf
+    name: extendedui--2.0.'{build}'.ipf
