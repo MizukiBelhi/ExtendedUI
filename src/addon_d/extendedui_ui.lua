@@ -22,27 +22,29 @@ function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	end
 end
 
-function EXTENDEDUI_ON_CHECK_HIDECHILD(frame, ctrl, argStr)
-	local frm = ui.GetFrame(argStr);
-	if frm == nil then
-		return;
-	end
 
+function EXTENDEDUI_ON_CHECK_HIDECHILD(frame, ctrl, argStr)
+	local s, bl = pcall(EXTENDEDUI_ON_CHECK_HIDECHILD_S, frame, ctrl, argStr);
+	if not(s) then
+		extui.print("[EUI] EXTENDEDUI_ON_CHECK_HIDECHILD(): "..bl);
+	end
+end
+
+function EXTENDEDUI_ON_CHECK_HIDECHILD_S(frame, ctrl, argStr)
 	if extui.selectedFrame == nil then
 		return;
 	end
 	
-	local tcc = frm.GetChild(extui.selectedFrame:GetName());
+	local tcc = extui.selectedFrame;
 	if tcc == nil then
 		return;
 	end
 	
 	tcc:SetVisible(ctrl:IsChecked());
 
-	local eframe = extui.GetFrame(argStr);
-	if eframe then
-		extui.framepos[tostring(argStr)]["child"][tostring(c)]["isHidden"] = ctrl:IsChecked();
-	end
+
+	extui.framepos[argStr]["child"][tcc:GetName()]["isHidden"] = ctrl:IsChecked();
+
 end
 
 function EXTENDEDUI_ON_CHECK_UPDATE(frame, ctrl, argStr)
