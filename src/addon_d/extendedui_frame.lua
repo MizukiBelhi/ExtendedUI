@@ -94,6 +94,7 @@ function extui_Frame:AddChild(child, displayName)
 				["name"] = string.gsub(displayName or child, "(%a)([%w_']*)", function(a,b) return a:upper()..b:lower(); end),
 				["isMovable"] = true,
 				["frameName"] = child,
+				["isHidden"] = false,
 			};
 	end
 end
@@ -596,6 +597,8 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			if not(extui.firstStart) then
 				extui.defaultFrames[tostring(k)]["child"][tostring(ck)] = extui.framepos[tostring(k)]["child"][tostring(ck)];
 			end
+			extui.defaultFrames[tostring(k)]["child"][tostring(ck)]["isHidden"] = not tcc:IsVisible()
+			
 			hasNew = true;
 		end,
 		function(k,v,ck,cv,toc,tcc)
@@ -617,6 +620,8 @@ function EXTENDEDUI_LOAD_POSITIONS()
 			if k == "buff" then
 				extui.UpdateBuffSizes(ck, true);
 			end
+
+			tcc:ShowWindow(extui.framepos[tostring(k)].hidden, extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
 
 		end,
 		function(k,v,ck,cv,toc,tcc)
@@ -897,6 +902,9 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 					if k == "buff" then
 						extui.UpdateBuffSizes(ck, true);
 					end
+
+					tcc:ShowWindow(extui.framepos[tostring(k)].hidden, extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
+
 				end
 			end
 		end
