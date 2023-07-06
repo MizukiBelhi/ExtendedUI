@@ -903,7 +903,7 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 						extui.UpdateBuffSizes(ck, true);
 					end
 
-					tcc:SetVisible(extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
+					tcc:SetVisible(extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"] or 1);
 
 				end
 			end
