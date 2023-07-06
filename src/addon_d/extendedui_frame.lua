@@ -242,6 +242,7 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame:AddChild("buffcountslot_sub", "Buffs From Others");
 	euiFrame:AddChild("buffslot", "Unaffected Buffs");
 	euiFrame:AddChild("debuffslot", "Debuffs");
+	euiFrame:AddChild("debuffminimizebutton", "Minimize Button");
 
 
 	extui.AddFrame("fevorcombo", "Fever Combo");
@@ -338,7 +339,8 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame.saveHidden = true;
 	euiFrame = extui.AddFrame("coin_get_gauge", "Merc Badge Acquisition");
 	euiFrame.saveHidden = true;
-	euiFrame.noResize = false;
+	euiFrame = extui.AddFrame("buff_separatedlist", "Separated Buffs");
+	euiFrame.saveHidden = true;
 
 	euiFrame = extui.AddFrame("minimized_total_shop_button", "Open Shops Button");
 	euiFrame.saveHidden = true;
