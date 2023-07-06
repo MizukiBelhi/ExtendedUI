@@ -22,6 +22,30 @@ function EXTENDEDUI_ON_CHECK_HIDE(frame, ctrl, argStr)
 	end
 end
 
+function EXTENDEDUI_ON_CHECK_HIDECHILD(frame, ctrl, argStr)
+	local frm = ui.GetFrame(argStr);
+	if frm == nil then
+		return;
+	end
+
+	if extui.selectedFrame == nil then
+		return;
+	end
+	
+	local tcc = frm.GetChild(extui.selectedFrame.GetName());
+	if tcc == nil then
+		return;
+	end
+	
+	tcc:SetVisible(ctrl:IsChecked());
+
+	local eframe = extui.GetFrame(argStr);
+	if eframe then
+		extui.framepos[tostring(argStr)]["child"][tostring(c)]["isHidden"] = ctrl:IsChecked();
+	end
+end
+tcc:ShowWindow(extui.framepos[tostring(k)].hidden, extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
+
 function EXTENDEDUI_ON_CHECK_UPDATE(frame, ctrl, argStr)
 	local frm = ui.GetFrame(argStr);
 	local chk = ctrl:IsChecked();
@@ -745,7 +769,22 @@ function extui.MiniCreateSliderForFrame(inx, iny, gbox, v)
 			ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_FRAME_RESET");
 			ctrls:SetEventScriptArgString(ui.LBUTTONUP, frame:GetName());
 			ctrls:SetSkinName("test_pvp_btn");
+		
 		end
+
+	else
+		iny = iny+25
+		ctrls = gbox:CreateOrGetControl("checkbox", "extuicheckvisc", inx+10, iny, 150, 30);
+		ctrls = tolua.cast(ctrls, "ui::CCheckBox");
+		ctrls:SetText("{@st42b}"..extui.TLang("showFrame").."{/}");
+		ctrls:SetClickSound("button_click_big");
+		ctrls:SetOverSound("button_over");
+		ctrls:SetEventScript(ui.LBUTTONUP, "EXTENDEDUI_ON_CHECK_HIDECHILD");
+		ctrls:SetEventScriptArgString(ui.LBUTTONUP, frame:GetName());
+		ctrls:SetCheck(cframe:IsVisible());
+
+		ctrls:SetColorTone("FF00FF00");
+		ctrls:SetTextTooltip("{@st42b}"..extui.TLang("vistrue").."{/}");
 
 	end
 end
