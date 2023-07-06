@@ -44,7 +44,6 @@ function EXTENDEDUI_ON_CHECK_HIDECHILD(frame, ctrl, argStr)
 		extui.framepos[tostring(argStr)]["child"][tostring(c)]["isHidden"] = ctrl:IsChecked();
 	end
 end
-tcc:ShowWindow(extui.framepos[tostring(k)].hidden, extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
 
 function EXTENDEDUI_ON_CHECK_UPDATE(frame, ctrl, argStr)
 	local frm = ui.GetFrame(argStr);
