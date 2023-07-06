@@ -621,7 +621,7 @@ function EXTENDEDUI_LOAD_POSITIONS()
 				extui.UpdateBuffSizes(ck, true);
 			end
 
-			tcc:ShowWindow(extui.framepos[tostring(k)].hidden, extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
+			tcc:SetVisible(extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
 
 		end,
 		function(k,v,ck,cv,toc,tcc)
@@ -903,7 +903,7 @@ function EXTENDEDUI_FULLFRAME_UPDATE(frame)
 						extui.UpdateBuffSizes(ck, true);
 					end
 
-					tcc:ShowWindow(extui.framepos[tostring(k)].hidden, extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
+					tcc:SetVisible(extui.framepos[tostring(k)]["child"][tostring(ck)]["isHidden"]);
 
 				end
 			end
