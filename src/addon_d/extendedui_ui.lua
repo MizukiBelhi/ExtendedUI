@@ -32,7 +32,7 @@ function EXTENDEDUI_ON_CHECK_HIDECHILD(frame, ctrl, argStr)
 		return;
 	end
 	
-	local tcc = frm.GetChild(extui.selectedFrame.GetName());
+	local tcc = frm.GetChild(extui.selectedFrame:GetName());
 	if tcc == nil then
 		return;
 	end
