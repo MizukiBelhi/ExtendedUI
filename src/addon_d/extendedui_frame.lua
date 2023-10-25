@@ -360,6 +360,9 @@ function EXTENDEDUI_ON_FRAME_LOADS()
 	euiFrame = extui.AddFrame("minimized_folding_party", "Open Party Menu");
 	euiFrame = extui.AddFrame("minimized_party_board", "Search Party");
 	euiFrame = extui.AddFrame("minimized_pilgrim_mode", "Pilgrim Info");
+
+	euiFrame = extui.AddFrame("minimized_popoboost_2023", "Popo Boost");
+	euiFrame.saveHidden = true;
 end
 
 function extui.ForEachFrameN(func)
