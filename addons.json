@@ -4,10 +4,10 @@
 		"name" : "ExtendedUI-2",
 		"file" : "extendedui",
 		"extension" : "ipf",
-		"fileVersion" : "v2.1.10",
-		"releaseTag" : "2.1.10",
+		"fileVersion" : "v2.1.11",
+		"releaseTag" : "2.1.11",
 		"unicode" : "⚗",
-		"description" : "Restores FPS and Grid, see github for notes.<br>Supported Languages: English, German, Chinese, Portuguese, Polish, Japanese",
+		"description" : "See github for notes.<br>Supported Languages: English, German, Chinese, Portuguese, Polish, Japanese",
 		"tags" : [
 			"ui",
 			"extension",
