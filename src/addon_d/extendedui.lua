@@ -81,6 +81,131 @@ function EXTENDEDUI_ON_INIT(addon, frame)
 	
 	extui.doFirstPositionLoad = false;
 
+	if _G["CTRLSET_CREATE_EXTOLD"] == nil then
+		_G["CTRLSET_CREATE_EXTOLD"] = _G["CTRLSET_CREATE"];
+		_G["CTRLSET_CREATE"] = function(frame, handle, buff, buffCls, buffIndex, buffID)
+			if frame ~= nil then
+				frame:ShowWindow(1);
+			end
+
+			local gbox = GET_CHILD_RECURSIVELY(frame, "buffGBox");
+			if gbox == nil then
+				return;
+			end
+
+			if handle == nil then
+				return; 
+			end
+
+			local colCnt = tonumber(frame:GetUserConfig("COL_COUNT"));
+			local row = tonumber(frame:GetUserConfig("BUFF_ROW"));
+			local col = tonumber(frame:GetUserConfig("BUFF_COL"));
+
+			if col % colCnt == 0 and col >= colCnt then
+				col = 0;
+				row = row + 1;
+				frame:SetUserConfig(row_configname, row);
+			end     
+
+			local ctrlSet = gbox:CreateOrGetControlSet("bufficon_slot", "BUFFSLOT_buff"..buffID, 0, 0);
+			if ctrlSet == nil then
+				return;
+			end
+			
+			col = col + 1;
+			frame:SetUserConfig(col_configname, col);
+
+			local slotsize = extui.GetSetting("iconsize");
+			ctrlSet:Resize(slotsize,slotsize);
+			
+
+			local slot = GET_CHILD_RECURSIVELY(ctrlSet, "slot");
+			local caption = GET_CHILD_RECURSIVELY(ctrlSet, "caption");
+			if slot ~= nil and caption ~= nil then
+				local icon = CreateIcon(slot);
+				local iconImageName = GET_BUFF_ICON_NAME(buffCls);
+				if iconImageName == "icon_ability_Warrior_Hoplite39" then
+					iconImageName = "ability_Warrior_Hoplite39";    
+				end
+				
+				slot:Resize(slotsize,slotsize);
+
+				icon:SetDrawCoolTimeText(0);
+				icon:Set(iconImageName, "BUFF", buffID, 0);
+				if buffIndex ~= nil then
+					icon:SetUserValue("BuffIndex", buffIndex);
+				end             
+
+				local bufflockoffset = tonumber(frame:GetUserConfig("DEFAULT_BUFF_LOCK_OFFSET"));
+				local buffGroup1 = TryGetProp(buffCls, "Group1", "Buff");
+				local IsRemove = TryGetProp(buffCls, "RemoveBySkill", "NO");
+				if buffGroup1 == "Debuff" and IsRemove == "YES" then
+					local bufflv = TryGetProp(buffCls, "Lv", "99");
+					if bufflv <= 3 then
+						slot:SetBgImage("buff_lock_icon_3");
+					elseif bufflv == 4 then
+						slot:SetBgImage("buff_lock_icon_4");
+					end
+					slot:SetBgImageSize(slot:GetWidth() + bufflockoffset, slot:GetHeight() + bufflockoffset);
+				end
+
+				if buff.over > 1 then
+					slot:SetText('{s13}{ol}{b}'..buff.over, 'count', ui.RIGHT, ui.BOTTOM, -5, -3);
+				else
+					slot:SetText("");
+				end
+
+				if slot:GetTopParentFrame():GetName() ~= "targetbuff" then
+					slot:SetEventScript(ui.RBUTTONUP, 'REMOVE_BUF');
+					slot:SetEventScriptArgNumber(ui.RBUTTONUP, buffID);
+				end 
+
+				slot:EnableDrop(0);
+				slot:EnableDrag(0);
+
+				caption:ShowWindow(1);
+				caption:SetText(GET_BUFF_TIME_TXT(buff.time, 0));
+
+				local targetinfo = info.GetTargetInfo(handle);
+				if targetinfo ~= nil then
+					if targetinfo.TargetWindow == 0 then
+						slot:ShowWindow(0); 
+					else
+						slot:ShowWindow(1);
+					end
+				else
+					slot:ShowWindow(1);
+				end
+
+				if buffCls.ClassName == "Premium_Nexon" or buffCls.ClassName == "Premium_Token" then
+					icon:SetTooltipType("premium");
+					icon:SetTooltipArg(handle, buffID, buff.arg1);
+				else
+					icon:SetTooltipType("buff");
+					if buffIndex ~= nil then
+						icon:SetTooltipArg(handle, buffID, buffIndex);
+					end
+				end
+
+				slot:Invalidate();
+			end
+
+			local offsetX = tonumber(frame:GetUserConfig("DEFAULT_SLOT_X_OFFSET"));
+			local offsetY = tonumber(frame:GetUserConfig("DEFAULT_SLOT_Y_OFFSET"));
+			local gboxAdd = tonumber(frame:GetUserConfig("GBOX_ADD"));
+			local defaultwidth = tonumber(frame:GetUserConfig("DEFAULT_GBOX_WIDTH"));
+			BUFF_SEPARATEDLIST_CTRLSET_GBOX_AUTO_ALIGN(gbox, 10, offsetX, gboxAdd, defaultwidth, true, offsetY, true);
+			
+			local nCol = colCnt;
+			if row < 2 then
+				nCol = 1;
+			end
+			gbox:Resize((nCol*extui.GetSetting("iconsize")) + 15, (row+1) * extui.GetSetting("iconsize"));
+			frame:Resize((nCol*extui.GetSetting("iconsize")) + 15, (row+1) * extui.GetSetting("iconsize"));
+			gbox:Invalidate();
+		end;
+	end
+
 	if _G["_PUMP_RECIPE_OPEN_EXTOLD"] == nil then
 		_G["_PUMP_RECIPE_OPEN_EXTOLD"] = _G["_PUMP_RECIPE_OPEN"];
 		_G["_PUMP_RECIPE_OPEN"] = function(...) 
